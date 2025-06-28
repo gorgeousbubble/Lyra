@@ -1,56 +1,57 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       MK6X_GPIO.c
- * @brief      MK66FX1M0VLQ18/MK66FN2M0VLQ18/MK64FX512VLQ12/MK64FN1M0VLQ12
- * @author     Alopex
+ * @file       gpio.c
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
  * @version    v1.0
- * @date       2016-09-24
+ * @date       2025-06-24
  */
 
 #include "gpio.h"
+#include "conf.h"
 
 /*
-**GPIO基址指针
+**GPIO base address pointer
 */
 GPIO_MemMapPtr GPIOX[PORT_PTX_MAX]=
 {
-  PTA_BASE_PTR,//PTA基址指针
-  PTB_BASE_PTR,//PTB基址指针
-  PTC_BASE_PTR,//PTC基址指针
-  PTD_BASE_PTR,//PTD基址指针
-  PTE_BASE_PTR,//PTE基址指针
+  PTA_BASE_PTR,//PTA base address pointer
+  PTB_BASE_PTR,//PTB base address pointer
+  PTC_BASE_PTR,//PTC base address pointer
+  PTD_BASE_PTR,//PTD base address pointer
+  PTE_BASE_PTR,//PTE base address pointer
 };
 
 /*
- *  @brief      初始化GPIO
- *  @param      PTXn            PTXx    端口
- *  @param      GPIO_CFG        CFG     引脚方向,0=输入,1=输出
- *  @param      uint8           DATA    输出初始状态,0=低电平,1=高电平(对输入无效)
+ *  @brief      GPIO Init
+ *  @param      PTXn            PTXx    port
+ *  @param      GPIO_CFG        CFG     port data direction,0=output,1=input
+ *  @param      uint8           DATA    output status,0=low level,1=high level(input invalidate)
  *  @since      v1.0
- *  Sample usage:       GPIO_Init(PTA8, GPI,0);    //初始化 PTA8 管脚为输入
+ *  Sample usage:       GPIO_Init(PTA8, GPI,0);    //Init PTA8 port as input
  */
 void GPIO_Init(PTXn PTXx,GPIO_CFG CFG,uint8 DATA)
 {
-  PORT_Init(PTXx,ALT1);//初始化为GPIO
+  PORT_Init(PTXx,ALT1);//Init GPIO
   
   if(CFG == GPI)//GPIO Input
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDDR 管脚号 清0，即对应管脚配置为端口方向输入
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDDR port number clear to 0, GPIO port as input direction
   }
   else//GPIO Output
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDDR 管脚号 置1，即对应管脚配置为端口方向输出
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDDR port number set to 1, GPIO port as output direction
     
-    if(DATA == 0)//低电平
+    if(DATA == 0)//low level
     {
-      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDOR 管脚号 清0，即对应管脚配置为端口输出低电平
+      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDOR port number clear to 0, GPIO port as low level output
     }
-    else//高电平
+    else//high level
     {
-      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDOR 管脚号 置1，即对应管脚配置为端口输出高电平
+      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDOR port number set to 1, GPIO port as high level output
     }
     
   }
@@ -58,68 +59,68 @@ void GPIO_Init(PTXn PTXx,GPIO_CFG CFG,uint8 DATA)
 }
 
 /*
- *  @brief      设置引脚数据方向
- *  @param      PTXn            PTXx    端口
- *  @param      GPIO_CFG        CFG     引脚方向,0=输入,1=输出
+ *  @brief      set GPIO port data direction
+ *  @param      PTXn            PTXx    port number
+ *  @param      GPIO_CFG        CFG     port direction,0=input,1=output
  *  @since      v1.0
- *  Sample usage:       GPIO_DDR(PTA8, GPI);    //设置 PTA8 管脚为输入
+ *  Sample usage:       GPIO_DDR(PTA8, GPI);    //set PTA8 port as input
  */
 void GPIO_DDR(PTXn PTXx,GPIO_CFG CFG)
 {
   if(CFG == GPI)
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDDR 管脚号 清0，即对应管脚配置为端口方向输入
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDDR port number clear to 0, GPIO port as input direction
   }
   else
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDDR 管脚号 置1，即对应管脚配置为端口方向输出
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDDR port number set to 1, GPIO port as output direction
   }
 }
 
 /*
- *  @brief      设置引脚状态
- *  @param      PTXn     PTXx    端口
- *  @param      uint8    DATA    输出初始状态,0=低电平,1=高电平(对输入无效)
+ *  @brief      set GPIO port status
+ *  @param      PTXn     PTXx    port
+ *  @param      uint8    DATA    output status, 0=low level,1=high level (input invalidate)
  *  @since      v1.0
- *  @warning    务必保证数据方向为输出(DEBUG模式下,有断言进行检测)
- *  Sample usage:       GPIO_Set(PTA8, 1);    // PTA8 管脚 输出 1
+ *  @warning    should ensure port data direction is output(assert enable in debug mode)
+ *  Sample usage:       GPIO_Set(PTA8, 1);    // PTA8 port output high level
  */
 void GPIO_Set(PTXn PTXx,uint8 DATA)
 {
   ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)),PORT_PTn(PTXx)) == GPO);
   
-  if(DATA == 0)//低电平
+  if(DATA == 0)//low level
   {
-    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDOR 管脚号 清0，即对应管脚配置为端口输出低电平
+    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDOR port number clear to 0, GPIO port output low level
   }
-  else//高电平
+  else//high level
   {
-    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDOR 管脚号 置1，即对应管脚配置为端口输出高电平
+    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDOR port number set to 1, GPIO port output high level
   }
 }
 
 /*
- *  @brief      反转引脚状态
- *  @param      PTXn    PTXx    端口
+ *  @brief      turn GPIO status
+ *  @param      PTXn    PTXx    port
  *  @since      v1.0
- *  @warning    务必保证数据方向为输出(DEBUG模式下,有断言进行检测)
- *  Sample usage:       GPIO_Turn(PTA8);    // PTA8 管脚 输出 反转
+ *  @warning    should ensure port data direction is output(assert enable in debug mode)
+ *  Sample usage:       GPIO_Turn(PTA8);    // PTA8 port output turn
  */
 void GPIO_Turn(PTXn PTXx)
 {
   ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)),PORT_PTn(PTXx)) == GPO);
   
-  GPIO_PTOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//管脚配置为端口输出反转
+  GPIO_PTOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//GPIO port turn
 
 }
 
 /*
- *  @brief      读取引脚输入状态
- *  @param      PTXn    PTXx    端口
- *  @return     管脚的状态,1为高电平,0为低电平
+ *  @brief      get GPIO status
+ *  @param      PTXn    PTXx    port
+ *  @return     GPIO port status, 1 high level, 0 low level
  *  @since      v1.0
- *  @warning    务必保证数据方向为输入(DEBUG模式下，有断言进行检测)
- *  Sample usage:       uint8 GPIO_DATA = GPIO_Get(PTA8);    // 获取 PTA8 管脚 输入电平
+ *  @warning    should ensure port data direction is output(assert enable in debug mode)
+ *  Sample usage:       uint8 GPIO_DATA = GPIO_Get(PTA8);    // get PTA8 pport input
  */
 uint8 GPIO_Get(PTXn PTXx)
 {

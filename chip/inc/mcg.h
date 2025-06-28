@@ -3,7 +3,7 @@
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       mcg.c
+ * @file       mcg.h
  * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
  * @author     alopex
  * @version    v1.0
@@ -16,7 +16,7 @@
 #include "common.h"
 
 /*
-**PLL锁相环(PLL频率)
+**PLL phase-locked loop (PLL frequency)
 */
 typedef enum
 {
@@ -67,7 +67,7 @@ typedef enum
 }PLLn;
 
 /*
-**PLL分频因子结构体
+**PLL frequency division factor structure
 */
 typedef struct
 {
@@ -77,7 +77,7 @@ typedef struct
 }MCG_PLL_DIV;
 
 /*
-**SIM时钟分频因子结构体
+**SIM clock division factor structure
 */
 typedef struct
 {

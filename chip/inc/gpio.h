@@ -1,13 +1,13 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       MK6X_GPIO.h
- * @brief      MK66FX1M0VLQ18/MK66FN2M0VLQ18/MK64FX512VLQ12/MK64FN1M0VLQ12
- * @author     Alopex
+ * @file       gpio.h
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
  * @version    v1.0
- * @date       2016-09-24
+ * @date       2025-06-24
  */
 
 #ifndef __GPIO_H__
@@ -17,24 +17,24 @@
 #include "port.h"
 
 /*
-**枚举定义GPIO管脚方向(输入,输出)
+**define enum GPIO port data direction (input, output)
 */
 typedef enum
 {
-  GPI,          //GPIO Input(GPIO输入)
-  GPO,          //GPIO Output(GPIO输出)
+  GPI,          //GPIO Input
+  GPO,          //GPIO Output
 }GPIO_CFG;
 
 #define HIGH    1u
 #define LOW     0u
 
-#define GPIOX_BASE(PTxn)    GPIOX[PORT_PTX(PTxn)]       //GPIO模块的基址指针
+#define GPIOX_BASE(PTxn)    GPIOX[PORT_PTX(PTxn)]       //GPIO base address pointer
 
 /*
-**GPIO端口设置宏
+**GPIO port related macro
 */
-#define GPIO_SET(PTxn,x)        GPIO_SET_##x(PTxn)      //x是输出电平,只能为0或1,0:低电平,1:高电平
-#define GPIO_DDRX(PTxn,x)       GPIO_DDRX_##x(PTxn)     //x是管脚方向,只能为0或1,0:输入,1:输出
+#define GPIO_SET(PTxn,x)        GPIO_SET_##x(PTxn)      //x should be 0 or 1 in output, 0: low level, 1: high level
+#define GPIO_DDRX(PTxn,x)       GPIO_DDRX_##x(PTxn)     //x stand for port data direction, should be 0 or 1,0: input, 1: output
 #define GPIO_TURN(PTxn)         GPIO_PTOR_REG(GPIOX_BASE(PTxn)) |= (1 << PORT_PTn(PTxn))
 #define GPIO_GET(PTxn)          ((GPIO_PDIR_REG(GPIOX_BASE(PTxn)) >> PORT_PTn(PTxn)) & 0x01)
 

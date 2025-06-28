@@ -13,9 +13,9 @@
 #include "main.h"
 
 /*
- *  @brief      main
- *  @note       main function
- *  @since      v1.0
+ *  @brief              main
+ *  @note               main function
+ *  @since              v1.0
  *  Sample usage:       void main(void)
  */
 void main(void)

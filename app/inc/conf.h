@@ -16,21 +16,21 @@
 #include "common.h"
 
 /*
-**晶振频率OSC(50MHz)
+**OSC crystal oscillator(50MHz)
 */
 #define EXTAL_IN_MHz            50
 
 /*
-**PLL锁相环频率设置宏
+**PLL phase locked loop frequency
 */
-#define MK64_CORE_PLL_CLK       PLL120          //内核PLL频率(PLL150-PLL180比较稳定,建议PLL150)
+#define MK64_CORE_PLL_CLK       PLL120          //PLL core frequency (PLL150-PLL180 is stable, suggest use PLL150)
 
-#define MK64_CORE_CLK           120             //内核时钟频率
-#define MK64_BUS_CLK             60             //总线时钟频率
-#define MK64_FLEX_CLK            30             //FLEX时钟频率
-#define MK64_FLASH_CLK           30             //FLASH时钟频率
+#define MK64_CORE_CLK           120             //core clock frequency
+#define MK64_BUS_CLK             60             //bus clock frequency
+#define MK64_FLEX_CLK            30             //flex clock frequency
+#define MK64_FLASH_CLK           30             //flash clock frequency
 /*
-**SIM分频因子设置
+**SIM division factors
 */
 #define MK64_CORE_DIV   0
 #define MK64_BUS_DIV    1
@@ -38,18 +38,18 @@
 #define MK64_FLASH_DIV  3
 
 /*
-**DWT延时
+**DWT delay
 */
 #define DELAY_MS(ms)    DWT_Delay_ms(ms)
 #define DELAY_US(us)    DWT_Delay_us(us)
 
 /*
-**选择是否输出调试信息，不输出则注释下面的宏定义
+**select whether printout debug information
 */
 #define DEBUG_PRINT
 
 /*
-**配置断言和其实现函数
+**configure assert and implement function
 */
 void assert_failed(char *, int);
 
@@ -62,10 +62,10 @@ void assert_failed(char *, int);
 #endif
           
 /*
-**配置调试输出函数
+**configure debug printout function
 */
 #if( defined(DEBUG) && defined(DEBUG_PRINT))
-#define DEBUG_PRINTF(FORMAT,...)        do{printf(FORMAT,##__VA_ARGS__);}while(0)	/*无需打印调试信息时，请将宏内容注释掉*/
+#define DEBUG_PRINTF(FORMAT,...)        do{printf(FORMAT,##__VA_ARGS__);}while(0)	/*please comment when don't need to printout debug information*/
 #else
 #define DEBUG_PRINTF(FORMAT,...)
 #endif

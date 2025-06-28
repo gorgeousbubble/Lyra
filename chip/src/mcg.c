@@ -14,7 +14,7 @@
 #include "mcg.h"
 
 /*
-**PLL锁相环频率结构体数组(EXTAL_50MHz)(MCGOUTCLK=(EXTAL_50MHz/(PRCIV+1)*(VDIV+16)/2))
+**PLL phase locked loop frequency array (EXTAL_50MHz)(MCGOUTCLK=(EXTAL_50MHz/(PRCIV+1)*(VDIV+16)/2))
 */
 MCG_PLL_DIV MCG_PLL[PLLMAX]=
 {
@@ -64,19 +64,19 @@ MCG_PLL_DIV MCG_PLL[PLLMAX]=
 };
 
 /*
-**SIM时钟分频结构体
+**SIM clock division structure
 */
 MCG_SIM_DIV MCG_DIV=
 {
-  MK64_CORE_DIV,        //内核分频因子
-  MK64_BUS_DIV,         //总线分频因子
-  MK64_FLEX_DIV,        //Flex分频因子
-  MK64_FLASH_DIV        //Flash分频因子
+  MK64_CORE_DIV,        //core frequency factor
+  MK64_BUS_DIV,         //bus frequency factor
+  MK64_FLEX_DIV,        //flex frequency factor
+  MK64_FLASH_DIV        //flash frequency factor
 };
 
 /*
- *  @brief      MCG 分频设置
- *  @param      PLLn    PLL锁相环时钟频率设置(选择PLL配置)
+ *  @brief      MCG division configure
+ *  @param      PLLn    PLL phase locked loop frequency
  *  @since      v1.0
  */
 void MCG_DIV_Count(PLLn PLLx)
@@ -85,9 +85,9 @@ void MCG_DIV_Count(PLLn PLLx)
   
   ASSERT(PLLx < PLLMAX);
   
-  MCG_PLL_Clock = MCG_PLL[PLLx].PLL_CLK;//选择相应PLL配置时钟
+  MCG_PLL_Clock = MCG_PLL[PLLx].PLL_CLK;//select PLL configure clock
   
-  //内核分频(CORE_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV1+1))
+  //core division (CORE_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV1+1))
   if(MCG_PLL_Clock <= MK64_CORE_CLK)
   {
     MCG_DIV.SIM_CORE_DIV = 0;//PLL_CLK/1
@@ -153,7 +153,7 @@ void MCG_DIV_Count(PLLn PLLx)
     MCG_DIV.SIM_CORE_DIV = 15;//PLL_CLK/16
   }
   
-  //总线分频(BUS_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV2+1))
+  //bus division (BUS_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV2+1))
   if(MCG_PLL_Clock <= MK64_BUS_CLK)
   {
     MCG_DIV.SIM_BUS_DIV = 0;//PLL_CLK/1
@@ -219,7 +219,7 @@ void MCG_DIV_Count(PLLn PLLx)
     MCG_DIV.SIM_BUS_DIV = 15;//PLL_CLK/16
   }
   
-  //FLEX分频(FLEX_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV3+1))
+  //flex division (FLEX_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV3+1))
   if(MCG_PLL_Clock <= MK64_FLEX_CLK)
   {
     MCG_DIV.SIM_FLEX_DIV = 0;//PLL_CLK/1
@@ -285,7 +285,7 @@ void MCG_DIV_Count(PLLn PLLx)
     MCG_DIV.SIM_FLEX_DIV = 15;//PLL_CLK/16
   }
   
-  //FLASH分频(FLASH_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV3+1))
+  //flash division (FLASH_CLK=PLL_CLK/(SIM_CLKDIV1_OUTDIV3+1))
   if(MCG_PLL_Clock <= MK64_FLASH_CLK)
   {
     MCG_DIV.SIM_FLASH_DIV = 0;//PLL_CLK/1
@@ -354,12 +354,12 @@ void MCG_DIV_Count(PLLn PLLx)
 }
 
 /*
- *  @brief      PLL锁相环频率设置
- *  @param      PLLn       频率设置参数
- *  @return     PLL频率（MHz）
+ *  @brief      PLL phase locked loop frequency configure
+ *  @param      PLLn    frequency parameter
+ *  @return     PLL     frequency
  *  @since      v1.0
- *  @warning    此函数只能在 复位后没进行任何频率设置情况下调用，即MCG在FEI模式下才可调用
- *  Sample usage:       uint8 PLL_CLK=PLL_Init(PLL180)//设置PLL180
+ *  @warning    this function only can be called after reset, MCG under FEI mode
+ *  Sample usage:       uint8 PLL_CLK=PLL_Init(PLL180)//set PLL180
  */
 uint8 PLL_Init(PLLn PLLx)
 {
@@ -368,19 +368,19 @@ uint8 PLL_Init(PLLn PLLx)
   
   MCG_DIV_Count(PLLx);
   
-  //Reset进入FEI模式,FEI->FBE(FLL内部时钟源模式->FLL旁路外部时钟源模式)
-  MCG_C2 &= ~MCG_C2_LP_MASK;    //旁路模式下允许PLL
-  MCG_C2 |= MCG_C2_RANGE(1);    //OSC晶体振荡器选择高频率范围(3-8MHz)
+  //Reset into FEI mode, FEI->FBE(FLL internal clock source mode -> FLL bypass external clock source mode)
+  MCG_C2 &= ~MCG_C2_LP_MASK;    //bypass mode allow PLL
+  MCG_C2 |= MCG_C2_RANGE(1);    //OSC crystal oscillator selects high frequency range(3-8MHz)
   
-  MCG_C1 &= ~MCG_C1_IREFS_MASK; //选择外部参考时钟
-  MCG_C1 |= MCG_C1_CLKS(2);     //选择外部参考时钟
-  MCG_C1 |= MCG_C1_FRDIV(7);    //参考时钟分频1536,50MHz/1536=33.33KHz(31.25KHz-39.0625KHz)
+  MCG_C1 &= ~MCG_C1_IREFS_MASK; //select external reference clock
+  MCG_C1 |= MCG_C1_CLKS(2);     //select external reference clock
+  MCG_C1 |= MCG_C1_FRDIV(7);    //reference clock division 1536,50MHz/1536=33.33KHz(31.25KHz-39.0625KHz)
   
-  while(MCG_S & MCG_S_IREFST_MASK);     //等待使用外部参考时钟
-  while(((MCG_S & MCG_S_CLKST_MASK) >> MCG_S_CLKST_SHIFT) != 0x2);      //等待选择外部参考时钟
+  while(MCG_S & MCG_S_IREFST_MASK);     //waiting to use external reference clock
+  while(((MCG_S & MCG_S_CLKST_MASK) >> MCG_S_CLKST_SHIFT) != 0x2);      //waiting for selection of external reference clock
   
-  //进入FBE模式(FLL旁路时钟源模式)
-  //FBE->PBE(FLL旁路外部时钟源模式->PLL旁路外部时钟源模式)
+  //enter FBE mode (FLL bypass clock source mode)
+  //FBE ->PBE (FLL bypass external clock source mode -> PLL bypass external clock source mode)
   Temp_Reg = FMC_PFAPR;
   
   FMC_PFAPR |= FMC_PFAPR_M7PFD_MASK | FMC_PFAPR_M6PFD_MASK | FMC_PFAPR_M5PFD_MASK
@@ -394,19 +394,19 @@ uint8 PLL_Init(PLLn PLLx)
   
   FMC_PFAPR = Temp_Reg;
   
-  //设置PRDIV和VDIV分频因子
+  //set PRDIV and VDIV division factors
   MCG_C5 |= MCG_C5_PRDIV0(MCG_PLL[PLLx].PLL_PRDIV);     //EXTAL_MHz/(PRDIV+1) (8-16MHz)
   MCG_C6 |= MCG_C6_VDIV0(MCG_PLL[PLLx].PLL_VDIV);       //EXTAL_MHz/(PRDIV+1)*(VDIV+16)
   MCG_C6 |= MCG_C6_PLLS_MASK;                           //PLL Enable
   
-  while(!(MCG_S & MCG_S_PLLST_MASK));                   //等待PLL时钟源选择
-  while(!(MCG_S & MCG_S_LOCK0_MASK));                   //等待PLL锁定
+  while(!(MCG_S & MCG_S_PLLST_MASK));                   //waiting for PLL clock source selection
+  while(!(MCG_S & MCG_S_LOCK0_MASK));                   //waiting for PLL lock
   
-  //进入PBE模式(PLL旁路时钟源模式)
-  //PBE->PEE(PLL旁路时钟源模式->PLL外部时钟源模式)
-  MCG_C1 &= ~MCG_C1_CLKS_MASK;                          //选择PLL输出时钟
+  //enter PBE mode (PLL bypass clock source mode)
+  //PBE ->PEE (PLL bypass clock source mode ->PLL external clock source mode)
+  MCG_C1 &= ~MCG_C1_CLKS_MASK;                          //select PLL output clock
   
-  while(((MCG_S & MCG_S_CLKST_MASK) >> MCG_S_CLKST_SHIFT) != 0x3);      //等待选择PLL时钟
+  while(((MCG_S & MCG_S_CLKST_MASK) >> MCG_S_CLKST_SHIFT) != 0x3);      //waiting for PLL clock selection
   
   return MCG_PLL[PLLx].PLL_CLK;
 }
