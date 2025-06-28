@@ -10,7 +10,7 @@
 #ifndef __USB_DESC_H__
 #define __USB_DESC_H__
 
-#include "FSL_Types.h"
+#include "fsl_types.h"
 
 //标准的USB设备有5种USB描述符:设备描述符,配置描述符,字符串描述符,接口描述符,端点描述符.一个设备只有一个设备描述符
 

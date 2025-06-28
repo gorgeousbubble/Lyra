@@ -1,18 +1,17 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       MK66_diskio.c
- * @brief      MK66FX1M0VLQ18/MK66FN2M0VLQ18
- * @author     Alopex
+ * @file       diskio.h
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
  * @version    v1.0
- * @date       2016-09-24
+ * @date       2025-06-24
  */
 
-#include "Common.h"
-#include "MK6X_SDHC.h"
 #include "diskio.h"
+#include "sdhc.h"
 
 
 static volatile DSTATUS   Stat             = STA_NOINIT;    /* Ó²ÅÌ×´Ì¬         */

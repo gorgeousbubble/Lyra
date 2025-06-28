@@ -7,8 +7,8 @@
  * @brief      USB_LIB
  */
 
-#include "USB.h"
-#include "USB_Desc.h"
+#include "usb.h"
+#include "usb_desc.h"
 
 /*
 **数组和全局缓冲区

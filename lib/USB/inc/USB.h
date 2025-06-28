@@ -10,10 +10,10 @@
 #ifndef __USB_H__
 #define __USB_H__
 
-#include "Common.h"
-#include "MK6X_Conf.h"
-#include "FSL_Types.h"
-#include "USB_CDC.h"
+#include "common.h"
+#include "conf.h"
+#include "fsl_types.h"
+#include "usb_cdc.h"
 
 //USB包设置
 #define MaxPacketSize           64                      //USB包设置(低速USB:8,全速USB:8,16,32,64,高速USB:64)

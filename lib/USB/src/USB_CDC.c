@@ -7,7 +7,7 @@
  * @brief      USB_LIB
  */
 
-#include "USB_CDC.h"
+#include "usb_cdc.h"
 
 /*
 **CDC Global Structures

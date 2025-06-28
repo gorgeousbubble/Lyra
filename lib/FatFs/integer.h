@@ -12,7 +12,7 @@
 
 #else			/* Embedded platform */
 
-#include "Common.h"
+#include "common.h"
 
 
 

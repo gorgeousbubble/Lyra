@@ -10,8 +10,8 @@
 #ifndef __USB_CDC_H__
 #define __USB_CDC_H__
 
-#include "USB.h"
-#include "FSL_Types.h"
+#include "usb.h"
+#include "fsl_types.h"
 
 #define CDC_INPointer   gu8EP2_IN_ODD_Buffer
 #define CDC_OUTPointer  gu8EP3_OUT_ODD_Buffer

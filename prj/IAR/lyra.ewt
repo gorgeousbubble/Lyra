@@ -5692,6 +5692,9 @@
     <group>
         <name>app</name>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\conf.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\main.c</name>
         </file>
     </group>
@@ -5700,6 +5703,21 @@
     </group>
     <group>
         <name>chip</name>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\gpio.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\mcg.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\port.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\sdhc.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\wdog.c</name>
+        </file>
     </group>
     <group>
         <name>dev</name>
@@ -5710,16 +5728,37 @@
             <name>$PROJ_DIR$\..\..\chip\inc\common.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\inc\conf.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\gpio.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\inc\main.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\mcg.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\startup\inc\misc.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\startup\inc\MK64F12.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\port.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\sdhc.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\startup\inc\system_init.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\startup\inc\vectors.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\wdog.h</name>
         </file>
     </group>
     <group>
@@ -5765,27 +5804,6 @@
         </group>
         <group>
             <name>fatfs</name>
-            <group>
-                <name>option</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\lib\FatFs\option\cc932.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\lib\FatFs\option\cc936.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\lib\FatFs\option\cc949.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\lib\FatFs\option\cc950.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\lib\FatFs\option\ccsbcs.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\lib\FatFs\option\syscall.c</name>
-                </file>
-            </group>
             <file>
                 <name>$PROJ_DIR$\..\..\lib\FatFs\diskio.c</name>
             </file>
@@ -5811,22 +5829,22 @@
         <group>
             <name>usb</name>
             <file>
-                <name>$PROJ_DIR$\..\..\lib\USB\inc\FSL_Types.h</name>
+                <name>$PROJ_DIR$\..\..\lib\USB\inc\fsl_types.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\lib\USB\src\USB.c</name>
+                <name>$PROJ_DIR$\..\..\lib\USB\src\usb.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\lib\USB\inc\USB.h</name>
+                <name>$PROJ_DIR$\..\..\lib\USB\inc\usb.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\lib\USB\src\USB_CDC.c</name>
+                <name>$PROJ_DIR$\..\..\lib\USB\src\usb_cdc.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\lib\USB\inc\USB_CDC.h</name>
+                <name>$PROJ_DIR$\..\..\lib\USB\inc\usb_cdc.h</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\lib\USB\inc\USB_Desc.h</name>
+                <name>$PROJ_DIR$\..\..\lib\USB\inc\usb_desc.h</name>
             </file>
         </group>
     </group>

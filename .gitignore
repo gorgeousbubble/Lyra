@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Build directories
+MK64FN1M0(Debug)
+MK64FN1M0(Release)
+MK64FX512(Debug)
+MK64FX512(Release)

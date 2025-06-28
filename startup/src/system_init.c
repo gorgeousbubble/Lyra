@@ -10,8 +10,12 @@
  * @date       2025-06-24
  */
 
-#include "common.h"
+#include "conf.h"
+#include "main.h"
+#include "mcg.h"
+#include "misc.h"
 #include "system_init.h"
+#include "wdog.h"
 
 #pragma section = ".data"
 #pragma section = ".data_init"
