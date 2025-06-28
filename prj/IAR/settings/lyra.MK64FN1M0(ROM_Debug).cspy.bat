@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).general.xcl" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(ROM_Debug).general.xcl" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(ROM_Debug).driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).general.xcl" "--debug_file=%~1" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).driver.xcl" 
+"C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(ROM_Debug).general.xcl" "--debug_file=%~1" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(ROM_Debug).driver.xcl" 
 
 @echo off 
 :end

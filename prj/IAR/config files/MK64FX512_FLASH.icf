@@ -3,52 +3,52 @@
 /*-Editor annotation file-*/
 /* IcfEditorFile="$TOOLKIT_DIR$\config\ide\IcfEditor\cortex_v1_0.xml" */
 /*-Specials-*/
-define symbol __ICFEDIT_intvec_start__ = 0x00000000;
+define symbol __ICFEDIT_intvec_start__ = 0x00000000;//ROM and RAD startup address (ROM startup)
 /*-Memory Regions-*/
 define symbol __ICFEDIT_region_ROM_start__ = 0x00000000;
-define symbol __ICFEDIT_region_ROM_end__   = 0x00080000;
+define symbol __ICFEDIT_region_ROM_end__   = 0x00080000;//ROM 512KB
 define symbol __ICFEDIT_region_RAM_start__ = 0x1fff0000;
-define symbol __ICFEDIT_region_RAM_end__   = 0x20000000;
+define symbol __ICFEDIT_region_RAM_end__   = 0x20000000;//SRAM:SRAM1:64KB SRAM2:192KB SRAM3:4KB
 /*-Sizes-*/
-define symbol __ICFEDIT_size_cstack__ = 0x2000;
-define symbol __ICFEDIT_size_heap__   = 0x4000;
+define symbol __ICFEDIT_size_cstack__ = 0x2000;//stack size 8KB
+define symbol __ICFEDIT_size_heap__   = 0x4000;//heap size 16KB
 /**** End of ICF editor section. ###ICF###*/
-
+// allocate for FlexNVM (128KB)
 define symbol __region_FlexNVM_start__  = 0x10000000;
 define symbol __region_FlexNVM_end__    = 0x10020000;
-
+// allocate for SRAM2 (192KB)
 define symbol __region_RAM2_start__ = 0x20000000;
 define symbol __region_RAM2_end__   = 0x20000000 + (__ICFEDIT_region_RAM_end__ - __ICFEDIT_region_RAM_start__) * 2;
-
+// allocate for SRAM3 (4KB)
 define symbol __region_RAM3_start__ = 0x14000000;
 define symbol __region_RAM3_end__   = 0x14001000;
-
+// allocate for vector table and vector ram
 define exported symbol __VECTOR_TABLE = __ICFEDIT_intvec_start__;
 define exported symbol __VECTOR_RAM = __ICFEDIT_region_RAM_start__;
-
+// allocate for boot stack address
 define exported symbol __BOOT_STACK_ADDRESS = __region_RAM2_end__ - 8;
-
+// allocate for code start address
 define symbol __code_start__ = __ICFEDIT_intvec_start__ + 0x410;
-
+// declare Memory size/ROM region/RAM region
 define memory mem with size = 4G;
 define region ROM_region   = mem:[from __ICFEDIT_region_ROM_start__   to __ICFEDIT_region_ROM_end__] | mem:[from __region_FlexNVM_start__ to __region_FlexNVM_end__];
 define region RAM_region   = mem:[from __ICFEDIT_region_RAM_start__ + 0x410   to __ICFEDIT_region_RAM_end__] | mem:[from __region_RAM2_start__ to __region_RAM2_end__];
-
+// declare block cstack and heap
 define block CSTACK    with alignment = 8, size = __ICFEDIT_size_cstack__   { };
 define block HEAP      with alignment = 8, size = __ICFEDIT_size_heap__     { };
-
+// initialize section data
 initialize manually { readwrite };
 initialize manually { section .data};
 initialize manually { section .textrw };
 do not initialize  { section .noinit };
-
+// declare block code relocate FLASH and RAM
 define block CodeRelocate { section .textrw_init };
 define block CodeRelocateRam { section .textrw };
-
+// specific interrupt table start and code start function
 place at address mem:__ICFEDIT_intvec_start__ { readonly section .intvec };
 place at address mem:__code_start__ { readonly section .noinit };
-
+// specific ROM region
 place in ROM_region   { readonly, block CodeRelocate};
-
+// specific RAM region
 place in RAM_region   { readwrite, block CodeRelocateRam,
                         block CSTACK, block HEAP };

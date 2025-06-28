@@ -52,7 +52,11 @@ Mkfile.old
 dkms.conf
 
 # Build directories
-MK64FN1M0(Debug)
-MK64FN1M0(Release)
-MK64FX512(Debug)
-MK64FX512(Release)
+MK64FN1M0(ROM Debug)
+MK64FN1M0(RAM Debug)
+MK64FN1M0(ROM Release)
+MK64FN1M0(RAM Release)
+MK64FX512(ROM Debug)
+MK64FX512(RAM Debug)
+MK64FX512(ROM Release)
+MK64FX512(RAM Release)

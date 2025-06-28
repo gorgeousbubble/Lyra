@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).general.xcl" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(ROM_Debug).general.xcl" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(ROM_Debug).driver.xcl" 
 }
 else
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(Debug).driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(ROM_Debug).general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FX512(ROM_Debug).driver.xcl" 
 }

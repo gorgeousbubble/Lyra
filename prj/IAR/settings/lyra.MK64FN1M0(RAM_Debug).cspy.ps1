@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.Debug.general.xcl" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(RAM_Debug).general.xcl" --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(RAM_Debug).driver.xcl" 
 }
 else
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.Debug.driver.xcl" 
+& "C:\Program Files\IAR Systems\Embedded Workbench 9.0\common\bin\cspybat" -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(RAM_Debug).general.xcl" --debug_file=$debugfile --backend -f "C:\Users\Alope\MicroController\Lyra\prj\IAR\settings\lyra.MK64FN1M0(RAM_Debug).driver.xcl" 
 }
