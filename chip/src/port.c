@@ -10,33 +10,33 @@
  * @date       2025-06-24
  */
 
+#include "conf.h"
 #include "gpio.h"
 #include "port.h"
 
 /*
-**PTX端口基址指针
+**PTX port base address pointer
 */
 PORT_MemMapPtr PORTX[PORT_PTX_MAX]=
 {
-  PORTA_BASE_PTR,//PTA基址指针
-  PORTB_BASE_PTR,//PTB基址指针
-  PORTC_BASE_PTR,//PTC基址指针
-  PORTD_BASE_PTR,//PTD基址指针
-  PORTE_BASE_PTR,//PTE基址指针
+  PORTA_BASE_PTR,//PTA base address pointer
+  PORTB_BASE_PTR,//PTB base address pointer
+  PORTC_BASE_PTR,//PTC base address pointer
+  PORTD_BASE_PTR,//PTD base address pointer
+  PORTE_BASE_PTR,//PTE base address pointer
 };
 
 /*
- *  @brief      PORT初始化
- *  @param      PTXn    PTXx    端口
- *  @param      uint32  CFG     端口属性配置，如触发选项和上拉下拉选项
+ *  @brief      PORT Init
+ *  @param      PTXn    PTXx    port
+ *  @param      uint32  CFG     port attribute configuration, such as trigger options and pull-up/pull-down options
  *  @since      v1.0
- *  @note       与PORT_Init_NoALT不同的是，此函数需要配置 MUX 复用功能，
-                否则 MUX = ALT0
- *  Sample usage:       PORT_Init(PTA8, IRQ_RISING | PF | ALT1 | PULLUP );    //初始化 PTA8 管脚，上升沿触发中断，带无源滤波器，复用功能为GPIO ，上拉电阻
+ *  @note       Unlike PORT_Snit_SoALT, this function requires configuring the MUX multiplexing function, otherwise MUX=ALT0
+ *  Sample usage:       PORT_Init(PTA8, IRQ_RISING | PF | ALT1 | PULLUP );    //Initialize PTA8 pin, trigger interrupt with rising edge, equipped with passive filter, multiplexing function for GPIO, pull-up resistor
  */
 void PORT_Init(PTXn PTXx,uint32 CFG)
 {
-  switch(PORT_PTX(PTXx))//选择Enable时钟
+  switch(PORT_PTX(PTXx))//select Enable Clock
   {
     case PORT_PTA:
                   SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK;
@@ -58,20 +58,19 @@ void PORT_Init(PTXn PTXx,uint32 CFG)
                   break;
   }
   
-  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//清中断标志
-  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) &= ~PORT_PCR_MUX_MASK;//清空原MUX寄存器值
-  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) |= (0 | CFG);//MUX管脚功能复用
+  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//clear interrupt flag
+  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) &= ~PORT_PCR_MUX_MASK;//clear the original MUX register value
+  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) |= (0 | CFG);//reuse of MUX pin function
   
 }
 
 /*
- *  @brief      PORT初始化
- *  @param      PTXn    PTXx    端口
- *  @param      uint32  CFG     端口属性配置，如触发选项和上拉下拉选项
+ *  @brief      PORT initialization
+ *  @param      PTXn    PTXx    port
+ *  @param      uint32  CFG     port attribute configuration, such as trigger options and pull-up/pull-down options
  *  @since      v1.0
- *  @note       与PORT_Init不同的是，此函数不需要配置 MUX 复用功能（即使配置了也不生效），
-                MUX 保留 为原先寄存器配置的值
- *  Sample usage:       PORT_Init_NoALT (PTA8, IRQ_RISING | PF | PULLUP );    //初始化 PTA8 管脚，上升沿触发中断，带无源滤波器，保留原先复用功能，上拉电阻
+ *  @note       Unlike PORT_Snit, this function does not require configuring the MUX multiplexing function (even if configured, it does not take effect), and the MUX remains at the value configured in the original register
+ *  Sample usage:       PORT_Init_NoALT (PTA8, IRQ_RISING | PF | PULLUP );    //initialize PTA8 pin, trigger interrupt with rising edge, equipped with passive filter, retain original multiplexing function, pull-up resistor
  */
 void PORT_Init_NoALT(PTXn PTXx,uint32 CFG)
 {
@@ -97,24 +96,24 @@ void PORT_Init_NoALT(PTXn PTXx,uint32 CFG)
                   break;
   }
   
-  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//清中断标志
-  CFG &= ~PORT_PCR_MUX_MASK;//清除配置MUX
-  CFG |= (PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) & PORT_PCR_MUX_MASK);//读取原来MUX配置
-  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) |= (0 | CFG);//MUX管脚功能复用
+  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//clear interrupt flag
+  CFG &= ~PORT_PCR_MUX_MASK;//clear configuration MUX
+  CFG |= (PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) & PORT_PCR_MUX_MASK);//read the original MUX configuration
+  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) |= (0 | CFG);//reuse of MUX pin function
   
 }
 
 /*
- *  @brief      PORT初始化EXIT外部中断
- *  @param      PTXn    PTXx    端口
- *  @param      uint32  CFG     端口属性配置，如触发选项和上拉下拉选项
+ *  @brief      PORT initialization EXIT external interrupt
+ *  @param      PTXn    PTXx    port
+ *  @param      uint32  CFG     port attribute configuration, such as trigger options and pull-up/pull-down options
  *  @since      v1.0
  *  @note       
- *  Sample usage:       PORT_Init_Exit(PTA13,IRQ_RISING)//PTA13,上升沿触发外部中断
+ *  Sample usage:       PORT_Init_Exit(PTA13,IRQ_RISING)//PTA13, rising edge triggers external interrupt
  */
 void PORT_Init_Exit(PTXn PTXx,uint32 CFG)
 {
-  switch(PORT_PTX(PTXx))//选择Enable时钟
+  switch(PORT_PTX(PTXx))//select enable clock
   {
     case PORT_PTA:
                   SIM_SCGC5 |= SIM_SCGC5_PORTA_MASK;
@@ -136,9 +135,9 @@ void PORT_Init_Exit(PTXn PTXx,uint32 CFG)
                   break;
   }
   
-  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) &= ~PORT_PCR_MUX_MASK;//清空原MUX寄存器值
-  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) |= (0 | ALT1 | CFG);//MUX管脚功能复用
-  GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));//管脚设置为输入模式
-  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//清中断标志
+  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) &= ~PORT_PCR_MUX_MASK;//clear the original MUX register value
+  PORT_PCR_REG(PORTX_BASE(PTXx),PORT_PTn(PTXx)) |= (0 | ALT1 | CFG);//reuse of MUX pin function
+  GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));//pin set to input mode
+  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//clear interrupt flag
   
 }

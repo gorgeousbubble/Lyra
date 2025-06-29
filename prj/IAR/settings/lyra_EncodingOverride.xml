@@ -26,7 +26,7 @@
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\inc\port.h</path>
-        <encoding>System</encoding>
+        <encoding>UTF-8</encoding>
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\inc\sdhc.h</path>
@@ -46,6 +46,10 @@
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\src\sdhc.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\src\wdog.c</path>
         <encoding>System</encoding>
     </override>
     <override>

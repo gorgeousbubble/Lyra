@@ -16,46 +16,46 @@
 #include "common.h"
 
 /*
-**PTX管脚枚举
+**PTX port enumeration
 */
 typedef enum
 {
-  //PORT_PTA(PTA端口)
+  //PORT_PTA(PTA port)
   PTA0,  PTA1,  PTA2,  PTA3,  PTA4,  PTA5,  PTA6,  PTA7,  PTA8,  PTA9,  PTA10, PTA11, PTA12, PTA13, PTA14, PTA15,
   PTA16, PTA17, PTA18, PTA19, PTA20, PTA21, PTA22, PTA23, PTA24, PTA25, PTA26, PTA27, PTA28, PTA29, PTA30, PTA31,
   
-  //PORT_PTB(PTB端口)
+  //PORT_PTB(PTB port)
   PTB0,  PTB1,  PTB2,  PTB3,  PTB4,  PTB5,  PTB6,  PTB7,  PTB8,  PTB9,  PTB10, PTB11, PTB12, PTB13, PTB14, PTB15,
   PTB16, PTB17, PTB18, PTB19, PTB20, PTB21, PTB22, PTB23, PTB24, PTB25, PTB26, PTB27, PTB28, PTB29, PTB30, PTB31,
   
-  //PORT_PTC(PTC端口)
+  //PORT_PTC(PTC port)
   PTC0,  PTC1,  PTC2,  PTC3,  PTC4,  PTC5,  PTC6,  PTC7,  PTC8,  PTC9,  PTC10, PTC11, PTC12, PTC13, PTC14, PTC15,
   PTC16, PTC17, PTC18, PTC19, PTC20, PTC21, PTC22, PTC23, PTC24, PTC25, PTC26, PTC27, PTC28, PTC29, PTC30, PTC31,
   
-  //PORT_PTD(PTD端口)
+  //PORT_PTD(PTD port)
   PTD0,  PTD1,  PTD2,  PTD3,  PTD4,  PTD5,  PTD6,  PTD7,  PTD8,  PTD9,  PTD10, PTD11, PTD12, PTD13, PTD14, PTD15,
   PTD16, PTD17, PTD18, PTD19, PTD20, PTD21, PTD22, PTD23, PTD24, PTD25, PTD26, PTD27, PTD28, PTD29, PTD30, PTD31,
   
-  //PORT_PTE(PTE端口)
+  //PORT_PTE(PTE port)
   PTE0,  PTE1,  PTE2,  PTE3,  PTE4,  PTE5,  PTE6,  PTE7,  PTE8,  PTE9,  PTE10, PTE11, PTE12, PTE13, PTE14, PTE15,
   PTE16, PTE17, PTE18, PTE19, PTE20, PTE21, PTE22, PTE23, PTE24, PTE25, PTE26, PTE27, PTE28, PTE29, PTE30, PTE31,
 }PTXn;
 
 /*
-**PTX端口枚举(A,B,C,D,E)
+**PTX port enumeration (A,B,C,D,E)
 */
 typedef enum
 {
-  PORT_PTA,          //PTA端口
-  PORT_PTB,          //PTB端口
-  PORT_PTC,          //PTC端口
-  PORT_PTD,          //PTD端口
-  PORT_PTE,          //PTE端口
+  PORT_PTA,          //PTA port
+  PORT_PTB,          //PTB port
+  PORT_PTC,          //PTC port
+  PORT_PTD,          //PTD port
+  PORT_PTE,          //PTE port
   PORT_PTX_MAX,
 }PTX;
 
 /*
-**PTX管脚编号枚举(PT0-PT31)
+**PTX port number enumeration (PT0-PT31)
 */
 typedef enum
 {
@@ -66,33 +66,33 @@ typedef enum
 }PTn;
 
 /*
-**PORT配置枚举
+**PORT configure enumeration
 */
 typedef enum
 {
-  //中断方式和DMA请求方式，两者只能选其中一种（可以不选）
-  //中断方式选择
-  IRQ_ZERO     = 0x08 << PORT_PCR_IRQC_SHIFT,   //低电平触发
-  IRQ_RISING   = 0x09 << PORT_PCR_IRQC_SHIFT,   //上升沿触发
-  IRQ_FALLING  = 0x0A << PORT_PCR_IRQC_SHIFT,   //下降沿触发
-  IRQ_EITHER   = 0x0B << PORT_PCR_IRQC_SHIFT,   //跳变沿触发
-  IRQ_ONE      = 0x0C << PORT_PCR_IRQC_SHIFT,   //高电平触发
+  //interrupt mode and DMA request mode, only one can be selected (optional)
+  //interrupt mode selection
+  IRQ_ZERO     = 0x08 << PORT_PCR_IRQC_SHIFT,   //low level trigger
+  IRQ_RISING   = 0x09 << PORT_PCR_IRQC_SHIFT,   //rising edge trigger
+  IRQ_FALLING  = 0x0A << PORT_PCR_IRQC_SHIFT,   //falling edge trigger
+  IRQ_EITHER   = 0x0B << PORT_PCR_IRQC_SHIFT,   //jump edge trigger
+  IRQ_ONE      = 0x0C << PORT_PCR_IRQC_SHIFT,   //high level trigger
 
-  //DMA请求选择
-  DMA_RISING   = 0x01 << PORT_PCR_IRQC_SHIFT,   //上升沿触发
-  DMA_FALLING  = 0x02 << PORT_PCR_IRQC_SHIFT,   //下降沿触发
-  DMA_EITHER   = 0x03 << PORT_PCR_IRQC_SHIFT,   //跳变沿触发
+  //DMA request selection
+  DMA_RISING   = 0x01 << PORT_PCR_IRQC_SHIFT,   //rising edge trigger
+  DMA_FALLING  = 0x02 << PORT_PCR_IRQC_SHIFT,   //falling edge trigger
+  DMA_EITHER   = 0x03 << PORT_PCR_IRQC_SHIFT,   //jump edge trigger
 
-  HDS          = 0x01 << PORT_PCR_DSE_SHIFT,    //输出高驱动能力
-  ODO          = 0x01 << PORT_PCR_ODE_SHIFT,    //漏极输出
-  PF           = 0x01 << PORT_PCR_PFE_SHIFT,    //带无源滤波器
-  SSR          = 0x01 << PORT_PCR_SRE_SHIFT,    //输出慢变化率
+  HDS          = 0x01 << PORT_PCR_DSE_SHIFT,    //output high driving capability
+  ODO          = 0x01 << PORT_PCR_ODE_SHIFT,    //drain output
+  PF           = 0x01 << PORT_PCR_PFE_SHIFT,    //with passive filter
+  SSR          = 0x01 << PORT_PCR_SRE_SHIFT,    //output slow rate of change
 
-  //下拉上拉选择
-  PULLDOWN     = 0x02 << PORT_PCR_PS_SHIFT,     //下拉
-  PULLUP       = 0x03 << PORT_PCR_PS_SHIFT,     //上拉
+  //pull down and up selection
+  PULLDOWN     = 0x02 << PORT_PCR_PS_SHIFT,     //pull down
+  PULLUP       = 0x03 << PORT_PCR_PS_SHIFT,     //pull up
 
-  //功能复用选择(如果不需要改变功能复用选择，保留原先的功能复用，直接选择ALT0)
+  //function reuse selection (if there is no need to change the function reuse selection, keep the original function reuse and directly select ALT0)
   ALT0         = 0x00 << PORT_PCR_MUX_SHIFT,
   ALT1         = 0x01 << PORT_PCR_MUX_SHIFT,    //GPIO
   ALT2         = 0x02 << PORT_PCR_MUX_SHIFT,
@@ -106,17 +106,17 @@ typedef enum
 
 
 /*
-**PORT端口相关宏
+**PORT port related macros
 */
 #define PORT_PTX(PTxn)          ((PTxn)>>5)             //PTx = PTxn / 32
 #define PORT_PTn(PTxn)          ((PTxn)&0x1f)           //PTn = PTxn & 31
-#define PORTX_BASE(PTxn)        PORTX[PORT_PTX(PTxn)]   //PORT基址指针
+#define PORTX_BASE(PTxn)        PORTX[PORT_PTX(PTxn)]   //PORT base address pointer
 
 /*
-**外部中断相关宏
+**external interrupt related macros
 */
-#define IRQ_MARK(X,n)   (PORT##X##_ISFR & (1 << n))     //判断中断标志位
-#define IRQ_CLEAR(X,n)  (PORT##X##_ISFR |= (1 << n))    //清中断标志位
+#define IRQ_MARK(X,n)   (PORT##X##_ISFR & (1 << n))     //determine the interrupt flag bit
+#define IRQ_CLEAR(X,n)  (PORT##X##_ISFR |= (1 << n))    //clear interrupt flag
 
 /*
 **variate declaration

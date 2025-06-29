@@ -1,13 +1,13 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       MK6X_WDOG.c
- * @brief      MK66FX1M0VLQ18/MK66FN2M0VLQ18/MK64FX512VLQ12/MK64FN1M0VLQ12
- * @author     Alopex
+ * @file       wdog.c
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
  * @version    v1.0
- * @date       2016-09-24
+ * @date       2025-06-24
  */
 
 #include "conf.h"
@@ -15,88 +15,88 @@
 #include "wdog.h"
 
 /*
- *  @brief      解锁WDOG
+ *  @brief      WDOG unlock
  *  @since      v1.0
  */
 void WDOG_Unlock(void)
 {
   uint8 WDOG_Temp=0;
   
-  WDOG_Temp = __get_BASEPRI();//返回寄存器 PRIMASK 的值(1bit) 1:关中断 0:开中断
+  WDOG_Temp = __get_BASEPRI();//Return the value of PRIMASK register (1-bit): 1: close interrupt 0: Open interrupt
   
-  DisableInterrupts;//关总中断
+  DisableInterrupts;//close all interrupts
   
-  WDOG_UNLOCK = 0xC520;//向WDOG_UNLOCK寄存器先后写入0xC520和0xD928解锁WDOG
+  WDOG_UNLOCK = 0xC520;//write 0xC520 and 0xD928 to the WDOG-UNLOCK register to unlock WDOG
   WDOG_UNLOCK = 0xD928;
   
-  if(WDOG_Temp == 0)//解锁之前是开中断
+  if(WDOG_Temp == 0)//before unlocking, it was interrupted
   {
-    EnableInterrupts;//开总中断
+    EnableInterrupts;//open all interrupts
   }
   
 }
 
 /*
- *  @brief      更新WDOG计数器
+ *  @brief      WDOG feed (counter update)
  *  @since      v1.0
  */
 void WDOG_Feed(void)
 {
   uint8 WDOG_Temp=0;
   
-  WDOG_Temp = __get_BASEPRI();//返回寄存器 PRIMASK 的值(1bit) 1:关中断 0:开中断
+  WDOG_Temp = __get_BASEPRI();//Return the value of PRIMASK register (1-bit): 1: close interrupt 0: Open interrupt
   
-  DisableInterrupts;//关总中断
+  DisableInterrupts;//close all interrupts
   
-  WDOG_REFRESH = 0xA602;//更新WDOG计数器,Feed Dog
+  WDOG_REFRESH = 0xA602;//update WDOG counter, Feed Dog
   WDOG_REFRESH = 0xB480;
   
-  if(WDOG_Temp == 0)//解锁之前是开中断
+  if(WDOG_Temp == 0)//before unlocking, it was interrupted
   {
-    EnableInterrupts;//开总中断
+    EnableInterrupts;//open all interrupts
   }
 }
 
 /*
- *  @brief      禁止WDOG
+ *  @brief      WDOG disable
  *  @since      v1.0
  */
 void WDOG_Disable(void)
 {
-  WDOG_Unlock();//解锁WDOG,配置WDOG寄存器
-  WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;//WDOGEN清零,禁止WDOG
+  WDOG_Unlock();//unlock WDOG,configure WDOG register
+  WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;//WDOGEN clear to 0, disable WDOG
 }
 
 /*
- *  @brief      启用WDOG
+ *  @brief      WDOG enable
  *  @since      v1.0
  */
 void WDOG_Enable(void)
 {
-  WDOG_Unlock();//解锁WDOG,配置WDOG寄存器
-  WDOG_STCTRLH |= WDOG_STCTRLH_WDOGEN_MASK;//WDOGEN置位,启用WDOG
+  WDOG_Unlock();//unlock WDOG,configure WDOG register
+  WDOG_STCTRLH |= WDOG_STCTRLH_WDOGEN_MASK;//WDOGEN set to 1, enable WDOG
 }
 
 /*
- *  @brief      初始化WDOG，设置时间
- *  @param      WDOG_Cnt    时间(单位MS)
+ *  @brief      WDOG init
+ *  @param      WDOG_Cnt
  *  @since      v1.0
  */
 void WDOG_Init(uint32 WDOG_Cnt)
 {
-  ASSERT(WDOG_Cnt >= 4);//计数时钟最少为4毫秒
+  ASSERT(WDOG_Cnt >= 4);//the minimum counting clock is 4 milliseconds
   
-  WDOG_Unlock();//解锁WDOG,配置WDOG寄存器
+  WDOG_Unlock();//unlock WDOG,configure WDOG register
   
-  WDOG_PRESC = WDOG_PRESC_PRESCVAL(0);//设置分频系数 = PRESCVAL +1(PRESCVAL取值范围为0~7)
+  WDOG_PRESC = WDOG_PRESC_PRESCVAL(0);//set the division factor to PRESSCVAL+1 (PRESSCVAL values range from 0 to 7)
   
-  WDOG_TOVALH = WDOG_Cnt >> 16;//设置WDOG时间
+  WDOG_TOVALH = WDOG_Cnt >> 16;//Set WDOG time
   WDOG_TOVALL = (uint16)(WDOG_Cnt & 0x0000ffff);
   
-  WDOG_STCTRLH = (0 | WDOG_STCTRLH_WDOGEN_MASK          //WDOG使能
-                    | WDOG_STCTRLH_ALLOWUPDATE_MASK     //WDOG允许更新
-                    | WDOG_STCTRLH_STOPEN_MASK          //WDOG在停止模式
-                    | WDOG_STCTRLH_WAITEN_MASK          //WDOG在等待模式
+  WDOG_STCTRLH = (0 | WDOG_STCTRLH_WDOGEN_MASK          //WDOG enable
+                    | WDOG_STCTRLH_ALLOWUPDATE_MASK     //WDOG allow update
+                    | WDOG_STCTRLH_STOPEN_MASK          //WDOG stop mode
+                    | WDOG_STCTRLH_WAITEN_MASK          //WDOG wait mode
                   );
   
 }

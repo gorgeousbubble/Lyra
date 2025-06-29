@@ -1,14 +1,15 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       MK6X_WDOG.h
- * @brief      MK66FX1M0VLQ18/MK66FN2M0VLQ18/MK64FX512VLQ12/MK64FN1M0VLQ12
- * @author     Alopex
+ * @file       wdog.h
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
  * @version    v1.0
- * @date       2016-09-24
+ * @date       2025-06-24
  */
+
 
 #ifndef __WDOG_H__
 #define __WDOG_H__

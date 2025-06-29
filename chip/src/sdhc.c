@@ -16,7 +16,7 @@
 SDCARD_t        SDHC_card;
 
 
-//SD卡命令
+//SD card command
 const uint32 ESDHC_COMMAND_XFERTYP[] =
 {
     /* CMD0 */
@@ -103,7 +103,7 @@ const uint32 ESDHC_COMMAND_XFERTYP[] =
 
 
 /*
- *  @brief      SDHC初始化(仅初始化模块，不初始化SD卡)
+ *  @brief      SDHC initialization (only module initialization, not SD card initialization)
  *  @since      v1.0
  */
 void SDHC_init()
@@ -111,26 +111,26 @@ void SDHC_init()
 
     SDHC_card.CARD = ESDHC_CARD_NONE;
 
-    /* 使能 SDHC 模块时钟 */
+    /* enable SDHC module clock */
     SIM_SCGC3 |= SIM_SCGC3_SDHC_MASK;
 
-    /* 复位 ESDHC */
+    /* reset ESDHC */
     SDHC_SYSCTL = SDHC_SYSCTL_RSTA_MASK | SDHC_SYSCTL_SDCLKFS(0x80);
     while (SDHC_SYSCTL & SDHC_SYSCTL_RSTA_MASK) {};
 
-    /* 初始化值 */
+    /* initialize value */
     SDHC_VENDOR     = 0;
     SDHC_BLKATTR    = SDHC_BLKATTR_BLKCNT(1) | SDHC_BLKATTR_BLKSIZE(512);
     SDHC_PROCTL     = SDHC_PROCTL_EMODE(ESDHC_PROCTL_EMODE_INVARIANT) | SDHC_PROCTL_D3CD_MASK;
     SDHC_WML        = SDHC_WML_RDWML(1) | SDHC_WML_WRWML(1);
 
-    /* 配置 ESDHC 波特率 */
+    /* configure ESDHC baud rate */
     SDHC_set_baudrate ( SDHC_INIT_BANDRATE );
 
     /* Poll inhibit bits */
     while (SDHC_PRSSTAT & (SDHC_PRSSTAT_CIHB_MASK | SDHC_PRSSTAT_CDIHB_MASK)) {};
 
-    /* 初始化管脚复用 */
+    /* initialize pin reuse */
     PORT_Init(PTE0, ALT4 | HDS | PULLUP ); /* ESDHC.D1  */
     PORT_Init(PTE1, ALT4 | HDS | PULLUP ); /* ESDHC.D0  */
     PORT_Init(PTE2, ALT4 | HDS          ); /* ESDHC.CLK */
@@ -138,31 +138,31 @@ void SDHC_init()
     PORT_Init(PTE4, ALT4 | HDS | PULLUP ); /* ESDHC.D3  */
     PORT_Init(PTE5, ALT4 | HDS | PULLUP ); /* ESDHC.D2  */
 
-    /* 使能请求 */
+    /* enable request */
     SDHC_IRQSTAT = 0xFFFF;
     SDHC_IRQSTATEN =      SDHC_IRQSTATEN_DEBESEN_MASK | SDHC_IRQSTATEN_DCESEN_MASK | SDHC_IRQSTATEN_DTOESEN_MASK
                           | SDHC_IRQSTATEN_CIESEN_MASK | SDHC_IRQSTATEN_CEBESEN_MASK | SDHC_IRQSTATEN_CCESEN_MASK | SDHC_IRQSTATEN_CTOESEN_MASK
                           | SDHC_IRQSTATEN_BRRSEN_MASK | SDHC_IRQSTATEN_BWRSEN_MASK | SDHC_IRQSTATEN_CRMSEN_MASK
                           | SDHC_IRQSTATEN_TCSEN_MASK | SDHC_IRQSTATEN_CCSEN_MASK;
 
-    /* 发送 80 个 最初的时钟周期 到卡上，卡上电期间是需要用到 */
+    /* send 80 initial clock cycles to the card, which are required during the power on period of the card */
     SDHC_SYSCTL |= SDHC_SYSCTL_INITA_MASK;
-    while (SDHC_SYSCTL & SDHC_SYSCTL_INITA_MASK) {};        //等待 80个SD周期发送完成
+    while (SDHC_SYSCTL & SDHC_SYSCTL_INITA_MASK) {};            //waiting for 80 SD cycles to complete sending
 
-    /* 检测 卡是否插入 */
-    if (SDHC_PRSSTAT & SDHC_PRSSTAT_CINS_MASK)              // CINS 字段 由 0变1表示插入卡，由1变0表示拔出卡
+    /* check if the card is inserted */
+    if (SDHC_PRSSTAT & SDHC_PRSSTAT_CINS_MASK)                  //the CINS field changes from 0 to 1 to indicate card insertion, and from 1 to 0 to indicate card removal
     {
-        SDHC_card.CARD = ESDHC_CARD_UNKNOWN;          //插入了卡，类型未知
+        SDHC_card.CARD = ESDHC_CARD_UNKNOWN;                    //Card inserted, unknown type
     }
-    SDHC_IRQSTAT |= SDHC_IRQSTAT_CRM_MASK;                  //写1清 CRM 标志位。0表示插入卡，1表示移除卡。写1清0后，卡还是没有插入，则恢复值为1
+    SDHC_IRQSTAT |= SDHC_IRQSTAT_CRM_MASK;                      //write 1 clear CRM flag. 0 represents inserting the card, 1 represents removing the card. After writing 1 to 0, if the card is still not inserted, the recovery value is 1
 }
 
 
 
 
 /*
- *  @brief      SDHC波特率配置
- *  @param      baudrate    波特率(Hz)
+ *  @brief      SDHC baud rate configuration
+ *  @param      baudrate    baud rate(Hz)
  *  @since      v1.0
  */
 void SDHC_set_baudrate(uint32 baudrate)
@@ -171,20 +171,20 @@ void SDHC_set_baudrate(uint32 baudrate)
     int32  val;
     uint32 clock = SDHC_CLOCK;
 
-    /* 计算最佳配置 */
-    //SDCLK 时钟频率 = 基时钟/(预分频器*除数)
-    //SD 时钟频率的最大值是 50MHz
-    //预分频 = 2,4,8,16,32,64,128,256  ,且 SDCLKFS = 预分频 >> 1;
-    //除数 = DVS + 1 ,DVS 的取值范围是 0~ 0xF
-    min = (uint32) - 1;                         //先把 min 配置为最大值
-    for (pres = 2; pres <= 256; pres <<= 1)     //pres 即 预分频器 prescaler
+    /* calculate the optimal configuration */
+    // SDCLK clock frequency=base clock/(prescaler * divisor)
+    // the maximum value of SD clock frequency is 50MHz
+    // pre division=2,4,8,16,32,64128256, and SDCLKFS=Pre division>>1;
+    // divisor=DVS+1, the value range of DVS is 0~0xF
+    min = (uint32) - 1;                         //set min to its maximum value first
+    for (pres = 2; pres <= 256; pres <<= 1)     //pres stands for Pre Divider
     {
-        for (div = 1; div <= 16; div++)         //div 即 除数Divisor
+        for (div = 1; div <= 16; div++)         //div stands for Divisor
         {
             val = pres * div * baudrate - clock;
-            if (val >= 0)                       //波特率 大于或等于 设定的目标值
+            if (val >= 0)                       //the baud rate is greater than or equal to the set target value
             {
-                if (min > val)                  //选择最接近 目标值 的
+                if (min > val)                  //choose the one closest to the target value
                 {
                     min = val;
                     minpres = pres;
@@ -194,32 +194,32 @@ void SDHC_set_baudrate(uint32 baudrate)
         }
     }
 
-    /* 禁止 ESDHC 时钟 */
+    /* prohibit ESDHC clock */
     SDHC_SYSCTL &= (~ SDHC_SYSCTL_SDCLKEN_MASK);
 
-    /* 改变分频系数 */
-    SDHC_SYSCTL = (   (SDHC_SYSCTL & (~ (SDHC_SYSCTL_DTOCV_MASK | SDHC_SYSCTL_SDCLKFS_MASK | SDHC_SYSCTL_DVS_MASK)) ) //先 清 SDHC_SYSCTL 的 DTOCV 、SDCLKFS 、DVS 字段
-                      | SDHC_SYSCTL_DTOCV(0x0E)               //数据超时计数器值 = SDCLK x (DTOCV + 213)  ,DTOCV 的范围是 0 - 0x0E
-                      | SDHC_SYSCTL_SDCLKFS(minpres >> 1)     //SDCLK 频率选择 = 基时钟 / (1 << SDCLKFS )
+    /* change the frequency division coefficient */
+    SDHC_SYSCTL = (   (SDHC_SYSCTL & (~ (SDHC_SYSCTL_DTOCV_MASK | SDHC_SYSCTL_SDCLKFS_MASK | SDHC_SYSCTL_DVS_MASK)) ) //first, clear the DTOCV, SDCLKFS, and DVS fields of SDHC_SYSCTL
+                      | SDHC_SYSCTL_DTOCV(0x0E)               //data timeout counter value=SDCLK x (DTOCV+213), DTOCV range is 0-0x0E
+                      | SDHC_SYSCTL_SDCLKFS(minpres >> 1)     //SDCLK frequency selection=base clock/(1<<SDCLKFS)
                       | SDHC_SYSCTL_DVS(mindiv - 1)
 
                   );
 
-    /* 等待 SD 时钟稳定  */
+    /* waiting for SD clock to stabilize  */
     while (0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_SDSTB_MASK));
 
 
-    /* 使能 ESDHC 时钟 */
+    /* enable ESDHC clock */
     SDHC_SYSCTL |= SDHC_SYSCTL_SDCLKEN_MASK;
 
-    SDHC_IRQSTAT |= SDHC_IRQSTAT_DTOE_MASK;     //清 数据超时错误 标志
+    SDHC_IRQSTAT |= SDHC_IRQSTAT_DTOE_MASK;     //clear data timeout error flag
 }
 
 
 /*
- *  @brief      SDHC发送cmd命令
- *  @param      command     命令
- *  @return     发送命令结果，    0表示成功，1表示错误，-1 表示 超时
+ *  @brief      SDHC sends cmd command
+ *  @param      command     command
+ *  @return     send command result, 0 indicates success, 1 indicates error, -1 indicates timeout
  *  @since      v1.0
  */
 uint32 SDHC_cmd (pESDHC_CMD_t command) /* [IN/OUT] Command specification */
@@ -227,24 +227,24 @@ uint32 SDHC_cmd (pESDHC_CMD_t command) /* [IN/OUT] Command specification */
     uint32  xfertyp;
     uint32  blkattr;
 
-    //ASSERT(SDHC_CMD_MAX > command->COMMAND  );      //断言，命令不能超过 SDHC_CMD_MAX
+    //ASSERT(SDHC_CMD_MAX > command->COMMAND  );      //assert that the command cannot exceed SDHC_CMD-MAX
 
-    /* 检查命令 */
+    /*check command*/
     xfertyp = ESDHC_COMMAND_XFERTYP[command->COMMAND ];
 
-    ASSERT (~0 != xfertyp);                             //断言，合法的CMD,xfertyp 不能为 ~0
+    ASSERT (~0 != xfertyp);                             //the assertion is that a valid CMD and xfertyp cannot be~0
 
-    /* 准备检测卡插拔状态 */
+    /* prepare to check the card insertion and removal status */
     SDHC_IRQSTAT |= SDHC_IRQSTAT_CRM_MASK;
 
-    /* 等待CMD 线空闲 */
+    /* waiting for CMD line to be idle */
     while (SDHC_PRSSTAT & SDHC_PRSSTAT_CIHB_MASK) {};
 
-    /* 设置命令 */
+    /* set command */
     SDHC_CMDARG = command->ARGUMENT;
     xfertyp &= (~ SDHC_XFERTYP_CMDTYP_MASK);
     xfertyp |= SDHC_XFERTYP_CMDTYP(command->TYPE);
-    if (ESDHC_TYPE_RESUME == command->TYPE)     //恢复命令 必须 DPSEL 位 置位
+    if (ESDHC_TYPE_RESUME == command->TYPE)     //the recovery command must have DPSEL position bits
     {
         xfertyp |= SDHC_XFERTYP_DPSEL_MASK;
     }
@@ -255,7 +255,7 @@ uint32 SDHC_cmd (pESDHC_CMD_t command) /* [IN/OUT] Command specification */
         {
             xfertyp |= SDHC_XFERTYP_DPSEL_MASK;
         }
-        if (command->READ)       //写数据
+        if (command->READ)       //write data
         {
            xfertyp |= SDHC_XFERTYP_DTDSEL_MASK;
         }
@@ -281,11 +281,11 @@ uint32 SDHC_cmd (pESDHC_CMD_t command) /* [IN/OUT] Command specification */
     SDHC_BLKATTR = blkattr;
 
 
-    /* 发出命令 */
+    /* send order */
     SDHC_DSADDR = 0;
     SDHC_XFERTYP = xfertyp;
 
-    /* 等待回应 */
+    /* waiting for response */
     SDHC_STATUS_WAIT (SDHC_IRQSTAT_CIE_MASK | SDHC_IRQSTAT_CEBE_MASK | SDHC_IRQSTAT_CCE_MASK | SDHC_IRQSTAT_CC_MASK);
     if (SDHC_STATUS_GET(SDHC_IRQSTAT_CIE_MASK | SDHC_IRQSTAT_CEBE_MASK | SDHC_IRQSTAT_CCE_MASK | SDHC_IRQSTAT_CC_MASK) != SDHC_IRQSTAT_CC_MASK)
     {
@@ -293,26 +293,26 @@ uint32 SDHC_cmd (pESDHC_CMD_t command) /* [IN/OUT] Command specification */
         return ESDHC_CMD_TIMEOUT;
     }
 
-    /* 检测卡拔插状态 */
+    /* check the status of card insertion and removal */
     if (SDHC_IRQSTAT & SDHC_IRQSTAT_CRM_MASK)
     {
         SDHC_IRQSTAT |= SDHC_IRQSTAT_CTOE_MASK | SDHC_IRQSTAT_CC_MASK;
         return ESDHC_CMD_ERR;
     }
 
-    /* 如果有，则获取相应 */
+    /* obtain the corresponding if there is */
     if (SDHC_IRQSTAT & SDHC_IRQSTAT_CTOE_MASK)
     {
         SDHC_IRQSTAT |= SDHC_IRQSTAT_CTOE_MASK | SDHC_IRQSTAT_CC_MASK;
         return ESDHC_CMD_TIMEOUT;
     }
 
-    //如果 发送有相应 命令
+    // if there is a corresponding command sent
     if ((xfertyp & SDHC_XFERTYP_RSPTYP_MASK) != SDHC_XFERTYP_RSPTYP(ESDHC_XFERTYP_RSPTYP_NO))
     {
         command->RESPONSE[0] = SDHC_CMDRSP(0);
 
-        //如果接收到长相应
+        // if the appearance is received
         if ((xfertyp & SDHC_XFERTYP_RSPTYP_MASK) == SDHC_XFERTYP_RSPTYP(ESDHC_XFERTYP_RSPTYP_136))
         {
             command->RESPONSE[1] = SDHC_CMDRSP(1);
@@ -321,7 +321,7 @@ uint32 SDHC_cmd (pESDHC_CMD_t command) /* [IN/OUT] Command specification */
         }
     }
 
-    //完成命令
+    //complete command
     SDHC_IRQSTAT |= SDHC_IRQSTAT_CC_MASK;
 
     return 0;
@@ -330,9 +330,9 @@ uint32 SDHC_cmd (pESDHC_CMD_t command) /* [IN/OUT] Command specification */
 
 
 /*
- *  @brief      SDHC 控制命令
- *  @param      ESDHC_IOCTL_CMD_e       命令
- *  @return     ESDHC_IOCTL_ERR_e       操作结果
+ *  @brief      SDHC control command
+ *  @param      ESDHC_IOCTL_CMD_e       command
+ *  @return     ESDHC_IOCTL_ERR_e       operate result
  *  @since      v1.0
  */
 ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr )
@@ -349,7 +349,7 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr )
     {
     case ESDHC_IOCTL_INIT:
 
-        SDHC_init();        //初始化 SD卡模块
+        SDHC_init();        //Init SD card
 
         mem = FALSE;
         io  = FALSE;
@@ -485,7 +485,7 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr )
                         val++;
 
                         /* CMD55 + ACMD41 - Send OCR */
-                        //MMC卡对CMD55+ACMD41命令不作响应，故在初始化过程中用这一命令可以区别SD卡跟MMC卡
+                        //MMC card does not respond to CMD55+ACMD41 command, so this command can be used during initialization to distinguish between SD card and MMC card
                         command.COMMAND = ESDHC_CMD55;
                         command.TYPE = ESDHC_TYPE_NORMAL;
                         command.ARGUMENT = 0;
@@ -570,10 +570,10 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr )
             }
         }
 
-        /* 设置 ESDHC 默认波特率 */
+        /* set ESDHC default baud rate */
         SDHC_set_baudrate (SDHC_BANDRATE);
 
-        /* 使能 SDHC 模块时钟 */
+        /* enable SDHC module clock */
         SIM_SCGC3 |= SIM_SCGC3_SDHC_MASK;
         
         break;
@@ -595,7 +595,7 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr )
         }
         else
         {
-            /* 获取 ESDHC 总线宽度 */
+            /* obtain ESDHC bus width */
             val = (SDHC_PROCTL & SDHC_PROCTL_DTW_MASK) >> SDHC_PROCTL_DTW_SHIFT;
             if (ESDHC_PROCTL_DTW_1BIT == val)
             {
@@ -622,7 +622,7 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr )
         }
         else
         {
-            /* 设置 ESDHC 总线宽度 */
+            /* set ESDHC bus width */
             if (! SDHC_is_running())
             {
                 if (ESDHC_BUS_WIDTH_1BIT == *param32_ptr)

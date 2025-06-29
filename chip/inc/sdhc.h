@@ -19,18 +19,18 @@
 
 #define SDHC_CLOCK      (MK64_Core_KHz * 1000)
 
-//SD卡初始数据传输需工作在低于400 kb／s的频率
-#define SDHC_INIT_BANDRATE      300000                  //启动时的波特率
-#define SDHC_BANDRATE           (50*1000*1000)          //正常工作时的波特率(50MBps)
-#define SDHC_BUS_WIDTH          ESDHC_BUS_WIDTH_4BIT    //带宽，目前代码仅支持 1bit 和 4bit
-#define SDCARD_BLOCK_SIZE       512                     //SD卡块大小
-#define SEND_OCR_TIME           100                     //发送 CMD55 + ACMD41 命令的次数
+// The initial data transfer of SD card needs to operate at a frequency below 400 kb/s
+#define SDHC_INIT_BANDRATE      300000                  //baud rate at startup
+#define SDHC_BANDRATE           (50*1000*1000)          //baud rate during normal operation (50MBps)
+#define SDHC_BUS_WIDTH          ESDHC_BUS_WIDTH_4BIT    //bandwidth, currently the code only supports 1-bit and 4-bit
+#define SDCARD_BLOCK_SIZE       512                     //SD block size
+#define SEND_OCR_TIME           100                     //number of times CMD55+ACMD41 commands were sent
 
 /* Error code returned by I/O functions */
 #define IO_ERROR        (-1)
 
 /*
-**SDHC枚举
+**SDHC enumerate
 */
 typedef enum
 {
@@ -41,35 +41,35 @@ typedef enum
   ESDHC_IOCTL_SET_BUS_WIDTH,
 }ESDHC_IOCTL_CMD_e;
 
-/* 命令码用于 disk_ioctrl 函数 */
-/* ESDHC 错误码 */
+/* command code used for disk_ioctrl function*/
+/* ESDHC error code */
 typedef enum
 {
   ESDHC_IOCTL_OK,             //OK
-  ESDHC_INIT_ERR,             //初始化失败
-  ESDHC_CMD_ERR,              //发送命令出错
-  ESDHC_CMD_TIMEOUT,          //发送命令超时
-  ESDHC_CMD_INVALID,          //无效命令
-  ESDHC_PARAM_INVALID,        //参数无效
-  ESDHC_BUS_WIDTH_INVALID,    //总线宽度无效
-  ESDHC_BUSY,                 //设备忙
+  ESDHC_INIT_ERR,             //init error
+  ESDHC_CMD_ERR,              //send command error
+  ESDHC_CMD_TIMEOUT,          //timeout error
+  ESDHC_CMD_INVALID,          //invalidate command
+  ESDHC_PARAM_INVALID,        //invalidate parameter
+  ESDHC_BUS_WIDTH_INVALID,    //bus bandwidth invalidate
+  ESDHC_BUSY,                 //device busy
 }ESDHC_IOCTL_ERR_e;
 
 
-/* ESDHC 总线宽度 */
+/* ESDHC bus bandwidth */
 typedef enum
 {
-  //值是根据寄存器 来配置的
+  //values are configured based on registers
   ESDHC_BUS_WIDTH_1BIT = 0,
   ESDHC_BUS_WIDTH_4BIT = 1,
   ESDHC_BUS_WIDTH_8BIT = 2,
 }ESDHC_BUS_WIDTH_e;
 
-/* ESDHC 卡类型 */
+/* ESDHC card type */
 typedef enum
 {
-  ESDHC_CARD_NONE,//没有卡
-  ESDHC_CARD_UNKNOWN,//不能识别卡
+  ESDHC_CARD_NONE,//no card
+  ESDHC_CARD_UNKNOWN,//unknown card
   ESDHC_CARD_SD,//SD
   ESDHC_CARD_SDHC,//SDHC
   ESDHC_CARD_SDIO,//SDIO
@@ -79,7 +79,7 @@ typedef enum
   ESDHC_CARD_CEATA,
 }ESDHC_CARD_e;
 
-/* ESDHC 命令类型 */
+/* ESDHC command type */
 typedef enum
 {
   ESDHC_TYPE_NORMAL,
@@ -88,7 +88,7 @@ typedef enum
   ESDHC_TYPE_ABORT,
 }ESDHC_TYPE_e;
 
-/* ESDHC 命令 */
+/* ESDHC instruction */
 #define ESDHC_CMD0                           (0)
 #define ESDHC_CMD1                           (1)
 #define ESDHC_CMD2                           (2)
@@ -159,11 +159,11 @@ typedef enum
 
 typedef struct
 {
-  uint8  COMMAND;             //命令
-  uint8  TYPE;                //命令类型 SDHC_XFERTYP_CMDTYP
+  uint8  COMMAND;             //command
+  uint8  TYPE;                //command type SDHC_XFERTYP_CMDTYP
   uint8  READ;
-  uint8  RES;                 //保留
-  uint32 ARGUMENT;            //命令的参数寄存器 (SDHC_CMDARG)
+  uint8  RES;                 //reseverd
+  uint32 ARGUMENT;            //parameter register of command (SDHC_CMDARG)
   uint32 BLOCKS;
   uint32 RESPONSE[4];
 }ESDHC_CMD_t, *pESDHC_CMD_t;
@@ -174,22 +174,22 @@ typedef struct
  */
 typedef struct
 {
-    /* 实际卡状态                                   */
+    /* card status                                  */
     uint32                CARD;
 
-    /* 底层的响应超时 >= 250 ms                     */
+    /* Bottom level response timeout >= 250 ms      */
     uint32               SD_TIMEOUT;
 
-    /* 该设备的块数量                               */
+    /* The number of blocks for this device         */
     uint32                NUM_BLOCKS;
 
-    /* 卡地址                                       */
+    /* card address                                 */
     uint32                ADDRESS;
 
-    /* 高容量 = 块寻址 (SD是字节寻址，SDHC是块寻址) */
+    /* High capacity=block addressing (SD is byte addressing, SDHC is block addressing) */
     uint8                 SDHC_SDHC;//
 
-    /* 规范2或更高版本的卡 = 不同的CSD寄存器        */
+    /* Standard 2 or higher version cards=different CSD registers                       */
     uint8                 VERSION2;
 
     uint8                 RES[2];
@@ -201,10 +201,10 @@ typedef struct
 #define SDHC_STATUS_GET(MASK)   (SDHC_IRQSTAT & (MASK))
 
 extern SDCARD_t                 SDHC_card;
-extern void                     SDHC_init();                                        // SDHC 初始化
-extern ESDHC_IOCTL_ERR_e        SDHC_ioctl(ESDHC_IOCTL_CMD_e  cmd, void *param_ptr); // SDHC 控制命令
-extern void                     SDHC_set_baudrate(uint32 baudrate);                 // SDHC波特率配置
-extern uint32                   SDHC_cmd (pESDHC_CMD_t command);                    // SDHC发送cmd命令
+extern void                     SDHC_init();                                        // SDHC init
+extern ESDHC_IOCTL_ERR_e        SDHC_ioctl(ESDHC_IOCTL_CMD_e  cmd, void *param_ptr); // SDHC control command
+extern void                     SDHC_set_baudrate(uint32 baudrate);                 // SDHC baud rate configure
+extern uint32                   SDHC_cmd (pESDHC_CMD_t command);                    // SDHC send cmd command
 
 
 #endif
