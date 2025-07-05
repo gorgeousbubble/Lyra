@@ -10,8 +10,11 @@
  * @date       2025-06-24
  */
 
+#include "conf.h"
+#include "dwt.h"
 #include "port.h"
 #include "sdhc.h"
+#include "system_init.h"
 
 SDCARD_t        SDHC_card;
 

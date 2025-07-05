@@ -77,36 +77,36 @@ extern "C" {
     /* File system object structure (FATFS) */
     typedef struct
     {
-        uint8   fs_type;        /* FAT子类型，一般在mount时用，置0表示未挂载*/
-        uint8   drv;            /* 物理驱动号，一般为0*/
-        uint8   csize;          /* 每个簇的扇区数目(1,2,4...128) */
-        uint8   n_fats;         /* 文件分配表的数目(1,2) */
-        /*FAT文件系统依次为：引导扇区、两个文件分配表、根目录区和数据区*/
-        uint8   wflag;          /* 标记文件是否被改动过，为1时要回写*/
-        uint8   fsi_flag;       /* 标记文件系统信息是否被改动过，为1时要回写*/
+        uint8   fs_type;        /* FAT subtype, usually used when mounting, set to 0 to indicate not mounted */
+        uint8   drv;            /* Physical driver number, usually 0 */
+        uint8   csize;          /* Number of sectors per cluster (1, 2, 4... 128) */
+        uint8   n_fats;         /* Number of file allocation tables (1,2) */
+        /* The FAT file system consists of a boot sector, two file allocation tables, a root directory area, and a data area */
+        uint8   wflag;          /* Mark whether the file has been modified, write back when it is 1 */
+        uint8   fsi_flag;       /* Mark whether the file system information has been modified, and write back when it is 1 */
         uint16  id;             /* 文件系统挂载ID */
-        uint16  n_rootdir;      /* 根目录区入口(目录项)的个数(用于FAT12/16)*/
+        uint16  n_rootdir;      /* The number of entries (directory entries) in the root directory area (for FAT12/16) */
 #if _MAX_SS != 512
-        uint16  ssize;          /* 每扇区的字节数(用于扇区大于512Byte的flash) */
+        uint16  ssize;          /* Byte count per sector (for flash with sectors larger than 512 bytes) */
 #endif
 #if _FS_REENTRANT
-        _SYNC_t sobj;           /* 允许重入，即定义同步对象，用在tiny中*/
+        _SYNC_t sobj;           /* Allow re-entry, that is, define synchronization objects, used in tiny */
 #endif
 #if !_FS_READONLY
-        uint32  last_clust;     /* 最后一个被分配的簇*/
-        uint32  free_clust;     /* 空闲簇的个数*/
-        uint32  fsi_sector;     /* 存放fsinfo的扇区(用于FAT32) */
+        uint32  last_clust;     /* The last assigned cluster */
+        uint32  free_clust;     /* The number of idle clusters */
+        uint32  fsi_sector;     /* Sector for storing fsinfo (for FAT32) */
 #endif
 #if _FS_RPATH
-        uint32  cdir;           /* 允许相对路径时用，存储当前目录起始簇(0:root)*/
+        uint32  cdir;           /* When relative paths are allowed, store the starting cluster of the current directory (0: root) */
 #endif
-        uint32  n_fatent;       /* FAT入口数(簇的数目 + 2)*/
-        uint32  fsize;          /* 每个FAT所占扇区*/
-        uint32  fatbase;        /* FAT起始扇区*/
-        uint32  dirbase;        /* 根目录起始扇区(FAT32:Cluster#) */
-        uint32  database;       /* 数据目录起始扇区*/
-        uint32  winsect;        /* 当前缓冲区中存储的扇区号*/
-        uint8   win[_MAX_SS];   /* 单个扇区缓存*/
+        uint32  n_fatent;       /* Number of FAT entries (number of clusters+2) */
+        uint32  fsize;          /* Each FAT occupies a sector */
+        uint32  fatbase;        /* FAT starting sector */
+        uint32  dirbase;        /* Root directory starting sector (FAT32: Cluster #) */
+        uint32  database;       /* Starting sector of data directory */
+        uint32  winsect;        /* The sector number stored in the current buffer */
+        uint8   win[_MAX_SS];   /* Single sector cache */
     } FATFS;
 
 
@@ -116,21 +116,21 @@ extern "C" {
 
     typedef struct
     {
-        FATFS   *fs;            /* 所在的fs指针*/
-        uint16  id;             /* 所在的fs挂载编号*/
-        uint8   flag;           /* 文件状态*/
-        uint8   pad1;           /* 不知道含义，也未见程序使用*/
-        uint32  fptr;           /* 文件读写指针*/
-        uint32  fsize;          /* 大小*/
-        uint32  sclust;         /* 文件起始簇(fsize=0时为0) */
-        uint32  clust;          /* 当前簇*/
-        uint32  dsect;          /* 当前数据扇区*/
+        FATFS   *fs;            /* The fs pointer where it is located */
+        uint16  id;             /* The fs mount number where it is located */
+        uint8   flag;           /* file status */
+        uint8   pad1;           
+        uint32  fptr;           /* file read/write pointer */
+        uint32  fsize;          /* file size */
+        uint32  sclust;         /* starting cluster of files (0 when fsize=0) */
+        uint32  clust;          /* current cluster */
+        uint32  dsect;          /* current data sector */
 #if !_FS_READONLY
-        uint32  dir_sect;       /* 包含目录项的扇区 */
-        uint8   *dir_ptr;       /* Ponter to the directory entry in the window */
+        uint32  dir_sect;       /* sector containing directory entries */
+        uint8   *dir_ptr;       /* ponter to the directory entry in the window */
 #endif
 #if _USE_FASTSEEK
-        uint32  *cltbl;         /*指向簇链接映射表的指针*/
+        uint32  *cltbl;         /* pointer to the cluster link mapping table */
 #endif
 #if _FS_SHARE
         uint32  lockid;         /* File lock ID (index of file semaphore table) */
@@ -146,13 +146,13 @@ extern "C" {
 
     typedef struct
     {
-        FATFS   *fs;            /* 同上*/
+        FATFS   *fs;            /* same as before */
         uint16  id;
-        uint16  index;          /* 当前读写索引号 */
-        uint32  sclust;         /* 文件数据区开始簇*/
-        uint32  clust;          /* 当前簇*/
-        uint32  sect;           /* 当前扇区*/
-        uint8   *dir;           /* 扇区缓存中当前SFN入口指针，SFN含义未知，猜测和LFN类似，与文件名相关*/
+        uint16  index;          /* current read-write index number */
+        uint32  sclust;         /* file data area starts clustering */
+        uint32  clust;          /* current cluster */
+        uint32  sect;           /* current sector */
+        uint8   *dir;           /* the current SFN entry pointer in the sector cache, SFN meaning unknown, speculated to be similar to LFN, related to file name */
         uint8   *fn;            /* Pointer to the SFN (in/out) {file[8],ext[3],status[1]} */
 #if _USE_LFN
         uint16  *lfn;           /* Pointer to the LFN working buffer */
@@ -173,7 +173,7 @@ extern "C" {
         uint8   fattrib;        /* Attribute */
         TCHAR   fname[13];      /* Short file name (8.3 format) */
 #if _USE_LFN
-        TCHAR   *lfname;            /* Pointer to the LFN buffer */
+        TCHAR   *lfname;        /* Pointer to the LFN buffer */
         uint32  lfsize;         /* Size of LFN buffer in TCHAR */
 #endif
     } FILINFO;

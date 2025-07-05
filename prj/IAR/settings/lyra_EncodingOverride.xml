@@ -17,8 +17,20 @@
         <encoding>System</encoding>
     </override>
     <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\inc\adc.h</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\inc\gpio.h</path>
         <encoding>UTF-8</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\inc\gpio_cfg.h</path>
+        <encoding>UTF-8</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\inc\i2c.h</path>
+        <encoding>System</encoding>
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\inc\mcg.h</path>
@@ -29,12 +41,24 @@
         <encoding>UTF-8</encoding>
     </override>
     <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\inc\port_cfg.h</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\inc\sdhc.h</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\src\adc.c</path>
         <encoding>System</encoding>
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\src\gpio.c</path>
         <encoding>UTF-8</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\src\i2c.c</path>
+        <encoding>System</encoding>
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\src\mcg.c</path>
@@ -53,6 +77,22 @@
         <encoding>System</encoding>
     </override>
     <override>
+        <path>C:\Users\Alope\MicroController\Lyra\dev\inc\mpu6050.h</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\dev\src\mpu6050.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\dev\src\oled.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\dev\src\oled_lib.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
         <path>C:\Users\Alope\MicroController\Lyra\lib\FatFs\diskio.c</path>
         <encoding>System</encoding>
     </override>
@@ -66,18 +106,26 @@
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\lib\FatFs\ffconf.h</path>
-        <encoding>System</encoding>
+        <encoding>UTF-8</encoding>
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\lib\USB\inc\USB.h</path>
         <encoding>System</encoding>
     </override>
     <override>
+        <path>C:\Users\Alope\MicroController\Lyra\lib\USB\inc\usb.h</path>
+        <encoding>UTF-8</encoding>
+    </override>
+    <override>
         <path>C:\Users\Alope\MicroController\Lyra\lib\USB\inc\usb_desc.h</path>
-        <encoding>System</encoding>
+        <encoding>UTF-8</encoding>
     </override>
     <override>
         <path>C:\Users\Alope\MicroController\Lyra\lib\USB\src\USB.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
+        <path>C:\Users\Alope\MicroController\Lyra\lib\USB\src\usb.c</path>
         <encoding>System</encoding>
     </override>
     <override>

@@ -14,8 +14,6 @@
 #define __SDHC_H__
 
 #include "common.h"
-#include "conf.h"
-#include "system_init.h"
 
 #define SDHC_CLOCK      (MK64_Core_KHz * 1000)
 
@@ -170,7 +168,7 @@ typedef struct
 
 
 /*!
- *  @brief      SD Card 结构信息
+ *  @brief      SD Card structure
  */
 typedef struct
 {

@@ -23,12 +23,12 @@
 /*
 **PLL phase locked loop frequency
 */
-#define MK64_CORE_PLL_CLK       PLL120          //PLL core frequency (PLL150-PLL180 is stable, suggest use PLL150)
+#define MK64_CORE_PLL_CLK       PLL100          //PLL core frequency (PLL150-PLL180 is stable, suggest use PLL150)
 
-#define MK64_CORE_CLK           120             //core clock frequency
-#define MK64_BUS_CLK             60             //bus clock frequency
-#define MK64_FLEX_CLK            30             //flex clock frequency
-#define MK64_FLASH_CLK           30             //flash clock frequency
+#define MK64_CORE_CLK           100             //core clock frequency
+#define MK64_BUS_CLK             50             //bus clock frequency
+#define MK64_FLEX_CLK            25             //flex clock frequency
+#define MK64_FLASH_CLK           25             //flash clock frequency
 /*
 **SIM division factors
 */

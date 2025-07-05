@@ -1,10 +1,13 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       USB_CDC.h
- * @brief      USB_LIB
+ * @file       usb_cdc.h
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
+ * @version    v1.0
+ * @date       2025-06-24
  */
 
 #ifndef __USB_CDC_H__
@@ -33,7 +36,7 @@
 #define SET_FEATURE             0x03
 
 /*
-**结构体类型
+**Structure Types
 */
 typedef struct
 {

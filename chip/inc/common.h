@@ -125,7 +125,7 @@ typedef enum
     */
     PendSV_VECTORn                  = 14,       /*!< 14 Cortex-M4 Pend SV Interrupt                                                                      */
     SysTick_VECTORn                 = 15,       /*!< 15 Cortex-M4 System Tick Interrupt                                                              */
-    /******  Kinetis 6X specific Interrupt Numbers **********************************************************************/
+    /******  Kinetis 64 specific Interrupt Numbers **********************************************************************/
     DMA0_VECTORn                    = 16,       // DMA Channel 0,16 Transfer Complete
     DMA1_VECTORn                    = 17,       // DMA Channel 1,17 Transfer Complete
     DMA2_VECTORn                    = 18,       // DMA Channel 2,18 Transfer Complete
@@ -194,13 +194,8 @@ typedef enum
     SPI2_VECTORn                    = 81,       // SPI2 Interrupt
     UART4_RX_TX_VECTORn             = 82,       // UART4 Receive/Transmit interrupt
     UART4_ERR_VECTORn               = 83,       // UART4 Error interrupt
-    #if defined(MK66F18)
-    Reserved84_VECTORn              = 84,       // Reserved interrupt 84
-    Reserved85_VECTORn              = 85,       // Reserved interrupt 85
-    #elif defined(MK64F12)
     UART5_RX_TX_VECTORn             = 84,       // UART5 Receive/Transmit interrupt
     UART5_ERR_VECTORn               = 85,       // UART5 Error interrupt
-    #endif
     CMP2_VECTORn                    = 86,       // CMP2 interrupt
     FTM3_VECTORn                    = 87,       // FTM3 fault, overflow and channels interrupt
     DAC1_VECTORn                    = 88,       // DAC1 interrupt
@@ -217,22 +212,6 @@ typedef enum
     ENET_Transmit_VECTORn           = 99,       // Ethernet MAC Transmit Interrupt
     ENET_Receive_VECTORn            = 100,      // Ethernet MAC Receive Interrupt
     ENET_Error_VECTORn              = 101,      // Ethernet MAC Error and miscelaneous Interrupt
-    #if defined(MK66F18)
-    LPUART0_VECTORn                 = 102,      // LPUART0 status/error interrupt
-    TSI0_VECTORn                    = 103,      // TSI0 Interrupt
-    TPM1_VECTORn                    = 104,      // TPM1 fault, overflow and channels interrupt
-    TPM2_VECTORn                    = 105,      // TPM2 fault, overflow and channels interrupt
-    USBHSDCD_VECTORn                = 106,      // USBHSDCD, USBHS Phy Interrupt
-    I2C3_VECTORn                    = 107,      // I2C3 interrupt
-    CMP3_VECTORn                    = 108,      // CMP3 interrupt  
-    USBHS_VECTORn                   = 109,      // USB high speed OTG interrupt
-    CAN1_ORed_MB_VECTORn            = 110,      // CAN1 OR'd Message Buffers Interrupt
-    CAN1_Bus_Off_VECTORn            = 111,      // CAN1 Bus Off Interrupt
-    CAN1_Error_VECTORn              = 112,      // CAN1 Error Interrupt
-    CAN1_Tx_Warning_VECTORn         = 113,      // CAN1 Tx Warning Interrupt
-    CAN1_Rx_Warning_VECTORn         = 114,      // CAN1 Rx Warning Interrupt
-    CAN1_Wake_Up_VECTORn            = 115,      // CAN1 Wake Up Interrupt
-    #elif defined(MK64F12)
     Reserved102_VECTORn             = 102,       // Reserved interrupt 102
     Reserved103_VECTORn             = 103,       // Reserved interrupt 103
     Reserved104_VECTORn             = 104,       // Reserved interrupt 104
@@ -247,7 +226,6 @@ typedef enum
     Reserved113_VECTORn             = 113,       // Reserved interrupt 113
     Reserved114_VECTORn             = 114,       // Reserved interrupt 114
     Reserved115_VECTORn             = 115,       // Reserved interrupt 115
-    #endif
 } VECTORn_t;
 
 /*

@@ -14,11 +14,11 @@
 #include "sdhc.h"
 
 
-static volatile DSTATUS   Stat             = STA_NOINIT;    /* 硬盘状态         */
+static volatile DSTATUS   Stat             = STA_NOINIT;    /* hard disk status */
 
 /*
- *  @brief      硬盘初始化
- *  @param      drv                 设备号(目前代码仅支持为 0)
+ *  @brief      hard disk status
+ *  @param      drv                 Device number (currently code only supports 0)
  *  @since      v1.0
  */
 DSTATUS disk_initialize (unsigned char drv)
@@ -26,9 +26,9 @@ DSTATUS disk_initialize (unsigned char drv)
     uint32                      param, c_size, c_size_mult, read_bl_len;
     ESDHC_CMD_t                 command;
 
-    if (drv) return STA_NOINIT;         /* 目前代码仅支持1个设备 */
-    if (Stat & STA_NODISK) return Stat; /* 没有插入卡 */
-    if ((Stat & STA_NOINIT) == 0)   return 0;/* 没有初始化 */
+    if (drv) return STA_NOINIT;         /* currently, the code only supports one device */
+    if (Stat & STA_NODISK) return Stat; /* no card inserted */
+    if ((Stat & STA_NOINIT) == 0)   return 0;/* not initiated */
 
     SDHC_card.SD_TIMEOUT = 0;
     SDHC_card.NUM_BLOCKS = 0;
@@ -36,13 +36,13 @@ DSTATUS disk_initialize (unsigned char drv)
     SDHC_card.SDHC_SDHC = FALSE;
     SDHC_card.VERSION2 = FALSE;
 
-    /* 初始化和检测卡 */
+    /* initialization and detection card */
     if (ESDHC_IOCTL_OK != SDHC_ioctl (ESDHC_IOCTL_INIT, NULL))
     {
         return FALSE;
     }
 
-    /* SDHC 检测 */
+    /* SDHC check */
     param = 0;
     if (ESDHC_IOCTL_OK != SDHC_ioctl (ESDHC_IOCTL_GET_CARD, &param))
     {
@@ -60,7 +60,7 @@ DSTATUS disk_initialize (unsigned char drv)
         return FALSE;
     }
 
-    /* 卡识别 */
+    /* card recognition */
     command.COMMAND = ESDHC_CMD2;
     command.TYPE = ESDHC_TYPE_NORMAL;
     command.ARGUMENT = 0;
@@ -71,7 +71,7 @@ DSTATUS disk_initialize (unsigned char drv)
         return FALSE;
     }
 
-    /* 获得卡地址 */
+    /* obtain card address */
     command.COMMAND = ESDHC_CMD3;
     command.TYPE = ESDHC_TYPE_NORMAL;
     command.ARGUMENT = 0;
@@ -83,7 +83,7 @@ DSTATUS disk_initialize (unsigned char drv)
     }
     SDHC_card.ADDRESS = command.RESPONSE[0] & 0xFFFF0000;
 
-    /* 获得卡参数 */
+    /* obtain card parameters */
     command.COMMAND = ESDHC_CMD9;
     command.TYPE = ESDHC_TYPE_NORMAL;
     command.ARGUMENT = SDHC_card.ADDRESS;
@@ -108,7 +108,7 @@ DSTATUS disk_initialize (unsigned char drv)
         SDHC_card.NUM_BLOCKS = (c_size + 1) << 10;
     }
 
-    /* 选择卡 */
+    /* select card */
     command.COMMAND = ESDHC_CMD7;
     command.TYPE = ESDHC_TYPE_NORMAL;
     command.ARGUMENT = SDHC_card.ADDRESS;
@@ -119,7 +119,7 @@ DSTATUS disk_initialize (unsigned char drv)
         return FALSE;
     }
 
-    /* 设置块的大小 */
+    /* set block size */
     command.COMMAND = ESDHC_CMD16;
     command.TYPE = ESDHC_TYPE_NORMAL;
     command.ARGUMENT = SDCARD_BLOCK_SIZE;
@@ -132,7 +132,7 @@ DSTATUS disk_initialize (unsigned char drv)
 
     if (ESDHC_BUS_WIDTH_4BIT == SDHC_BUS_WIDTH)
     {
-        /* 应用程序特定的命令 */
+        /* application specific commands */
         command.COMMAND = ESDHC_CMD55;
         command.TYPE = ESDHC_TYPE_NORMAL;
         command.ARGUMENT = SDHC_card.ADDRESS;
@@ -143,7 +143,7 @@ DSTATUS disk_initialize (unsigned char drv)
             return FALSE;
         }
 
-        /* 设置总线带宽 == 4 */
+        /* set bandwidth == 4 */
         command.COMMAND = ESDHC_ACMD6;
         command.TYPE = ESDHC_TYPE_NORMAL;
         command.ARGUMENT = 2;
@@ -161,15 +161,15 @@ DSTATUS disk_initialize (unsigned char drv)
         }
     }
 
-    Stat &= ~STA_NOINIT;        /* 清 STA_NOINIT */
+    Stat &= ~STA_NOINIT;        /* clear STA_NOINIT */
 
     return (Stat & 0x03);
 }
 
 /*
- *  @brief      从MMC接收数据包
- *  @param      buff                接收 SDCARD_BLOCK_SIZE 个字节的数据块到数据缓冲区地址
- *  @param      btr                 字节数目(必须是 4 的倍数)
+ *  @brief      Receive data packets from MMC
+ *  @param      buff                Receive a data block of SDCARD_BLOCK_SIZE bytes to the data buffer address
+ *  @param      btr                 Number of bytes (must be a multiple of 4)
  *  @since      v1.0
  */
 static int rcvr_datablock (uint8   *buff, uint32  btr)
@@ -198,7 +198,7 @@ static int rcvr_datablock (uint8   *buff, uint32  btr)
 
             while (0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_BREN_MASK)) {};
 
-            //小端
+            // little port
             *ptr++ = SDHC_DATPORT;
         }
         bytes -= i;
@@ -208,38 +208,38 @@ static int rcvr_datablock (uint8   *buff, uint32  btr)
 }
 
 /*
- *  @brief      读扇区
- *  @param      drv                 驱动号(目前代码仅支持为 0)
- *  @param      buff                缓冲区地址
- *  @param      sector              扇区号
- *  @param      count               扇区数(1~255)
- *  @return     DRESULT             执行结果
+ *  @brief      read sector
+ *  @param      drv                 driver number (currently code only supports 0)
+ *  @param      buff                buffer address
+ *  @param      sector              sector number
+ *  @param      count               sector number (1~255)
+ *  @return     DRESULT             execute result
  *  @since      v1.0
  */
-DRESULT disk_read (         //读磁盘扇区
-    uint8  drv,             /* 物理驱动编号 (0) */
-    uint8  *buff,           /* 指向数据缓冲区来存储读到的数据 */
-    uint32 sector,          /* 开始的扇区号 (LBA) */
-    uint8  count            /* 扇区总数(1..255) */
+DRESULT disk_read (         //read disk sectors
+    uint8  drv,             /* physical driver number (0) */
+    uint8  *buff,           /* point to the data buffer to store the read data */
+    uint32 sector,          /* start sector number (LBA) */
+    uint8  count            /* total sector number(1..255) */
 )
 {
     ESDHC_CMD_t command;
 
-    if (drv || (!count)) return RES_PARERR;       //drv 只能为 0， count 必须不等于0
-    if (Stat & STA_NOINIT) return RES_NOTRDY;     //未就绪
+    if (drv || (!count)) return RES_PARERR;       //drv can only be 0, count must not be equal to 0
+    if (Stat & STA_NOINIT) return RES_NOTRDY;     //not ready
 
-    /* 检测参数 */
+    /* detect parameter */
     if ((NULL == buff))
     {
-        return RES_PARERR;//参数无效
+        return RES_PARERR;//paramter invalidate
     }
 
     if (!SDHC_card.SDHC_SDHC)
     {
-        sector *= SDCARD_BLOCK_SIZE;    /* 如果需要,转换为字节地址 */
+        sector *= SDCARD_BLOCK_SIZE;    /* if necessary, convert to byte address */
     }
 
-    if (count == 1) /* 单块读 */
+    if (count == 1) /* single block reading */
     {
         command.COMMAND = ESDHC_CMD17;
         command.TYPE = ESDHC_TYPE_NORMAL;
@@ -257,7 +257,7 @@ DRESULT disk_read (         //读磁盘扇区
     }
     else
     {
-        /* 多块读 */
+        /* multiple block */
         //
         command.COMMAND = ESDHC_CMD18;
         //command.COMMAND = ESDHC_CMD17;
@@ -279,9 +279,9 @@ DRESULT disk_read (         //读磁盘扇区
 }
 
 /*
- *  @brief      发送数据包到 MMC
- *  @param      buff                发送 SDCARD_BLOCK_SIZE 个字节的数据块的数据缓冲区地址
- *  @param      btr                 字节数目(必须是 4 的倍数)
+ *  @brief      sending data packets to MMC
+ *  @param      buff                send the data buffer address of SDCARD_BLOCK_SIZE byte data block
+ *  @param      btr                 number of bytes (must be a multiple of 4)
  *  @since      v1.0
  */
 static int xmit_datablock (const uint8 *buff, uint32 btr    )
@@ -314,12 +314,12 @@ static int xmit_datablock (const uint8 *buff, uint32 btr    )
 
 
 /*
- *  @brief      写扇区
- *  @param      drv                 驱动号(目前代码仅支持为 0)
- *  @param      buff                缓冲区地址
- *  @param      sector              扇区号
- *  @param      count               扇区数(1~255)
- *  @return     DRESULT             执行结果
+ *  @brief      write sector
+ *  @param      drv                 driver number (currently code only supports 0)
+ *  @param      buff                buffer address
+ *  @param      sector              sector number
+ *  @param      count               sector number (1~255)
+ *  @return     DRESULT             result
  *  @since      v1.0
  */
 DRESULT disk_write (uint8  drv, const uint8  *buff, uint32 sector, uint8  count)
@@ -334,7 +334,7 @@ DRESULT disk_write (uint8  drv, const uint8  *buff, uint32 sector, uint8  count)
     /* Check parameters */
     if ((NULL == buff))
     {
-        return RES_PARERR;      // 参数无效
+        return RES_PARERR;      // parameter invalidate
     }
 
     if (!SDHC_card.SDHC_SDHC)
@@ -410,10 +410,10 @@ DRESULT disk_write (uint8  drv, const uint8  *buff, uint32 sector, uint8  count)
 
 
 /*
- *  @brief      硬盘 控制命令
- *  @param      drv                 驱动号
- *  @param      ctrl                控制命令
- *  @param      buff                缓冲区地址，用于接收和发送控制数据
+ *  @brief      hard disk control command
+ *  @param      drv                 dirver number
+ *  @param      ctrl                command
+ *  @param      buff                buffer address, used for receiving and sending control data
  *  @since      v1.0
  */
 DRESULT disk_ioctl (
@@ -482,8 +482,8 @@ DRESULT disk_ioctl (
 
 
 /*
- *  @brief      获取硬盘状态
- *  @return     硬盘状态
+ *  @brief      get hard disk status
+ *  @return     hard disk status
  *  @since      v1.0
  */
 DSTATUS disk_status (
@@ -496,8 +496,8 @@ DSTATUS disk_status (
 
 
 /*
- *  @brief      获取时间(为了满足接口需要而添加，实际上并没用实现功能)
- *  @return     结果总是为 0
+ *  @brief      retrieve time (added to meet interface requirements, but not actually used to implement functionality)
+ *  @return     result is always 0
  *  @since      v1.0
  */
 uint32  get_fattime (void)

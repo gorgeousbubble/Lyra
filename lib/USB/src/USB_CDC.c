@@ -1,10 +1,13 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       USB_CDC.c
- * @brief      USB_LIB
+ * @file       usb_cdc.c
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
+ * @version    v1.0
+ * @date       2025-06-24
  */
 
 #include "usb_cdc.h"
@@ -17,16 +20,16 @@ uint8 u8CDCState = WAITING_FOR_ENUMERATION;
 uint8 CDC_OUT_Data[CDC_BUFFER_SIZE];
 
 /*
- *  @brief      CDC类初始化函数
+ *  @brief      CDC class initialization function
  *  @since      v1.0
  */
 void CDC_Init(void)
 {
-  //配置串口特性
-  com_cfg.DTERate      = 9600;                //波特率
-  com_cfg.CharFormat   = 0;                   //字符格式
-  com_cfg.ParityType   = 0;                   //极性类型
-  com_cfg.Databits     = 0x08;                //数据位数
+  //configure serial port features
+  com_cfg.DTERate      = 9600;                //baud rate
+  com_cfg.CharFormat   = 0;                   //character format
+  com_cfg.ParityType   = 0;                   //polarity type
+  com_cfg.Databits     = 0x08;                //number of data bits
 }
 
 /**********************************************************/
@@ -37,7 +40,7 @@ void CDC_Engine(void)
   switch(u8CDCState)
   {
     case WAITING_FOR_ENUMERATION:
-    /* 等待 USB 枚举 */
+    /* Waiting for USB enumeration */
     while(gu8USB_State != uENUMERATED)
     {
       (void)u8CDCState;
@@ -63,8 +66,8 @@ void CDC_Engine(void)
 }
 
 /*
- *  @brief      当前接口请求为CDC类请求 的 中断服务函数
- *  @note       在 USB_Setup_Handler 中断里调用
+ *  @brief      The current interface request is an interrupt service function for CDC class requests
+ *  @note       Call in USB_SetupHHandler interrupt
  *  @since      v1.0
  */
 uint8 CDC_InterfaceReq_Handler(void)

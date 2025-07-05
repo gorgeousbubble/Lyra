@@ -1,19 +1,22 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       USB.c
- * @brief      USB_LIB
+ * @file       usb.c
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
+ * @version    v1.0
+ * @date       2025-06-24
  */
 
 #include "usb.h"
 #include "usb_desc.h"
 
 /*
-**数组和全局缓冲区
+**Arrays and global buffers
 */
-#pragma data_alignment=512      //必须 512 字节对齐
+#pragma data_alignment=512      //Must be aligned with 512 bytes
 
 tBDT tBDTtable[16];
 
@@ -87,11 +90,11 @@ const uint8 *String_Table[4] =
 };
 
 /*
-**USB 中断服务函数的全局变量
+**USB global variables of interrupt service function
 */
-uint8   gu8USB_Flags;           //USB 的 各端点 接收到数据 的 标志位
+uint8   gu8USB_Flags;           //the flag bits of data received by each endpoint of USB
 uint8   gu8USBClearFlags;
-uint8   *pu8IN_DataPointer;     //指向 USB输入数据缓冲区的 指针
+uint8   *pu8IN_DataPointer;     //pointer to USB input data buffer
 uint8   gu8IN_Counter;
 uint8   gu8USB_Toogle_flags;
 uint8   gu8Dummy;
@@ -100,10 +103,10 @@ uint8   gu8Interface;
 uint8   gu8HALT_EP;
 uint8   gu8USB_State;
 
-tUSB_Setup *Setup_Pkt;          //USB setup 数据包指针
+tUSB_Setup *Setup_Pkt;          //USB setup packet pointer
 
 /*
- *  @brief      端点IN传送(IN是相对主机而言)
+ *  @brief      Endpoint IN transmission (IN is relative to the host)
  *  @since      v1.0
  */
 void EP_IN_Transfer(uint8 u8EP, uint8 *pu8DataPointer, uint8 u8DataSize)
@@ -172,7 +175,7 @@ void EP_IN_Transfer(uint8 u8EP, uint8 *pu8DataPointer, uint8 u8DataSize)
 }
 
 /*
- *  @brief      端点OUT传送(OUT是相对主机而言)
+ *  @brief      Endpoint OUT transmission (OUT is relative to the host)
  *  @since      v1.0
  */
 uint8 EP_OUT_Transfer(uint8 u8EP, uint8 *pu8DataPointer)
@@ -197,7 +200,7 @@ uint8 EP_OUT_Transfer(uint8 u8EP, uint8 *pu8DataPointer)
 }
 
 /*
- *  @brief      端点OUT长度检测(OUT是相对主机而言)
+ *  @brief      Endpoint OUT length detection (OUT is relative to the host)
  *  @since      v1.0
  */
 uint16 USB_EP_OUT_SizeCheck(uint8 u8EP)
@@ -210,7 +213,7 @@ uint16 USB_EP_OUT_SizeCheck(uint8 u8EP)
 }
 
 /*
- *  @brief      设置 USB 端点
+ *  @brief      Set USB endpoint
  *  @since      v1.0
  */
 void USB_Set_Interface(void)
@@ -241,7 +244,7 @@ void USB_Set_Interface(void)
 
 
 /*
- *  @brief      标准请求中断服务函数（USB接收的Setup的请求）
+ *  @brief      Standard Request Interrupt Service Function (USB Received Setup Request)
  *  @since      v1.0
  */
 void USB_StdReq_Handler(void)
@@ -301,7 +304,7 @@ void USB_StdReq_Handler(void)
 }
 
 /*
- *  @brief      USB SETUP中断 服务函数
+ *  @brief      USB SETUP Interrupt Service Function
  *  @since      v1.0
  */
 void USB_Setup_Handler(void)
@@ -343,7 +346,7 @@ void USB_Setup_Handler(void)
 }
 
 /*
- *  @brief      USB 端点 SETUP中断 服务函数
+ *  @brief      USB Endpoint SETUP Interrupt Service Function
  *  @since      v1.0
  */
 void USB_Endpoint_Setup_Handler(void)
@@ -377,7 +380,7 @@ void USB_Endpoint_Setup_Handler(void)
 }
 
 /*
- *  @brief      USB 令牌中断 服务函数
+ *  @brief      USB Token Interrupt Service Function
  *  @since      v1.0
  */
 void USB_Handler(void)
@@ -416,7 +419,7 @@ void USB_Handler(void)
 }
 
 /*
- *  @brief      USB 端点 0 IN 服务函数(IN是相对主机而言)
+ *  @brief      USB endpoint 0 IN service function (IN is relative to the host)
  *  @since      v1.0
  */
 void USB_EP0_IN_Handler(void)
@@ -431,7 +434,7 @@ void USB_EP0_IN_Handler(void)
 }
 
 /*
- *  @brief      USB 端点 0 stall(传输失败)
+ *  @brief      USB endpoint 0 stall (transfer failed)
  *  @since      v1.0
  */
 void USB_EP0_Stall(void)
@@ -444,7 +447,7 @@ void USB_EP0_Stall(void)
 }
 
 /*
- *  @brief      USB 端点 0 OUT 服务函数(OUT 是相对主机而言)
+ *  @brief      USB endpoint 0 OUT service function (OUT is relative to the host)
  *  @since      v1.0
  */
 void USB_EP0_OUT_Handler(void)
@@ -457,7 +460,7 @@ void USB_EP0_OUT_Handler(void)
 }
 
 /*
- *  @brief      USB stall 中断（传输失败）
+ *  @brief      USB stall interrupt (transfer failed)
  *  @since      v1.0
  */
 void USB_Stall_Handler(void)
@@ -468,7 +471,7 @@ void USB_Stall_Handler(void)
 }
 
 /*
- *  @brief      USB 复位 中断服务函数
+ *  @brief      USB reset interrupt service function
  *  @since      v1.0
  */
 void USB_Reset_Handler(void)
@@ -530,7 +533,7 @@ void USB_Reset_Handler(void)
 
 
 /*
- *  @brief      USB 总的 中断服务函数
+ *  @brief      USB overall interrupt service function
  *  @since      v1.0
  */
 void USB_ISR(void)

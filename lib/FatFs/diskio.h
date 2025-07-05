@@ -27,26 +27,26 @@ typedef uint8   DSTATUS;
 /* Results of Disk Functions */
 typedef enum
 {
-    RES_OK = 0,                 /* 0: 成功      */
-    RES_ERROR,                  /* 1: R/W 错误  */
-    RES_WRPRT,                  /* 2: 写保护    */
-    RES_NOTRDY,                 /* 3: 未就绪    */
-    RES_PARERR                  /* 4: 参数无效  */
+    RES_OK = 0,                 /* 0: success               */
+    RES_ERROR,                  /* 1: R/W error             */
+    RES_WRPRT,                  /* 2: write protect         */
+    RES_NOTRDY,                 /* 3: not ready             */
+    RES_PARERR                  /* 4: parameter invalidate  */
 } DRESULT;
 
 
 /* Disk Status Bits (DSTATUS) */
-#define STA_NOINIT      0x01    /* 磁盘未初始化 1表示未初始化，0表示已初始化   */
-#define STA_NODISK      0x02    /* 磁盘未插入    */
-#define STA_PROTECT     0x04    /* 写保护        */
+#define STA_NOINIT      0x01    /* disk not initialized 1 means not initialized, 0 means initialized   */
+#define STA_NODISK      0x02    /* disk not inserted    */
+#define STA_PROTECT     0x04    /* write protection     */
 
 
 /* Generic command (defined for FatFs) */
-#define CTRL_SYNC           0   /* 冲刷磁盘缓冲 */
-#define GET_SECTOR_COUNT    1   /* 获取磁盘大小 */
-#define GET_SECTOR_SIZE     2   /* 获取扇区大小 (for multiple sector size (_MAX_SS >= 1024)) */
-#define GET_BLOCK_SIZE      3   /* 获取块大小 (for only f_mkfs()) */
-#define CTRL_ERASE_SECTOR   4   /* 强制删除一个扇区 (for only _USE_ERASE) */
+#define CTRL_SYNC           0   /* flush disk buffer */
+#define GET_SECTOR_COUNT    1   /* get disk size */
+#define GET_SECTOR_SIZE     2   /* obtain sector size (for multiple sector size (_MAX_SS >= 1024)) */
+#define GET_BLOCK_SIZE      3   /* get block size (for only f_mkfs()) */
+#define CTRL_ERASE_SECTOR   4   /* forcefully delete a sector (for only _USE_ERASE) */
 
 /* Generic command */
 #define CTRL_POWER          5   /* Get/Set power status */
@@ -69,15 +69,17 @@ typedef enum
 #define NAND_FORMAT         30  /* Create physical format */
 
 
-/*--------------移植时需要编写的几个底层函数--------------*/
-extern DSTATUS disk_initialize (uint8);                          //初始化磁盘（只支持磁盘0）
-extern DSTATUS disk_status (uint8);                              //返回磁盘状态
-extern DRESULT disk_read (uint8, uint8 *, uint32, uint8);           //读磁盘扇区
-extern DRESULT disk_ioctl (uint8, uint8, void *);                 //磁盘控制
-extern uint32   get_fattime (void);                              //获取当前时间
+/*
+**function declaration
+*/
+extern DSTATUS disk_initialize (uint8);                         //initialize disk (only supports disk 0)
+extern DSTATUS disk_status (uint8);                             //return to disk status
+extern DRESULT disk_read (uint8, uint8 *, uint32, uint8);       //read disk sectors
+extern DRESULT disk_ioctl (uint8, uint8, void *);               //disk control
+extern uint32   get_fattime (void);                             //get the current time
 
 #if _READONLY == 0
-DRESULT disk_write (uint8, const uint8 *, uint32, uint8);           //写磁盘扇区
+DRESULT disk_write (uint8, const uint8 *, uint32, uint8);       //write disk sectors
 #endif
 
 

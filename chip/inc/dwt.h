@@ -3,25 +3,25 @@
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       wdog.h
+ * @file       dwt.h
  * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
  */
 
-#ifndef __WDOG_H__
-#define __WDOG_H__
+#ifndef __DWT_H__
+#define __DWT_H__
 
 #include "common.h"
+
+#define DWT_CLK_KHZ             MK64_Core_KHz
 
 /*
 **function declaration
 */
-extern void WDOG_Unlock(void);
-extern void WDOG_Feed(void);
-extern void WDOG_Disable(void);
-extern void WDOG_Enable(void);
-extern void WDOG_Init(uint32 WDOG_Cnt);
+extern void DWT_Delay_us(uint32 DWT_us);
+extern void DWT_Delay_ms(uint32 DWT_ms);
+
 
 #endif

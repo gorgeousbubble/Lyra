@@ -10,7 +10,9 @@
  * @date       2025-06-24
  */
 
+#include "init.h"
 #include "main.h"
+#include "mpu6050.h"
 
 /*
  *  @brief              main
@@ -19,6 +21,9 @@
  *  Sample usage:       void main(void)
  */
 void main(void)
-{ 
-  return;
+{
+  AllInit();
+  for(;;)
+  {
+  }
 }

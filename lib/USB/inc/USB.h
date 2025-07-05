@@ -1,10 +1,13 @@
 /*
  *     COPYRIGHT NOTICE
- *     Copyright(c) 2016, Alopex
+ *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       USB.h
- * @brief      USB_LIB
+ * @file       usb.h
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @author     alopex
+ * @version    v1.0
+ * @date       2025-06-24
  */
 
 #ifndef __USB_H__
@@ -15,15 +18,15 @@
 #include "fsl_types.h"
 #include "usb_cdc.h"
 
-//USB包设置
-#define MaxPacketSize           64                      //USB包设置(低速USB:8,全速USB:8,16,32,64,高速USB:64)
+//USB package settings
+#define MaxPacketSize           64                      //USB package settings (low-speed USB: 8, full speed USB: 8,16,32,64, high-speed USB: 64)
 
 //USB Macros
-#define DISABLE_USB             USBCTL0 = 0             //禁止USB模块
+#define DISABLE_USB             USBCTL0 = 0             //Prohibit USB module
 #define ENDPOINTS               3
 
 /*
-**EP配置
+**EP configuration
 */
 #define _EP_IN                  USB_ENDPT_EPTXEN_MASK
 #define _EP_OUT                 USB_ENDPT_EPRXEN_MASK
@@ -70,7 +73,7 @@
 #define EP6_BUFF_OFFSET         0x08
 
 /*
-**BDT状态值
+**BDT status
 */
 #define kMCU                    0x00
 #define kSIE                    0x80
@@ -124,7 +127,7 @@
 #define ENDPOINT_REQ            0x02
 
 /*
-**枚举类型
+**Enum Types
 */
 enum
 {
@@ -180,7 +183,7 @@ enum
 };
 
 /*
-**数据结构体
+**Data Structure
 */
 typedef struct
 {
@@ -229,7 +232,7 @@ typedef struct
 }USB_Registers;
 
 /*
-**联合类型
+**Union Type
 */
 typedef union _tBDT_STAT
 {

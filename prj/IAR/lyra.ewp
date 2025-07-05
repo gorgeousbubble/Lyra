@@ -2793,7 +2793,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>240</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -3857,7 +3857,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>240</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -7049,7 +7049,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>240</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -8113,7 +8113,7 @@
             <data>
                 <extensions></extensions>
                 <cmdline></cmdline>
-                <hasPrio>240</hasPrio>
+                <hasPrio>1</hasPrio>
                 <buildSequence>inputOutputBased</buildSequence>
             </data>
         </settings>
@@ -8519,19 +8519,46 @@
             <name>$PROJ_DIR$\..\..\app\src\conf.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\init.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\it.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\main.c</name>
         </file>
     </group>
     <group>
         <name>board</name>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_i2c.c</name>
+        </file>
     </group>
     <group>
         <name>chip</name>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\adc.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\dac.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\delay.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\dwt.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\gpio.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\i2c.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\mcg.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\pit.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\port.c</name>
@@ -8540,14 +8567,29 @@
             <name>$PROJ_DIR$\..\..\chip\src\sdhc.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\uart.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\wdog.c</name>
         </file>
     </group>
     <group>
         <name>dev</name>
+        <file>
+            <name>$PROJ_DIR$\..\..\dev\src\mpu6050.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\dev\src\oled.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\dev\src\oled_lib.c</name>
+        </file>
     </group>
     <group>
         <name>inc</name>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\adc.h</name>
+        </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\common.h</name>
         </file>
@@ -8555,10 +8597,34 @@
             <name>$PROJ_DIR$\..\..\app\inc\conf.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\dac.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\delay.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\dwt.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\gpio.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\gpio_cfg.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\i2c.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\inc\init.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\inc\it.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\inc\main.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_i2c.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\mcg.h</name>
@@ -8570,13 +8636,28 @@
             <name>$PROJ_DIR$\..\..\startup\inc\MK64F12.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\dev\inc\mpu6050.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\dev\inc\oled.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\pit.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\port.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\port_cfg.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\sdhc.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\startup\inc\system_init.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\uart.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\startup\inc\vectors.h</name>
@@ -8659,7 +8740,7 @@
                 <name>$PROJ_DIR$\..\..\lib\USB\src\usb.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\lib\USB\inc\USB.h</name>
+                <name>$PROJ_DIR$\..\..\lib\USB\inc\usb.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\lib\USB\src\usb_cdc.c</name>
