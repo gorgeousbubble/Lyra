@@ -11,6 +11,9 @@
  */
 
 #include "conf.h"
+#include "dwt.h"
+#include "maps_dock_lcm.h"
+#include "maps_dock_led.h"
 
 /*
  *  @brief      assert failed function
@@ -34,7 +37,29 @@ void assert_failed(char *file, int line)
  */
 void default_isr(void)
 {
+  #ifdef  DEBUG
+  #define VECTORNUM     (*(volatile uint8_t*)(0xE000ED04))
+  uint8 vtr = VECTORNUM;
+  
+  MAPS_Dock_LCM_Init();
+  MAPS_Dock_LCM_Put_Str_6x8(0,0,Vector_Str[vtr],LCM_Pure_Color);
+  
+  MAPS_Dock_LEDx_Init(MAPS_Dock_LED1,LED_ON);
+  MAPS_Dock_LEDx_Init(MAPS_Dock_LED2,LED_ON);
+  MAPS_Dock_LEDx_Init(MAPS_Dock_LED3,LED_ON);
+  MAPS_Dock_LEDx_Init(MAPS_Dock_LED4,LED_ON);
+  
+  while(1)
+  {
+    MAPS_Dock_LEDx_Turn(MAPS_Dock_LED1);
+    MAPS_Dock_LEDx_Turn(MAPS_Dock_LED2);
+    MAPS_Dock_LEDx_Turn(MAPS_Dock_LED3);
+    MAPS_Dock_LEDx_Turn(MAPS_Dock_LED4);
+    DELAY_MS(100);
+  }
+  #else
   return;
+  #endif
 }
 
 

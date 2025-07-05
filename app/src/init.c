@@ -14,6 +14,12 @@
 #include "i2c.h"
 #include "init.h"
 #include "it.h"
+#include "maps_dock_key.h"
+#include "maps_dock_lcd.h"
+#include "maps_dock_lcm.h"
+#include "maps_dock_led.h"
+#include "maps_dock_rocker.h"
+#include "maps_dock_w25q80.h"
 #include "misc.h"
 #include "mpu6050.h"
 #include "pit.h"
@@ -51,16 +57,16 @@ void AllInit(void)
   /*
   **MAPS_Dock
   */
-  //MAPS_Dock_LED_Init();//LED initialization
-  //MAPS_Dock_LCM_Init();//LCM initialization
-  //MAPS_Dock_KEY_ALL_Init();//KEY independent button initialization
-  //MAPS_Dock_Rocker_Key_Init();//Rocker joystick button initialization
-  //MAPS_Dock_W25Q80_Init();//W25Q80 initialization
+  MAPS_Dock_LED_Init();//LED initialization
+  MAPS_Dock_LCM_Init();//LCM initialization
+  MAPS_Dock_KEY_ALL_Init();//KEY independent button initialization
+  MAPS_Dock_Rocker_Key_Init();//Rocker joystick button initialization
+  MAPS_Dock_W25Q80_Init();//W25Q80 initialization
   
   /*
   **MAPS
   */
-  //MAPS_LCD_Init();//LCD initialization
+  MAPS_LCD_Init();//LCD initialization
   
   /*
   **MK64

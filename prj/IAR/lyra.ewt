@@ -11397,6 +11397,24 @@
         <file>
             <name>$PROJ_DIR$\..\..\board\src\maps_dock_i2c.c</name>
         </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_key.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_lcd.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_lcm.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_led.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_rocker.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_w25q80.c</name>
+        </file>
     </group>
     <group>
         <name>chip</name>
@@ -11429,6 +11447,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\sdhc.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\spi.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\uart.c</name>
@@ -11491,6 +11512,33 @@
             <name>$PROJ_DIR$\..\..\board\inc\maps_dock_i2c.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_key.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_lcd.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_lcd_font.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_lcd_pic.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_lcm.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_lcm_lib.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_led.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_rocker.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_w25q80.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\mcg.h</name>
         </file>
         <file>
@@ -11516,6 +11564,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\sdhc.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\spi.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\startup\inc\system_init.h</name>

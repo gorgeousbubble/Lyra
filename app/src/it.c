@@ -12,6 +12,7 @@
 
 #include "adc.h"
 #include "it.h"
+#include "maps_dock_led.h"
 #include "misc.h"
 #include "mpu6050.h"
 #include "pit.h"
@@ -93,7 +94,7 @@ void PIT0_IRQHandler(void)
       PIT_Flag = 0;
     }
     
-    //MAPS_Dock_LED_Turn();//LED turnover
+    MAPS_Dock_LED_Turn();//LED turnover
     ADC_Convert_Result[0] = ADC_Once(ADC0_DP0,ADC_12Bit);//ADC convert
     ADC_Convert_Result[1] = ADC_Once(ADC0_DM0,ADC_12Bit);//ADC convert
   }
