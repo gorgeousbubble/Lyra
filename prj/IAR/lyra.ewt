@@ -11422,6 +11422,9 @@
             <name>$PROJ_DIR$\..\..\chip\src\adc.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\can.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\dac.c</name>
         </file>
         <file>
@@ -11474,6 +11477,9 @@
         <name>inc</name>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\adc.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\can.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\common.h</name>

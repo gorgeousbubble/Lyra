@@ -53,6 +53,10 @@
         <encoding>System</encoding>
     </override>
     <override>
+        <path>C:\Users\Alope\MicroController\Lyra\chip\src\can.c</path>
+        <encoding>System</encoding>
+    </override>
+    <override>
         <path>C:\Users\Alope\MicroController\Lyra\chip\src\gpio.c</path>
         <encoding>UTF-8</encoding>
     </override>
