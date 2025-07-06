@@ -8576,13 +8576,28 @@
             <name>$PROJ_DIR$\..\..\chip\src\flash.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\flexbus.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\ftm.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\gpio.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\i2c.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\i2s.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\lptmr.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\mcg.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\pdb.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\pit.c</name>
@@ -8591,10 +8606,19 @@
             <name>$PROJ_DIR$\..\..\chip\src\port.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\rtc.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\sdhc.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\spi.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\sys_tick.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\sys_usb.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\uart.c</name>
@@ -8645,6 +8669,12 @@
             <name>$PROJ_DIR$\..\..\chip\inc\flash.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\flexbus.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\ftm.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\gpio.h</name>
         </file>
         <file>
@@ -8654,10 +8684,16 @@
             <name>$PROJ_DIR$\..\..\chip\inc\i2c.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\i2s.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\inc\init.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\inc\it.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\lptmr.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\inc\main.h</name>
@@ -8708,6 +8744,9 @@
             <name>$PROJ_DIR$\..\..\dev\inc\oled.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\pdb.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\pit.h</name>
         </file>
         <file>
@@ -8717,10 +8756,19 @@
             <name>$PROJ_DIR$\..\..\chip\inc\port_cfg.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\rtc.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\sdhc.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\spi.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\sys_tick.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\sys_usb.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\startup\inc\system_init.h</name>
