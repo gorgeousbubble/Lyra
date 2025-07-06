@@ -11431,7 +11431,13 @@
             <name>$PROJ_DIR$\..\..\chip\src\delay.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\src\dma.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\src\dwt.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\src\flash.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\gpio.c</name>
@@ -11494,7 +11500,13 @@
             <name>$PROJ_DIR$\..\..\chip\inc\delay.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\dma.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\dwt.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\chip\inc\flash.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\gpio.h</name>
