@@ -25,11 +25,36 @@
 #undef  VECTOR_064
 #define VECTOR_064      PIT0_IRQHandler
 
+#undef  VECTOR_065
+#define VECTOR_065      PIT1_IRQHandler
+
+/*
+**variate definition
+*/
+typedef struct {
+  int X;
+  int Y;
+  int Z;
+} ACC;
+
+typedef struct {
+  int X;
+  int Y;
+  int Z;
+} GYRO;
+
+typedef struct {
+  ACC Acc;
+  GYRO Gyro;
+} MPU6050_Sensor;
+
 /*
 **variate declaration
 */
-extern int PIT_Count;//PIT counter
+extern int PIT0_Count;//PIT0 counter
+extern int PIT1_Count;//PIT1 counter
 extern uint16 ADC_Convert_Result[2];//ADC sample
+extern MPU6050_Sensor MPU6050;//MPU6050
 
 /*
 **function declaration
@@ -37,6 +62,7 @@ extern uint16 ADC_Convert_Result[2];//ADC sample
 extern void PORTC_PTC19_IRQHandler(void);
 extern void PORTD_PTD15_IRQHandler(void);
 extern void PIT0_IRQHandler(void);
+extern void PIT1_IRQHandler(void);
 
 
 

@@ -8549,6 +8549,9 @@
             <name>$PROJ_DIR$\..\..\board\src\maps_dock_rocker.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\board\src\maps_dock_sd_card.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\board\src\maps_dock_w25q80.c</name>
         </file>
     </group>
@@ -8634,6 +8637,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\dev\src\oled.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\dev\src\oled_i2c.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\dev\src\oled_lib.c</name>
@@ -8726,6 +8732,9 @@
             <name>$PROJ_DIR$\..\..\board\inc\maps_dock_rocker.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\board\inc\maps_dock_sd_card.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\board\inc\maps_dock_w25q80.h</name>
         </file>
         <file>
@@ -8742,6 +8751,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\dev\inc\oled.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\dev\inc\oled_i2c.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\pdb.h</name>

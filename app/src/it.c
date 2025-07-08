@@ -21,13 +21,24 @@
 /*
 **PIT counter
 */
-int PIT_Count=0;//PIT count
-char PIT_Flag=0;//PIT flag
+int PIT0_Count=0;//PIT0 count
+char PIT0_Flag=0;//PIT0 flag
+
+int PIT1_Count=0;//PIT1 count
+char PIT1_Flag=0;//PIT1 flag 
 
 /*
 **ADC convert
 */
 uint16 ADC_Convert_Result[2]={0};
+
+/*
+**MPU6050 sensor
+*/
+MPU6050_Sensor MPU6050 = {
+  .Acc = {0, 0, 0},
+  .Gyro = {0, 0, 0}
+};
 
 /*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
@@ -76,22 +87,22 @@ void PIT0_IRQHandler(void)
   
   //Put Your Code...
   
-  PIT_Count++;
+  PIT0_Count++;
   
-  if(PIT_Count > 100)
+  if(PIT0_Count > 100)
   {
-    PIT_Count = 100;
+    PIT0_Count = 100;
   }
   
-  if(PIT_Count == 100)
+  if(PIT0_Count == 100)
   {
-    PIT_Count = 0;
+    PIT0_Count = 0;
     
-    PIT_Flag++;
+    PIT0_Flag++;
     
-    if(PIT_Flag > 3)
+    if(PIT0_Flag > 3)
     {
-      PIT_Flag = 0;
+      PIT0_Flag = 0;
     }
     
     MAPS_Dock_LED_Turn();//LED turnover
@@ -101,5 +112,47 @@ void PIT0_IRQHandler(void)
   
   PIT_Flag_Clear(PIT0);
   enable_irq(PIT0_IRQn);
+}
+
+/*
+ *  @brief      PIT1_IRQHandler     PIT1 timed interrupt service function
+ *  @since      v1.0
+ */
+void PIT1_IRQHandler(void)
+{
+  PIT_Flag_Clear(PIT1);
+  disable_irq(PIT1_IRQn);
+  
+  //Put Your Code...
+  
+  PIT1_Count++;
+  
+  if(PIT1_Count > 100)
+  {
+    PIT1_Count = 100;
+  }
+  
+  if(PIT1_Count == 100)
+  {
+    PIT1_Count = 0;
+    
+    PIT1_Flag++;
+    
+    if(PIT1_Flag > 3)
+    {
+      PIT1_Flag = 0;
+    }
+    
+    // MPU6050 sensor data read
+    MPU6050.Acc.X = MPU_Get_Acc_X();
+    MPU6050.Acc.Y = MPU_Get_Acc_Y();
+    MPU6050.Acc.Z = MPU_Get_Acc_Z();
+    MPU6050.Gyro.X = MPU_Get_Gyro_X();
+    MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
+    MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
+  }
+  
+  PIT_Flag_Clear(PIT1);
+  enable_irq(PIT1_IRQn);
 }
 

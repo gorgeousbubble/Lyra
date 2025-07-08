@@ -119,13 +119,19 @@ void MAPS_Dock_Rocker_Key_LCM_Control(void)
       case 1:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Str_6x8(49,1,"List1",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,2,"PIT_Count:",PIT_Count,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,2,"PIT0_Count:",PIT0_Count,LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,3,"ADC0_DP0:",ADC_Convert_Result[0],LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,4,"ADC0_DM0:",ADC_Convert_Result[1],LCM_Pure_Color);
               break;
       case 2:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Str_6x8(49,1,"List2",LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,2,"MPU6050.Acc.X:",MPU6050.Acc.X,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,3,"MPU6050.Acc.Y:",MPU6050.Acc.Y,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,4,"MPU6050.Acc.Z:",MPU6050.Acc.Z,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,5,"MPU6050.Gyro.X:",MPU6050.Gyro.X,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,6,"MPU6050.Gyro.Y:",MPU6050.Gyro.Y,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,7,"MPU6050.Gyro.Z:",MPU6050.Gyro.Z,LCM_Pure_Color);
               break;
       case 3:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);

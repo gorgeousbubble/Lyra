@@ -22,6 +22,8 @@
 #include "maps_dock_w25q80.h"
 #include "misc.h"
 #include "mpu6050.h"
+#include "oled.h"
+#include "oled_i2c.h"
 #include "pit.h"
 #include "system_init.h"
 #include "uart.h"
@@ -44,6 +46,11 @@ void Interrupt_Init(void)
   set_irq_priority(PIT0_IRQn,2);//Interrupt priority 2
   Set_Vector_Handler(PIT0_VECTORn,PIT0_IRQHandler);
   enable_irq(PIT0_IRQn);//Interrupts enable
+  
+  PIT_Init_ms(PIT1,1);//PIT1 timed interrupt, with a timing cycle of 1ms
+  set_irq_priority(PIT1_IRQn,3);//Interrupt priority 3
+  Set_Vector_Handler(PIT1_VECTORn,PIT1_IRQHandler);
+  enable_irq(PIT1_IRQn);//Interrupts enable
   
 }
 
@@ -77,6 +84,8 @@ void AllInit(void)
   UART_Init(UART_UART4,115200);//UART4 initialization, baud rate 115200Bps
   //DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
   I2C_GPIO_Init();//MPU6050 initialization
+  Oled_I2C_Init();//Oled initialization
+  Oled_I2C_Draw_Picture_128x64((uint8 const*)Oled_Picture_128x64_JBD_Logo);
   
   Interrupt_Init();//Interrupt initialization
   
