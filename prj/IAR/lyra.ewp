@@ -8525,6 +8525,9 @@
             <name>$PROJ_DIR$\..\..\app\src\it.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\kalman_filter.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\main.c</name>
         </file>
     </group>
@@ -8697,6 +8700,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\inc\it.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\inc\kalman_filter.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\lptmr.h</name>

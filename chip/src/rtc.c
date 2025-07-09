@@ -11,6 +11,7 @@
  */
 
 #include "rtc.h"
+#include <time.h>
 
 /*
  *  @brief      RTC Initialization
@@ -64,12 +65,38 @@ void RTC_Set_Time(uint32 Seconds)
 }
 
 /*
+ *  @brief      Set the current time format
+ *  @since      v1.0
+ */
+void RTC_Set_Time_Format(struct tm *timeinfo)
+{
+  //Convert struct tm to seconds
+  time_t rawtime = mktime(timeinfo);
+  uint32 Seconds = (uint32)rawtime;
+
+  //Set the RTC time
+  RTC_Set_Time(Seconds);
+}
+
+/*
  *  @brief      Get the current time
  *  @since      v1.0
  */
 uint32 RTC_Get_Time(void)
 {
   return RTC_TSR;               //After counting starts, the RTC_TSR register reads the current counting time
+}
+
+/*
+ *  @brief      Get the current time format
+ *  @since      v1.0
+ */
+struct tm RTC_Get_Time_Format(void)
+{
+  struct tm *timeinfo;
+  time_t rawtime = RTC_Get_Time(); //Get the current time in seconds
+  timeinfo = localtime(&rawtime); //Convert to local time structure
+  return *timeinfo; //Return the time structure
 }
 
 /*

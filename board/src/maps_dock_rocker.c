@@ -122,6 +122,7 @@ void MAPS_Dock_Rocker_Key_LCM_Control(void)
               MAPS_Dock_LCM_Put_Para_6x8(0,2,"PIT0_Count:",PIT0_Count,LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,3,"ADC0_DP0:",ADC_Convert_Result[0],LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,4,"ADC0_DM0:",ADC_Convert_Result[1],LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,5,"RTC_Count:",RTC_Count,LCM_Pure_Color);
               break;
       case 2:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
@@ -136,10 +137,19 @@ void MAPS_Dock_Rocker_Key_LCM_Control(void)
       case 3:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Str_6x8(49,1,"List3",LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,2,"Year:",RTC_Time_Now.Year,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,3,"Mon:",RTC_Time_Now.Month,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,4,"Day:",RTC_Time_Now.Day,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,5,"Hour:",RTC_Time_Now.Hour,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,6,"Min:",RTC_Time_Now.Minute,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,7,"Sec:",RTC_Time_Now.Second,LCM_Pure_Color);
               break;
       case 4:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Str_6x8(49,1,"List4",LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,2,"MPU6050.Angle.X:",(int)MPU6050_Angle.Angle_X,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,3,"MPU6050.Angle.Y:",(int)MPU6050_Angle.Angle_Y,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,4,"MPU6050.Angle.Z:",(int)MPU6050_Angle.Angle_Z,LCM_Pure_Color);
               break;
       case 5:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);

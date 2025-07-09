@@ -14,6 +14,7 @@
 #define __IT_H__
 
 #include "common.h"
+#include "kalman_filter.h"
 #include "vectors.h"
 
 #undef  VECTOR_077
@@ -48,6 +49,21 @@ typedef struct {
   GYRO Gyro;
 } MPU6050_Sensor;
 
+typedef struct {
+  float Angle_X; //Angle X
+  float Angle_Y; //Angle Y
+  float Angle_Z; //Angle Z
+} Angle;
+
+typedef struct {
+  int Year;
+  int Month;
+  int Day;
+  int Hour;
+  int Minute;
+  int Second;
+} RTC_Time;
+
 /*
 **variate declaration
 */
@@ -55,6 +71,12 @@ extern int PIT0_Count;//PIT0 counter
 extern int PIT1_Count;//PIT1 counter
 extern uint16 ADC_Convert_Result[2];//ADC sample
 extern MPU6050_Sensor MPU6050;//MPU6050
+extern Angle MPU6050_Angle;//MPU6050 angle
+extern KalmanFilter KF_X;//Kalman Filter X
+extern KalmanFilter KF_Y;//Kalman Filter Y
+extern KalmanFilter KF_Z;//Kalman Filter Z
+extern uint32 RTC_Count;
+extern RTC_Time RTC_Time_Now;
 
 /*
 **function declaration

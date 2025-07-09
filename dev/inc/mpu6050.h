@@ -106,6 +106,5 @@ extern int MPU_Get_Gyro_X(void);
 extern int MPU_Get_Gyro_Y(void);
 extern int MPU_Get_Gyro_Z(void);
 extern void MPU6050_Init(void);
-extern void I2C_GPIO_Init(void);
 
 #endif
