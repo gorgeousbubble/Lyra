@@ -13,8 +13,11 @@
 #include "conf.h"
 #include "dwt.h"
 #include "gpio.h"
+#include "it.h"
 #include "maps_dock_key.h"
+#include "oled_i2c.h"
 #include "uart.h"
+#include "watch.h"
 
 /*
 **Independent button port
@@ -152,4 +155,12 @@ void MAPS_Dock_KEY_Incident(void)
     UART_PutStr(UART_UART4,"KEY3 ");
     MAPS_Dock_KEY_Delay(500);//Button delay 500ms
   }
+  
+  Oled_I2C_Put_Str_6x8(28, 0, "Lyra Project");
+  //Oled_I2C_Put_Date_6x8(34, 1, "-", RTC_Time_Now.Year, RTC_Time_Now.Month, RTC_Time_Now.Day);
+  //Oled_I2C_Put_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+  Watch_Render_Current_Time_6x8(40, 1, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem12);
+  Watch_Render_Current_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem24);
+  Watch_Render_Current_Time_8x16(0, 4, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem12);
+  Watch_Render_Current_Time_8x16(0, 6, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem24);
 }

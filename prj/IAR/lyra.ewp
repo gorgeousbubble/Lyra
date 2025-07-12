@@ -8530,6 +8530,9 @@
         <file>
             <name>$PROJ_DIR$\..\..\app\src\main.c</name>
         </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\watch.c</name>
+        </file>
     </group>
     <group>
         <name>board</name>
@@ -8647,6 +8650,9 @@
         <file>
             <name>$PROJ_DIR$\..\..\dev\src\oled_lib.c</name>
         </file>
+    </group>
+    <group>
+        <name>func</name>
     </group>
     <group>
         <name>inc</name>
@@ -8798,6 +8804,9 @@
             <name>$PROJ_DIR$\..\..\startup\inc\vectors.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\inc\watch.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\wdog.h</name>
         </file>
     </group>
@@ -8917,5 +8926,8 @@
         <file>
             <name>$PROJ_DIR$\..\..\startup\src\vectors.c</name>
         </file>
+    </group>
+    <group>
+        <name>utils</name>
     </group>
 </project>

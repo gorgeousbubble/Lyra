@@ -881,3 +881,1040 @@ void Oled_I2C_Put_Para_Pot_8x16(uint8 x,uint8 y,uint8 ch[],float Value)
     }
   }
 }
+
+/*
+ *  @brief      Oled draws 6x8 time parameters (12-hour format)
+ *  @param      uint8   x       x scope is 0~127
+ *  @param      uint8   y       y scope is 0~7
+ *  @param      uint8   ch[]    ch array, displaying parameter names
+ *  @param      int     hour     hour integer parameter
+ *  @param      int     minute   minute integer parameter
+ *  @param      int     second   second integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Oled_I2C_Put_Time_6x8_12(0,0,":",hour,minute,second);
+ */
+void Oled_I2C_Put_Time_6x8_12(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second,int isAM)
+{
+  uint8 c=0,i=0,j=0;
+  int Hour_Num[2]={0};
+  int Min_Num[2]={0};
+  int Sec_Num[2]={0};
+  
+  // hour
+  Oled_I2C_Ten = (hour % 100) / 10;
+  Oled_I2C_Single = hour % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Hour_Num[0] = 16;
+    Hour_Num[1] = 16;
+  }
+  
+  // minute
+  Oled_I2C_Ten = (minute % 100) / 10;
+  Oled_I2C_Single = minute % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Min_Num[0] = 16;
+    Min_Num[1] = 16;
+  }
+  
+  // second
+  Oled_I2C_Ten = (second % 100) / 10;
+  Oled_I2C_Single = second % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Sec_Num[0] = 16;
+    Sec_Num[1] = 16;
+  }
+  
+  // hour
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Hour_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=6,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // minute
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Min_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=6,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // second
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Sec_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+
+  // meridiem
+  char meridiem[3] = {' ', ' ', '\0'};
+  if(isAM)
+  {
+    meridiem[0] = 'A';
+    meridiem[1] = 'M';
+  }
+  else
+  {
+    meridiem[0] = 'P';
+    meridiem[1] = 'M';
+  }
+
+  for(c=0,i=0,j=0;meridiem[j]!='\0';x+=6,j++)
+  {
+    c=meridiem[j]-32;
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+}
+
+/*
+ *  @brief      Oled draws 6x8 time parameters (24-hour format)
+ *  @param      uint8   x       x scope is 0~127
+ *  @param      uint8   y       y scope is 0~7
+ *  @param      uint8   ch[]    ch array, displaying parameter names
+ *  @param      int     hour     hour integer parameter
+ *  @param      int     minute   minute integer parameter
+ *  @param      int     second   second integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Oled_I2C_Put_Time_6x8_24(0,0,":",hour,minute,second);
+ */
+void Oled_I2C_Put_Time_6x8_24(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second)
+{
+  uint8 c=0,i=0,j=0;
+  int Hour_Num[2]={0};
+  int Min_Num[2]={0};
+  int Sec_Num[2]={0};
+  
+  // hour
+  Oled_I2C_Ten = (hour % 100) / 10;
+  Oled_I2C_Single = hour % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Hour_Num[0] = 16;
+    Hour_Num[1] = 16;
+  }
+  
+  // minute
+  Oled_I2C_Ten = (minute % 100) / 10;
+  Oled_I2C_Single = minute % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Min_Num[0] = 16;
+    Min_Num[1] = 16;
+  }
+  
+  // second
+  Oled_I2C_Ten = (second % 100) / 10;
+  Oled_I2C_Single = second % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Sec_Num[0] = 16;
+    Sec_Num[1] = 16;
+  }
+  
+  // hour
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Hour_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=6,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // minute
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Min_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=6,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // second
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Sec_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+}
+
+/*
+ *  @brief      Oled draws 8x16 time parameters (12-hour format)
+ *  @param      uint8   x       x scope is 0~127
+ *  @param      uint8   y       y scope is 0,2,4,6
+ *  @param      uint8   ch[]    ch array, displaying parameter names
+ *  @param      int     hour     hour integer parameter
+ *  @param      int     minute   minute integer parameter
+ *  @param      int     second   second integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Oled_Put_Para_8x16(0,0,"hello:",Value);
+ */
+void Oled_I2C_Put_Time_8x16_12(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second,int isAM)
+{
+  uint8 c=0,i=0,j=0;
+  int Hour_Num[2]={0};
+  int Min_Num[2]={0};
+  int Sec_Num[2]={0};
+  
+  // hour
+  Oled_I2C_Ten = (hour % 100) / 10;
+  Oled_I2C_Single = hour % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Hour_Num[0] = 16;
+    Hour_Num[1] = 16;
+  }
+
+  // minute
+  Oled_I2C_Ten = (minute % 100) / 10;
+  Oled_I2C_Single = minute % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Min_Num[0] = 16;
+    Min_Num[1] = 16;
+  }
+
+  // second
+  Oled_I2C_Ten = (second % 100) / 10;
+  Oled_I2C_Single = second % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Sec_Num[0] = 16;
+    Sec_Num[1] = 16;
+  }
+
+  // hour
+  for(c=0,i=0,j=0;j<2;x+=8,j++)
+  {
+    c=Hour_Num[j];
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=8,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+  
+  // minute
+  for(c=0,i=0,j=0;j<2;x+=8,j++)
+  {
+    c=Min_Num[j];
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=8,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+
+  // second
+  for(c=0,i=0,j=0;j<2;x+=8,j++)
+  {
+    c=Sec_Num[j];
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+
+  // meridiem
+  char meridiem[3] = {' ', ' ', '\0'};
+  if(isAM)
+  {
+    meridiem[0] = 'A';
+    meridiem[1] = 'M';
+  }
+  else
+  {
+    meridiem[0] = 'P';
+    meridiem[1] = 'M';
+  }
+
+  // segment
+  for(c=0,i=0,j=0;meridiem[j]!='\0';x+=8,j++)
+  {
+    c=meridiem[j]-32;
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+  
+}
+
+/*
+ *  @brief      Oled draws 8x16 time parameters (24-hour format)
+ *  @param      uint8   x       x scope is 0~127
+ *  @param      uint8   y       y scope is 0,2,4,6
+ *  @param      uint8   ch[]    ch array, displaying parameter names
+ *  @param      int     hour     hour integer parameter
+ *  @param      int     minute   minute integer parameter
+ *  @param      int     second   second integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Oled_Put_Para_8x16(0,0,"hello:",Value);
+ */
+void Oled_I2C_Put_Time_8x16_24(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second)
+{
+  uint8 c=0,i=0,j=0;
+  int Hour_Num[2]={0};
+  int Min_Num[2]={0};
+  int Sec_Num[2]={0};
+  
+  // hour
+  Oled_I2C_Ten = (hour % 100) / 10;
+  Oled_I2C_Single = hour % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Hour_Num[0] = Oled_I2C_Ten + 16;
+    Hour_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Hour_Num[0] = 16;
+    Hour_Num[1] = 16;
+  }
+
+  // minute
+  Oled_I2C_Ten = (minute % 100) / 10;
+  Oled_I2C_Single = minute % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Min_Num[0] = Oled_I2C_Ten + 16;
+    Min_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Min_Num[0] = 16;
+    Min_Num[1] = 16;
+  }
+
+  // second
+  Oled_I2C_Ten = (second % 100) / 10;
+  Oled_I2C_Single = second % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Sec_Num[0] = Oled_I2C_Ten + 16;
+    Sec_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Sec_Num[0] = 16;
+    Sec_Num[1] = 16;
+  }
+
+  // hour
+  for(c=0,i=0,j=0;j<2;x+=8,j++)
+  {
+    c=Hour_Num[j];
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=8,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+  
+  // minute
+  for(c=0,i=0,j=0;j<2;x+=8,j++)
+  {
+    c=Min_Num[j];
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=8,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+
+  // second
+  for(c=0,i=0,j=0;j<2;x+=8,j++)
+  {
+    c=Sec_Num[j];
+    
+    if(x>119)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i]);
+    }
+    
+    Oled_I2C_Set_Pos(x,y+1);
+    
+    for(i=0;i<8;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_8x16[c*16+i+8]);
+    }
+  }
+  
+}
+
+/*
+ *  @brief      Oled draws 6x8 data parameters
+ *  @param      uint8   x       x scope is 0~127
+ *  @param      uint8   y       y scope is 0~7
+ *  @param      uint8   ch[]    ch array, displaying parameter names
+ *  @param      int     hour     hour integer parameter
+ *  @param      int     minute   minute integer parameter
+ *  @param      int     second   second integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Oled_I2C_Put_Date_8x16_12(0,0,":",hour,minute,second);
+ */
+void Oled_I2C_Put_Date_6x8(uint8 x,uint8 y,uint8 ch[],int year,int month,int day)
+{
+  uint8 c=0,i=0,j=0;
+  int Year_Num[4]={0};
+  int Month_Num[2]={0};
+  int Day_Num[2]={0};
+  
+  // year
+  Oled_I2C_Thousand = (year % 10000) / 1000;
+  Oled_I2C_Hundred = (year % 1000) / 100;
+  Oled_I2C_Ten = (year % 100) / 10;
+  Oled_I2C_Single = year % 10;
+    
+  if(Oled_I2C_Thousand != 0)
+  {
+    Year_Num[0] = Oled_I2C_Thousand + 16;
+    Year_Num[1] = Oled_I2C_Hundred + 16;
+    Year_Num[2] = Oled_I2C_Ten + 16;
+    Year_Num[3] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Hundred != 0)
+  {
+    Year_Num[0] = Oled_I2C_Thousand + 16;
+    Year_Num[1] = Oled_I2C_Hundred + 16;
+    Year_Num[2] = Oled_I2C_Ten + 16;
+    Year_Num[3] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Ten != 0)
+  {
+    Year_Num[0] = Oled_I2C_Thousand + 16;
+    Year_Num[1] = Oled_I2C_Hundred + 16;
+    Year_Num[2] = Oled_I2C_Ten + 16;
+    Year_Num[3] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Year_Num[0] = Oled_I2C_Thousand + 16;
+    Year_Num[1] = Oled_I2C_Hundred + 16;
+    Year_Num[2] = Oled_I2C_Ten + 16;
+    Year_Num[3] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Year_Num[0] = 16;
+    Year_Num[1] = 16;
+    Year_Num[2] = 16;
+    Year_Num[3] = 16;
+  }
+  
+  // month
+  Oled_I2C_Ten = (month % 100) / 10;
+  Oled_I2C_Single = month % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Month_Num[0] = Oled_I2C_Ten + 16;
+    Month_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Month_Num[0] = Oled_I2C_Ten + 16;
+    Month_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Month_Num[0] = 16;
+    Month_Num[1] = 16;
+  }
+  
+  // day
+  Oled_I2C_Ten = (day % 100) / 10;
+  Oled_I2C_Single = day % 10;
+    
+  if(Oled_I2C_Ten != 0)
+  {
+    Day_Num[0] = Oled_I2C_Ten + 16;
+    Day_Num[1] = Oled_I2C_Single + 16;
+  }
+  else if(Oled_I2C_Single != 0)
+  {
+    Day_Num[0] = Oled_I2C_Ten + 16;
+    Day_Num[1] = Oled_I2C_Single + 16;
+  }
+  else
+  {
+    Day_Num[0] = 16;
+    Day_Num[1] = 16;
+  }
+  
+  // hour
+  for(c=0,i=0,j=0;j<4;x+=6,j++)
+  {
+    c=Year_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=6,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // minute
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Month_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // segment
+  for(c=0,i=0,j=0;ch[j]!='\0';x+=6,j++)
+  {
+    c=ch[j]-32;
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+  // second
+  for(c=0,i=0,j=0;j<2;x+=6,j++)
+  {
+    c=Day_Num[j];
+    
+    if(x>121)
+    {
+      x=0;
+      y++;
+    }
+    
+    Oled_I2C_Set_Pos(x,y);
+    
+    for(i=0;i<6;i++)
+    {
+      Oled_I2C_WrDat(Oled_FontLib_6x8[c][i]);
+    }
+  }
+  
+}

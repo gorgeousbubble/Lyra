@@ -46,43 +46,43 @@
 //I2C Port Macro
 //I2C SCL port initialization
 #ifndef I2C_PORT_INIT_SCL
-#define I2C_PORT_INIT_SCL       GPIO_Init(PTE27,GPO,0)
+#define I2C_PORT_INIT_SCL       GPIO_Init(PTA29,GPO,0)
 #endif
 //I2C SDA port initialization
 #ifndef I2C_PORT_INIT_SDA
-#define I2C_PORT_INIT_SDA       GPIO_Init(PTE25,GPO,0)
+#define I2C_PORT_INIT_SDA       GPIO_Init(PTA28,GPO,0)
 #endif
 //I2C SCL port output
 #ifndef I2C_DDR_OUT_SCL
-#define I2C_DDR_OUT_SCL         GPIO_DDRX(PTE27,1)
+#define I2C_DDR_OUT_SCL         GPIO_DDRX(PTA29,1)
 #endif
 //I2C SDA port output
 #ifndef I2C_DDR_OUT_SDA
-#define I2C_DDR_OUT_SDA         GPIO_DDRX(PTE25,1)
+#define I2C_DDR_OUT_SDA         GPIO_DDRX(PTA28,1)
 #endif
 //I2C SDA port input
 #ifndef I2C_DDR_IN_SDA
-#define I2C_DDR_IN_SDA          GPIO_DDRX(PTE25,0)
+#define I2C_DDR_IN_SDA          GPIO_DDRX(PTA28,0)
 #endif
 //I2C SCL port high level
 #ifndef I2C_SET_SCL_H
-#define I2C_SET_SCL_H           GPIO_SET(PTE27,1)
+#define I2C_SET_SCL_H           GPIO_SET(PTA29,1)
 #endif
 //I2C SCL port low level
 #ifndef I2C_SET_SCL_L
-#define I2C_SET_SCL_L           GPIO_SET(PTE27,0)
+#define I2C_SET_SCL_L           GPIO_SET(PTA29,0)
 #endif
 //I2C SDA port high level
 #ifndef I2C_SET_SDA_H
-#define I2C_SET_SDA_H           GPIO_SET(PTE25,1)
+#define I2C_SET_SDA_H           GPIO_SET(PTA28,1)
 #endif
 //I2C SDA port low level
 #ifndef I2C_SET_SDA_L
-#define I2C_SET_SDA_L           GPIO_SET(PTE25,0)
+#define I2C_SET_SDA_L           GPIO_SET(PTA28,0)
 #endif
 //I2C SDA port input signal
 #ifndef I2C_GET_SDA_IN
-#define I2C_GET_SDA_IN          GPIO_GET(PTE25)
+#define I2C_GET_SDA_IN          GPIO_GET(PTA28)
 #endif
 
 #define I2C_DELAY_TIME          I2C_Delay(10)

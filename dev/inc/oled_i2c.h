@@ -103,4 +103,10 @@ extern void Oled_I2C_Put_Para_Pot_6x8(uint8 x,uint8 y,uint8 ch[],float Value);
 extern void Oled_I2C_Put_Para_8x16(uint8 x,uint8 y,uint8 ch[],int Value);
 extern void Oled_I2C_Put_Para_Pot_8x16(uint8 x,uint8 y,uint8 ch[],float Value);
 
+extern void Oled_I2C_Put_Time_6x8_12(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second, int isAM);
+extern void Oled_I2C_Put_Time_6x8_24(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second);
+extern void Oled_I2C_Put_Time_8x16_12(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second,int isAM);
+extern void Oled_I2C_Put_Time_8x16_24(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second);
+extern void Oled_I2C_Put_Date_6x8(uint8 x,uint8 y,uint8 ch[],int year,int month,int day);
+
 #endif

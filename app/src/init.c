@@ -92,14 +92,12 @@ void AllInit(void)
   struct tm timeinfo = {
     .tm_year = 2025 - 1900, // Year since 1900
     .tm_mon = 7 - 1,        // Month (0-11)
-    .tm_mday = 9,          // Day of the month (1-31)
-    .tm_hour = 23,          // Hour (0-23)
+    .tm_mday = 10,          // Day of the month (1-31)
+    .tm_hour = 16,          // Hour (0-23)
     .tm_min = 0,            // Minute (0-59)
     .tm_sec = 0             // Second (0-59)
   };
   RTC_Set_Time_Format(&timeinfo);//Set RTC time format
-  
-  Oled_I2C_Draw_Picture_128x64((uint8 const*)Oled_Picture_128x64_JBD_Logo);
   
   /*
   **Kalman Filter
