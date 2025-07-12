@@ -161,6 +161,6 @@ void MAPS_Dock_KEY_Incident(void)
   //Oled_I2C_Put_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
   Watch_Render_Current_Time_6x8(40, 1, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem12);
   Watch_Render_Current_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem24);
-  Watch_Render_Current_Time_8x16(0, 4, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem12);
-  Watch_Render_Current_Time_8x16(0, 6, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem24);
+  Watch_Render_Current_Time_Wo_Sec_12x24(34, 3, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, ClockSystem24);
+  
 }
