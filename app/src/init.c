@@ -92,9 +92,9 @@ void AllInit(void)
   struct tm timeinfo = {
     .tm_year = 2025 - 1900, // Year since 1900
     .tm_mon = 7 - 1,        // Month (0-11)
-    .tm_mday = 10,          // Day of the month (1-31)
-    .tm_hour = 16,          // Hour (0-23)
-    .tm_min = 0,            // Minute (0-59)
+    .tm_mday = 13,          // Day of the month (1-31)
+    .tm_hour = 17,          // Hour (0-23)
+    .tm_min = 40,            // Minute (0-59)
     .tm_sec = 0             // Second (0-59)
   };
   RTC_Set_Time_Format(&timeinfo);//Set RTC time format

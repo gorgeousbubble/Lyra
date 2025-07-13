@@ -156,11 +156,12 @@ void MAPS_Dock_KEY_Incident(void)
     MAPS_Dock_KEY_Delay(500);//Button delay 500ms
   }
   
-  Oled_I2C_Put_Str_6x8(28, 0, "Lyra Project");
+  //Oled_I2C_Put_Str_6x8(28, 0, "Lyra Project");
   //Oled_I2C_Put_Date_6x8(34, 1, "-", RTC_Time_Now.Year, RTC_Time_Now.Month, RTC_Time_Now.Day);
   //Oled_I2C_Put_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
-  Watch_Render_Current_Time_6x8(40, 1, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem12);
-  Watch_Render_Current_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem24);
-  Watch_Render_Current_Time_Wo_Sec_12x24(34, 3, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, ClockSystem24);
+  //Watch_Render_Current_Time_6x8(40, 1, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem12);
+  //Watch_Render_Current_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem24);
+  //Watch_Render_Current_Time_Wo_Sec_12x24(34, 3, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, ClockSystem24);
+  Watch_Render_Current_Time_Clock(RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
   
 }
