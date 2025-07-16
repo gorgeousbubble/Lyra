@@ -225,3 +225,35 @@ void PIT1_IRQHandler(void)
   enable_irq(PIT1_IRQn);
 }
 
+/*
+ *  @brief      RTC_IRQHandler     RTC timed interrupt service function
+ *  @since      v1.0
+ */
+void RTC_IRQHandler(void)
+{
+  if(RTC_SR & RTC_SR_TIF_MASK)//Invalid settings
+  {
+    RTC_SR = 0;
+    RTC_TSR = 0;
+    
+    //Put Your Code...
+    
+  }
+  
+  if(RTC_SR & RTC_SR_TOF_MASK)//Count overflow
+  {
+    RTC_SR = 0;
+    RTC_TSR = 0;
+    
+    //Put Your Code...
+    
+  }
+  
+  if(RTC_SR & RTC_SR_TAF_MASK)//Alarm
+  {
+    RTC_TAR = 0;
+    
+    //Put Your Code...
+  }
+  
+}

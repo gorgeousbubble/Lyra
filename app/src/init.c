@@ -54,6 +54,10 @@ void Interrupt_Init(void)
   Set_Vector_Handler(PIT1_VECTORn,PIT1_IRQHandler);
   enable_irq(PIT1_IRQn);//Interrupts enable
   
+  set_irq_priority(RTC_IRQn,4);//Interrupt priority 4
+  Set_Vector_Handler(RTC_VECTORn,RTC_IRQHandler);
+  enable_irq(RTC_IRQn);//Interrupts enable
+  
 }
 
 /*
@@ -89,6 +93,7 @@ void AllInit(void)
   Oled_I2C_Init();//Oled initialization
   RTC_Init();//RTC initialization
 
+  /*// set current time
   struct tm timeinfo = {
     .tm_year = 2025 - 1900, // Year since 1900
     .tm_mon = 7 - 1,        // Month (0-11)
@@ -97,7 +102,20 @@ void AllInit(void)
     .tm_min = 40,            // Minute (0-59)
     .tm_sec = 0             // Second (0-59)
   };
-  RTC_Set_Time_Format(&timeinfo);//Set RTC time format
+  RTC_Set_Time_Format(&timeinfo);//Set RTC time format*/
+  
+  struct tm time = RTC_Get_Time_Format();
+  
+  /*// set alarm time
+  struct tm alarm_time = {
+    .tm_year = 2025 - 1900, // Year since 1900
+    .tm_mon = 7 - 1,        // Month (0-11)
+    .tm_mday = 13,          // Day of the month (1-31)
+    .tm_hour = 17,          // Hour (0-23)
+    .tm_min = 41,           // Minute (0-59)
+    .tm_sec = 0             // Second (0-59)
+  };
+  RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
   
   /*
   **Kalman Filter

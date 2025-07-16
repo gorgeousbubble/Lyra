@@ -37,6 +37,7 @@ extern void RTC_Set_Time_Format(struct tm *timeinfo);
 extern uint32 RTC_Get_Time(void);
 extern struct tm RTC_Get_Time_Format(void);
 extern uint8 RTC_Set_Alarm(uint32 Alarm);
+extern uint8 RTC_Set_Alarm_Format(struct tm *timeinfo);
 extern void RTC_Close_Alarm(void);
 extern void RTC_Test_Handler(void);
 

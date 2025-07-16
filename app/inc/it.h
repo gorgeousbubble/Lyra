@@ -29,6 +29,9 @@
 #undef  VECTOR_065
 #define VECTOR_065      PIT1_IRQHandler
 
+#undef  VECTOR_062
+#define VECTOR_062      RTC_IRQHandler
+
 /*
 **variate definition
 */
@@ -85,6 +88,7 @@ extern void PORTC_PTC19_IRQHandler(void);
 extern void PORTD_PTD15_IRQHandler(void);
 extern void PIT0_IRQHandler(void);
 extern void PIT1_IRQHandler(void);
+extern void RTC_IRQHandler(void);
 
 
 
