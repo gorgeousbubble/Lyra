@@ -118,11 +118,6 @@ void AllInit(void)
   RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
   
   /*
-  **Oled clean screen
-  */
-  Oled_I2C_Clean();
-  
-  /*
   **Kalman Filter
   */
   Kalman_Init(&KF_X);//Kalman filter initialization

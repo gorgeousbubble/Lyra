@@ -176,7 +176,7 @@ uint8 MAX30102_I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr)
   return I2C_Data;
 }
 
-//Read a byte
+//Read a word
 int MAX30102_I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr)
 {
   uint8 I2C_Reg_H=0;
@@ -188,6 +188,29 @@ int MAX30102_I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr)
   return ((I2C_Reg_H<<8)+I2C_Reg_L);
 }
 
+//Read six bytes
+void MAX30102_I2C_GPIO_Read_Reg_Six_Byte(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr,uint8* data)
+{
+  MAX30102_I2C_GPIO_Start();
+  MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr);
+  MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr);
+  MAX30102_I2C_GPIO_Start();
+  MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr+1);
+  for (uint8 i = 0; i < 6; i++)
+  {
+    data[i] = MAX30102_I2C_GPIO_Recv_Byte();
+    if (i < 5) // Send ACK for all but the last byte
+    {
+      MAX30102_I2C_GPIO_Send_Ack(0);
+    }
+    else // Send NACK for the last byte
+    {
+      MAX30102_I2C_GPIO_Send_Ack(1);
+    }
+  }
+  MAX30102_I2C_GPIO_Stop();
+}
+
 /*
 **MAX30102 initialization
 */
@@ -197,12 +220,17 @@ void MAX30102_Init(void)
   MAX30102_I2C_PORT_INIT_SDA;
   MAX30102_Reset(); //Reset the MAX30102 sensor
   // Configure the sensor
+  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_INTR_ENABLE_1,0xc0);
+  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_INTR_ENABLE_2,0x00);
+  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_FIFO_WR_PTR,0x00);
+  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_OVF_COUNTER,0x00);
+  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_FIFO_RD_PTR,0x00);
+  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_FIFO_CONFIG,0x0F);
   MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_MODE_CONFIG,0x03);
   MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_SPO2_CONFIG,0x27);
   MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_LED1_PA,0x24);
   MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_LED2_PA,0x24);
-  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_INTR_ENABLE_1,0x21);
-  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_LED2_PA,0x80);
+  MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR,REG_PILOT_PA,0x7F);  
 }
 
 /*
@@ -230,10 +258,10 @@ void MAX30102_ReadFIFO(uint32* red, uint32* ir)
 {
     uint8 data[6];
     // read 6 bytes from FIFO
-    for (uint8 i = 0; i < 6; i++)
-    {
-        data[i] = MAX30102_I2C_GPIO_Read_Reg_Byte(MAX30102_DEVICE_ADDR, REG_FIFO_DATA);
-    }
+    /*for (int i = 0; i < 6; i++) {
+        data[i] = MAX30102_I2C_GPIO_Read_Reg_Byte(MAX30102_DEVICE_ADDR, REG_FIFO_DATA + i);
+    }*/
+    MAX30102_I2C_GPIO_Read_Reg_Six_Byte(MAX30102_DEVICE_ADDR, REG_FIFO_DATA, data);
     // combine the bytes into 24-bit values
     *red = ((uint32_t)data[0] << 16) | ((uint32_t)data[1] << 8) | data[2];
     *ir = ((uint32_t)data[3] << 16) | ((uint32_t)data[4] << 8) | data[5];
