@@ -477,6 +477,36 @@ void Oled_I2C_Draw_Picture_128x64(const uint8 *Picture)
   }
 }
 
+void Oled_I2C_Draw_BMP_128x64(const uint8 *Buff,OLED_Color_e Oled_Color_x)
+{
+  uint8 i=0,j=0;
+  
+  if(Oled_Color_x == OLED_Pure_Color)//Orthochromatic
+  {
+    for(i=0;i<OLED_I2C_Max_Page;i++)
+    {
+      Oled_I2C_Set_Pos(0,i);
+      
+      for(j=0;j<OLED_I2C_Max_COL;j++)
+      {
+        Oled_I2C_WrDat(*Buff++);
+      }
+    }
+  }
+  else//Reverse color
+  {
+    for(i=0;i<OLED_I2C_Max_Page;i++)
+    {
+      Oled_I2C_Set_Pos(0,i);
+      
+      for(j=0;j<OLED_I2C_Max_COL;j++)
+      {
+        Oled_I2C_WrDat(~*Buff++);
+      }
+    }
+  }
+}
+
 /*
  *  @brief      Oled draws 6x8 integer parameters
  *  @param      uint8   x       x scope is 0~127

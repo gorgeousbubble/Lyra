@@ -15,6 +15,7 @@
 #include "init.h"
 #include "it.h"
 #include "kalman_filter.h"
+#include "max30102.h"
 #include "maps_dock_key.h"
 #include "maps_dock_lcd.h"
 #include "maps_dock_lcm.h"
@@ -91,20 +92,19 @@ void AllInit(void)
   //DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
   MPU6050_Init();//MPU6050 initialization
   Oled_I2C_Init();//Oled initialization
+  MAX30102_Init();//MAX30102 initialization
   RTC_Init();//RTC initialization
 
   /*// set current time
   struct tm timeinfo = {
     .tm_year = 2025 - 1900, // Year since 1900
     .tm_mon = 7 - 1,        // Month (0-11)
-    .tm_mday = 13,          // Day of the month (1-31)
-    .tm_hour = 17,          // Hour (0-23)
-    .tm_min = 40,            // Minute (0-59)
+    .tm_mday = 18,          // Day of the month (1-31)
+    .tm_hour = 22,          // Hour (0-23)
+    .tm_min = 8,            // Minute (0-59)
     .tm_sec = 0             // Second (0-59)
   };
   RTC_Set_Time_Format(&timeinfo);//Set RTC time format*/
-  
-  struct tm time = RTC_Get_Time_Format();
   
   /*// set alarm time
   struct tm alarm_time = {
@@ -116,6 +116,11 @@ void AllInit(void)
     .tm_sec = 0             // Second (0-59)
   };
   RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
+  
+  /*
+  **Oled clean screen
+  */
+  Oled_I2C_Clean();
   
   /*
   **Kalman Filter

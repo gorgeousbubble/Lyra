@@ -13,6 +13,7 @@
 #include "adc.h"
 #include "it.h"
 #include "kalman_filter.h"
+#include "max30102.h"
 #include "maps_dock_led.h"
 #include "misc.h"
 #include "mpu6050.h"
@@ -94,6 +95,12 @@ RTC_Time RTC_Time_Now = {
   .Minute = 0,
   .Second = 0
 };
+
+/*
+**MAX30102 counter
+*/
+uint32 MAX30102_RED = 0;
+uint32 MAX30102_IR = 0;
 
 /*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
@@ -219,6 +226,9 @@ void PIT1_IRQHandler(void)
     MPU6050_Angle.Angle_X = Kalman_Filter(&KF_X, MPU6050.Gyro.X, MPU6050.Acc.X);
     MPU6050_Angle.Angle_Y = Kalman_Filter(&KF_Y, MPU6050.Gyro.Y, MPU6050.Acc.Y);
     MPU6050_Angle.Angle_Z = Kalman_Filter(&KF_Z, MPU6050.Gyro.Z, MPU6050.Acc.Z);
+    
+    // MAX30102 sensor data read
+    MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);
   }
   
   PIT_Flag_Clear(PIT1);

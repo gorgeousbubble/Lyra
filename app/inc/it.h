@@ -80,6 +80,8 @@ extern KalmanFilter KF_Y;//Kalman Filter Y
 extern KalmanFilter KF_Z;//Kalman Filter Z
 extern uint32 RTC_Count;
 extern RTC_Time RTC_Time_Now;
+extern uint32 MAX30102_RED;
+extern uint32 MAX30102_IR;
 
 /*
 **function declaration

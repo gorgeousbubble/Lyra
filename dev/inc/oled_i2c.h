@@ -68,11 +68,19 @@
 #define OLED_I2C_XLevelL                0x00                            //OledX axis low position
 #define OLED_I2C_XLevelH                0x10                            //OledX axis high position
 #define OLED_I2C_XLevel	        ((XLevelH&0x0F)*16+XLevelL)             //OledX axis coordinate
-#define OLED_I2C_Max_COL	        128                             //Oled maximum number of columns
-#define OLED_I2C_Max_ROW		64                              //Oled maximum number of rows
-#define	OLED_I2C_BRIGHTNESS	        0xCF                            //Oled brightness
+#define OLED_I2C_Max_COL	            128                             //Oled maximum number of columns
+#define OLED_I2C_Max_ROW		        64                              //Oled maximum number of rows
+#define OLED_I2C_Max_Page               8                               //Oled maximum number of pages
+#define	OLED_I2C_BRIGHTNESS	            0xCF                            //Oled brightness
 #define OLED_I2C_X_WIDTH                128                             //OledX axis width
 #define OLED_I2C_Y_WIDTH                64                              //OledY axis width
+
+//Oled printing color enumeration
+typedef enum
+{
+  OLED_Pure_Color,       //Orthochromatic
+  OLED_Invert_Color,     //Reverse color
+}OLED_Color_e;
 
 /*
 **variate declaration
@@ -82,6 +90,7 @@ extern const uint8 Oled_FontLib_8x16[];
 extern const uint8 Oled_FontLib_12x24[];
 extern const uint8 Oled_Picture_128x64_Star[][16];
 extern const uint8 Oled_Picture_128x64_JBD_Logo[][16];
+extern const uint8 LCM_Freescale_logo[];
 
 /*
 **function declaration
@@ -94,6 +103,7 @@ extern void Oled_I2C_Clean(void);
 extern void Oled_I2C_Reset(void);
 extern void Oled_I2C_Init(void);
 extern void Oled_I2C_Put_Pixel(uint8 x,uint8 y);
+extern void Oled_I2C_Draw_BMP_128x64(const uint8 *Buff,OLED_Color_e Oled_Color_x);
 extern void Oled_I2C_Put_Str_6x8(uint8 x,uint8 y,uint8 ch[]);
 extern void Oled_I2C_Put_Str_8x16(uint8 x,uint8 y,uint8 ch[]);
 extern void Oled_I2C_Put_Str_12x24(uint8 x,uint8 y,uint8 ch[]);

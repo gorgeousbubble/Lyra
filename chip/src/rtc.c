@@ -21,12 +21,14 @@
 void RTC_Init(void)
 {
   volatile uint32 RTC_Delay=0;
+  volatile uint32 TSR=0;
+  volatile uint32 TAR=0;
   
   SIM_SCGC6 |= SIM_SCGC6_RTC_MASK;//RTC clock enable
-  SIM->SOPT1 |= SIM_SOPT1_OSC32KSEL(0x2);//RTC clock source use LSE
-  
-  PMC->REGSC |= PMC_REGSC_BGEN_MASK;
   PMC->REGSC |= PMC_REGSC_BGBE_MASK;
+  
+  TSR = RTC_TSR;
+  TAR = RTC_TAR;
   
   RTC_CR = RTC_CR_SWR_MASK;     //RTC register reset
   RTC_CR &= ~RTC_CR_SWR_MASK;   //RTC software reset
@@ -35,10 +37,7 @@ void RTC_Init(void)
            | RTC_CR_OSCE_MASK   //Enable 32.768KHz crystal oscillator
            | RTC_CR_SC16P_MASK  //Enable 16pF bypass capacitor
            | RTC_CR_CLKO_MASK   //32.768KHz wave does not output to the outside
-           | RTC_CR_UM_MASK     //Enable update mode
            );
-  
-  PMC->REGSC |= PMC_REGSC_ACKISO_MASK;
   
   //Waiting for the crystal oscillator to stabilize
   RTC_Delay = 0x600000;
@@ -51,10 +50,9 @@ void RTC_Init(void)
              );
   
   RTC_SR &= ~RTC_SR_TCE_MASK;   //Disable RTC counter 
-  
   //Time and alarm settings
-  RTC_TSR = 0;                  //The initial value of the second counter is 0
-  RTC_TAR = 0;                  //Alarm clock counter value 0
+  RTC_TSR = TSR;                  //The initial value of the second counter is 0
+  RTC_TAR = TAR;                  //Alarm clock counter value 0
   RTC_IER = 0;                  //Disable interrupt
   
   RTC_SR |= RTC_SR_TCE_MASK;    //Enable RTC counter
