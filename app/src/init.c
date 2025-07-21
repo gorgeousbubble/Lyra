@@ -88,7 +88,7 @@ void AllInit(void)
   ADC_Init(ADC0_DP0);//ADC0_DP0 channel initialization
   ADC_Init(ADC0_DM0);//ADC0_DM0 channel initialization
   I2C_Init(I2C_I2C0,400000);//I2C0 initialization, baud rate 400Kbps
-  UART_Init(UART_UART4,115200);//UART4 initialization, baud rate 115200Bps
+  UART_Init(UART_UART0,115200);//UART4 initialization, baud rate 115200Bps
   //DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
   MPU6050_Init();//MPU6050 initialization
   Oled_I2C_Init();//Oled initialization

@@ -24,8 +24,8 @@
 **UART
 */
 //UART0
-#define UART0_RX_PIN    PTA15   //PTA1,PTA15,PTB16,PTD6         //PTA1 should not be used (JTAG)
-#define UART0_TX_PIN    PTA14   //PTA2,PTA14,PTB17,PTD7         //PTA2 should not be used (JTAG)
+#define UART0_RX_PIN    PTA1   //PTA1,PTA15,PTB16,PTD6         //PTA1 should not be used (JTAG)
+#define UART0_TX_PIN    PTA2   //PTA2,PTA14,PTB17,PTD7         //PTA2 should not be used (JTAG)
 
 //UART1
 #define UART1_RX_PIN    PTC3    //PTC3,PTE1                     //PTE1 should not be used (SDHC)

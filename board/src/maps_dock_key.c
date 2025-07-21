@@ -134,25 +134,25 @@ void MAPS_Dock_KEY_Incident(void)
   if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
   {
     //Put Your Code...
-    UART_PutStr(UART_UART4,"KEY0 ");
+    UART_PutStr(UART_UART0,"KEY0 ");
     MAPS_Dock_KEY_Delay(500);//Button delay 500ms
   }
   else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
   {
     //Put Your Code...
-    UART_PutStr(UART_UART4,"KEY1 ");
+    UART_PutStr(UART_UART0,"KEY1 ");
     MAPS_Dock_KEY_Delay(500);//Button delay 500ms
   }
   else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
   {
     //Put Your Code...
-    UART_PutStr(UART_UART4,"KEY2 ");
+    UART_PutStr(UART_UART0,"KEY2 ");
     MAPS_Dock_KEY_Delay(500);//Button delay 500ms
   }
   else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
   {
     //Put Your Code...
-    UART_PutStr(UART_UART4,"KEY3 ");
+    UART_PutStr(UART_UART0,"KEY3 ");
     MAPS_Dock_KEY_Delay(500);//Button delay 500ms
   }
   

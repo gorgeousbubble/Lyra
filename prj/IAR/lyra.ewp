@@ -8645,6 +8645,9 @@
             <name>$PROJ_DIR$\..\..\dev\src\max30102.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\dev\src\max30102_algo.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\dev\src\mpu6050.c</name>
         </file>
         <file>
@@ -8760,6 +8763,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\dev\inc\max30102.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\dev\inc\max30102_algo.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\mcg.h</name>
