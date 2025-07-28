@@ -11386,6 +11386,9 @@
             <name>$PROJ_DIR$\..\..\app\src\conf.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\health.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\init.c</name>
         </file>
         <file>
@@ -11570,6 +11573,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\gpio_cfg.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\inc\health.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\i2c.h</name>

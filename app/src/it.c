@@ -11,6 +11,8 @@
  */
 
 #include "adc.h"
+#include "ftm.h"
+#include "health.h"
 #include "it.h"
 #include "kalman_filter.h"
 #include "max30102.h"

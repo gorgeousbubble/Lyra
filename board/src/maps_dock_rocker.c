@@ -13,6 +13,7 @@
 #include "conf.h"
 #include "dwt.h"
 #include "gpio.h"
+#include "health.h"
 #include "it.h"
 #include "maps_dock_lcm.h"
 #include "maps_dock_rocker.h"
@@ -156,6 +157,8 @@ void MAPS_Dock_Rocker_Key_LCM_Control(void)
               MAPS_Dock_LCM_Put_Str_6x8(49,1,"List5",LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,2,"MAX30102.RED:",MAX30102_RED,LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,3,"MAX30102.IR:",MAX30102_IR,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,4,"SPO2:",SPO2,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,5,"Heart_Rate:",Heart_Rate,LCM_Pure_Color);
               break;
       default:
               break;

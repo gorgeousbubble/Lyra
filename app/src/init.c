@@ -11,6 +11,8 @@
  */
 
 #include "adc.h"
+#include "ftm.h"
+#include "health.h"
 #include "i2c.h"
 #include "init.h"
 #include "it.h"
@@ -88,20 +90,21 @@ void AllInit(void)
   ADC_Init(ADC0_DP0);//ADC0_DP0 channel initialization
   ADC_Init(ADC0_DM0);//ADC0_DM0 channel initialization
   I2C_Init(I2C_I2C0,400000);//I2C0 initialization, baud rate 400Kbps
-  UART_Init(UART_UART0,115200);//UART4 initialization, baud rate 115200Bps
+  UART_Init(UART_UART0,115200);//UART0 initialization, baud rate 115200Bps
   //DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
   MPU6050_Init();//MPU6050 initialization
   Oled_I2C_Init();//Oled initialization
   MAX30102_Init();//MAX30102 initialization
   RTC_Init();//RTC initialization
+  //Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init();
 
-  /*// set current time
-  struct tm timeinfo = {
+  // set current time
+  /*struct tm timeinfo = {
     .tm_year = 2025 - 1900, // Year since 1900
     .tm_mon = 7 - 1,        // Month (0-11)
-    .tm_mday = 18,          // Day of the month (1-31)
+    .tm_mday = 28,          // Day of the month (1-31)
     .tm_hour = 22,          // Hour (0-23)
-    .tm_min = 8,            // Minute (0-59)
+    .tm_min = 35,            // Minute (0-59)
     .tm_sec = 0             // Second (0-59)
   };
   RTC_Set_Time_Format(&timeinfo);//Set RTC time format*/
