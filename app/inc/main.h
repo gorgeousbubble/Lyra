@@ -15,6 +15,23 @@
 
 #include "common.h"
 
+/*
+**OLED state enumeration
+*/
+typedef enum
+{
+  MAPS_OLED_Off = 0, //OLED off
+  MAPS_OLED_On = 1,  //OLED on
+}MAPS_OLED_Status;
+
+/*
+**Screen status enumeration
+*/
+typedef enum
+{
+  MAPS_Screen_Saver = 0,  //Screen saver
+  MAPS_Screen_Normal = 1, //Normal screen
+}MAPS_Screen_Status;
 
 /*
 **variate declaration

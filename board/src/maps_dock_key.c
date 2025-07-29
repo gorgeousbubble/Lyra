@@ -14,6 +14,7 @@
 #include "dwt.h"
 #include "gpio.h"
 #include "it.h"
+#include "main.h"
 #include "maps_dock_key.h"
 #include "oled_i2c.h"
 #include "uart.h"
@@ -23,6 +24,8 @@
 **Independent button port
 */
 PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX]={PTB21,PTB22,PTB23,PTB20};
+
+MAPS_Screen_Status Lyra_Status = MAPS_Screen_Saver; //Screen status
 
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
@@ -130,39 +133,43 @@ MAPS_Dock_KEY_Status MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEYn MAPS_Dock_KEYx)
  */
 void MAPS_Dock_KEY_Incident(void)
 {
-  //Press KEY0
-  if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
+  if(Lyra_Status == MAPS_Screen_Saver)
   {
-    //Put Your Code...
-    UART_PutStr(UART_UART0,"KEY0 ");
-    MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+    Oled_I2C_Draw_BMP_128x64(LCM_Freescale_logo, OLED_Invert_Color);
+    //Press KEY0
+    if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
+    {
+      Lyra_Status = MAPS_Screen_Normal; //Switch to normal screen
+    }
   }
-  else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
+  else
   {
-    //Put Your Code...
-    UART_PutStr(UART_UART0,"KEY1 ");
-    MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+    //Press KEY0
+    if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
+    {
+      //Put Your Code...
+      UART_PutStr(UART_UART0,"KEY0 ");
+      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+    }
+    else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
+    {
+      //Put Your Code...
+      UART_PutStr(UART_UART0,"KEY1 ");
+      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+    }
+    else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
+    {
+      //Put Your Code...
+      UART_PutStr(UART_UART0,"KEY2 ");
+      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+    }
+    else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
+    {
+      //Put Your Code...
+      UART_PutStr(UART_UART0,"KEY3 ");
+      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+    }
+    
+    Watch_Render_Current_Time_Clock(RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
   }
-  else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
-  {
-    //Put Your Code...
-    UART_PutStr(UART_UART0,"KEY2 ");
-    MAPS_Dock_KEY_Delay(500);//Button delay 500ms
-  }
-  else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
-  {
-    //Put Your Code...
-    UART_PutStr(UART_UART0,"KEY3 ");
-    MAPS_Dock_KEY_Delay(500);//Button delay 500ms
-  }
-  
-  //Oled_I2C_Put_Str_6x8(28, 0, "Lyra Project");
-  //Oled_I2C_Put_Date_6x8(34, 1, "-", RTC_Time_Now.Year, RTC_Time_Now.Month, RTC_Time_Now.Day);
-  //Oled_I2C_Put_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
-  //Watch_Render_Current_Time_6x8(40, 1, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem12);
-  //Watch_Render_Current_Time_6x8(40, 2, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second, ClockSystem24);
-  //Watch_Render_Current_Time_Wo_Sec_12x24(34, 3, ":", RTC_Time_Now.Hour, RTC_Time_Now.Minute, ClockSystem24);
-  
-  //Oled_I2C_Draw_BMP_128x64(LCM_Freescale_logo, OLED_Invert_Color);
-  Watch_Render_Current_Time_Clock(RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
 }

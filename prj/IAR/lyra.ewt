@@ -11383,6 +11383,9 @@
             <name>$PROJ_DIR$\..\..\app\src\alarm.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\beep.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\conf.c</name>
         </file>
         <file>
@@ -11537,6 +11540,9 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\inc\alarm.h</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\inc\beep.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\can.h</name>

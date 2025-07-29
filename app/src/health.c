@@ -73,13 +73,13 @@ void freeLinkedList(LinkedList* list) {
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(void)
 {
   // Initialize the GPIO ports for MAX30102
-  //MAX30102_PORT_INIT_RD;
-  //MAX30102_PORT_INIT_IRD;
-  //MAX30102_PORT_INIT_INT;
+  MAX30102_PORT_INIT_RD;
+  MAX30102_PORT_INIT_IRD;
+  MAX30102_PORT_INIT_INT;
 
   // Initialize the linked lists for IR and RED data
-  IR_Buff = createLinkedList(100);  // Example capacity
-  RED_Buff = createLinkedList(100); // Example capacity
+  IR_Buff = createLinkedList(500);  // Example capacity
+  RED_Buff = createLinkedList(500); // Example capacity
 
   // Initialize the MAX30102 sensor
   MAX30102_Init();
@@ -104,18 +104,18 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Clean(void)
 */
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
 {
-  //uint32 min = 0x3FFFF;
-  //uint32 max = 0;
-  //uint32 pre_data = 0;
-  //uint32 cur_data = 0;
+  uint32 min = 0x3FFFF;
+  uint32 max = 0;
+  uint32 pre_data = 0;
+  uint32 cur_data = 0;
   uint32 ir_data = 0;
   uint32 red_data = 0;
   int32 spo2 = 0;
   int8 spo2_valid = 0;
   int32 heart_rate = 0;
   int8 heart_rate_valid = 0;
-  //int32 brightness = 0;
-  //float temp = 0.0f;
+  int32 brightness = 0;
+  float temp = 0.0f;
 
   // Check if the linked lists are initialized
   //pre_data = RED_Buff->tail->data;
@@ -128,7 +128,7 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
   addNode(RED_Buff, red_data);
 
   // find the minimum and maximum values in the RED data
-  /*Node* current = RED_Buff->head;
+  Node* current = RED_Buff->head;
   while (current != NULL) {
     if (current->data < min) {
       min = current->data;
@@ -137,10 +137,10 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
       max = current->data;
     }
     current = current->next;
-  }*/
+  }
 
   // calculate the current data as the difference from the minimum
-  /*cur_data = RED_Buff->tail->data;
+  cur_data = RED_Buff->tail->data;
   if(cur_data > pre_data)//just to determine the brightness of LED according to the deviation of adjacent two AD data
   {
     temp = cur_data - pre_data;
@@ -165,13 +165,13 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
   {
     RD_Duty = 10000;
   }
-  else if(RD_Duty < 0)
+  else if(RD_Duty <= 0)
   {
     RD_Duty = 0;
   }
   FTM_PWM_Duty(FTM_FTM0, FTM_CH4, RD_Duty); // Update PWM duty cycle
 
-  if(brightness < 120)
+  /*if(brightness < 120)
     MAX30102_SET_IRD_H; // Set IRD port high level
   else
     MAX30102_SET_IRD_L; // Set IRD port low level*/

@@ -15,7 +15,6 @@
 #include "maps_dock_lcd.h"
 #include "maps_dock_key.h"
 #include "maps_dock_rocker.h"
-#include "mpu6050.h"
 
 /*
  *  @brief              main

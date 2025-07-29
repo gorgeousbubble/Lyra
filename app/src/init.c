@@ -11,6 +11,7 @@
  */
 
 #include "adc.h"
+#include "beep.h"
 #include "ftm.h"
 #include "health.h"
 #include "i2c.h"
@@ -96,7 +97,7 @@ void AllInit(void)
   Oled_I2C_Init();//Oled initialization
   MAX30102_Init();//MAX30102 initialization
   RTC_Init();//RTC initialization
-  //Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init();
+  //Beep_Init();//Beep initialization
 
   // set current time
   /*struct tm timeinfo = {
