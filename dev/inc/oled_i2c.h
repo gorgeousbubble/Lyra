@@ -91,6 +91,9 @@ extern const uint8 Oled_FontLib_12x24[];
 extern const uint8 Oled_Picture_128x64_Star[][16];
 extern const uint8 Oled_Picture_128x64_JBD_Logo[][16];
 extern const uint8 LCM_Freescale_logo[];
+extern const uint8 LCM_Watch_icon[];
+extern const uint8 LCM_Stop_Watch_icon[];
+extern const uint8 LCM_Alarm_Clock_icon[];
 
 /*
 **function declaration

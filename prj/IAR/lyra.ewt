@@ -11542,6 +11542,9 @@
             <name>$PROJ_DIR$\..\..\app\inc\alarm.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\utils\inc\animation.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\inc\beep.h</name>
         </file>
         <file>
@@ -11823,5 +11826,8 @@
     </group>
     <group>
         <name>utils</name>
+        <file>
+            <name>$PROJ_DIR$\..\..\utils\src\animation.c</name>
+        </file>
     </group>
 </project>

@@ -14,6 +14,7 @@
 #define __MAPS_DOCK_KEY_H__
 
 #include "common.h"
+#include "main.h"
 #include "port.h"
 
 /*
@@ -44,6 +45,8 @@ typedef enum
 **variate declaration
 */
 extern PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX];
+extern MAPS_Screen_Status Lyra_Status; //Screen status
+extern MAPS_Menu_Selection Lyra_Menu_Selection; //Menu selection
 
 /*
 **function declaration

@@ -15,6 +15,7 @@
 #include "gpio.h"
 #include "health.h"
 #include "it.h"
+#include "maps_dock_key.h"
 #include "maps_dock_lcm.h"
 #include "maps_dock_rocker.h"
 
@@ -124,6 +125,8 @@ void MAPS_Dock_Rocker_Key_LCM_Control(void)
               MAPS_Dock_LCM_Put_Para_6x8(0,3,"ADC0_DP0:",ADC_Convert_Result[0],LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,4,"ADC0_DM0:",ADC_Convert_Result[1],LCM_Pure_Color);
               MAPS_Dock_LCM_Put_Para_6x8(0,5,"RTC_Count:",RTC_Count,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,6,"Lyra_Status:",Lyra_Status,LCM_Pure_Color);
+              MAPS_Dock_LCM_Put_Para_6x8(0,7,"Lyra_Menu_Selection:",Lyra_Menu_Selection,LCM_Pure_Color);
               break;
       case 2:
               MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);

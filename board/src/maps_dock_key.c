@@ -10,6 +10,7 @@
  * @date       2025-06-24
  */
 
+#include "animation.h"
 #include "conf.h"
 #include "dwt.h"
 #include "gpio.h"
@@ -26,6 +27,7 @@
 PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX]={PTB21,PTB22,PTB23,PTB20};
 
 MAPS_Screen_Status Lyra_Status = MAPS_Screen_Saver; //Screen status
+MAPS_Menu_Selection Lyra_Menu_Selection = MAPS_Menu_Clock; //Menu selection
 
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
@@ -133,43 +135,129 @@ MAPS_Dock_KEY_Status MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEYn MAPS_Dock_KEYx)
  */
 void MAPS_Dock_KEY_Incident(void)
 {
+  //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 1, 2);
   if(Lyra_Status == MAPS_Screen_Saver)
   {
     Oled_I2C_Draw_BMP_128x64(LCM_Freescale_logo, OLED_Invert_Color);
     //Press KEY0
     if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
     {
-      Lyra_Status = MAPS_Screen_Normal; //Switch to normal screen
+      Lyra_Status = MAPS_Screen_Menu; //Switch to normal screen
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
   }
-  else
+  else if(Lyra_Status == MAPS_Screen_Menu)
+  {
+    // Check dock key press status
+    //Press KEY0
+    if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
+    {
+      Lyra_Status = MAPS_Screen_Normal; //Switch to normal screen
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
+    }
+    //Press KEY1
+    else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
+    {
+      Lyra_Status = MAPS_Screen_Saver; //Return back to screen saver
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
+    }
+    //Press KEY2
+    else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
+    {
+      switch(Lyra_Menu_Selection)
+      {
+        case MAPS_Menu_Clock:
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 0, 5);
+          Lyra_Menu_Selection = MAPS_Menu_AlarmClock; //Switch to Stop Watch
+          break;
+        case MAPS_Menu_StopWatch:
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 0, 0, 5);
+          Lyra_Menu_Selection = MAPS_Menu_Clock; //Switch to Clock
+          break;
+        case MAPS_Menu_AlarmClock:
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, 0, 0, 5);
+          Lyra_Menu_Selection = MAPS_Menu_StopWatch; //Switch to Stop Watch
+          break;
+        default:
+          break;
+      }
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
+    }
+    //Press KEY3
+    else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
+    {
+      switch(Lyra_Menu_Selection)
+      {
+        case MAPS_Menu_Clock:
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, 1, 0, 5);
+          Lyra_Menu_Selection = MAPS_Menu_StopWatch; //Switch to Stop Watch
+          break;
+        case MAPS_Menu_StopWatch:
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 1, 0, 5);
+          Lyra_Menu_Selection = MAPS_Menu_AlarmClock; //Switch to Alarm Clock
+          break;
+        case MAPS_Menu_AlarmClock:
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 1, 0, 5);
+          Lyra_Menu_Selection = MAPS_Menu_Clock; //Switch to Clock
+          break;
+        default:
+          break;
+      }
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
+    }
+    // Display the current menu selection
+    switch(Lyra_Menu_Selection)
+    {
+      case MAPS_Menu_Clock:
+        Oled_I2C_Draw_BMP_128x64(LCM_Watch_icon, OLED_Invert_Color);
+        break;
+      case MAPS_Menu_StopWatch:
+        Oled_I2C_Draw_BMP_128x64(LCM_Stop_Watch_icon, OLED_Invert_Color);
+        break;
+      case MAPS_Menu_AlarmClock:
+        Oled_I2C_Draw_BMP_128x64(LCM_Alarm_Clock_icon, OLED_Invert_Color);
+        break;
+      default:
+        break;
+    }
+  }
+  else if(Lyra_Status == MAPS_Screen_Normal)
   {
     //Press KEY0
     if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
     {
-      //Put Your Code...
-      UART_PutStr(UART_UART0,"KEY0 ");
-      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
+    //Press KEY1
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
     {
-      //Put Your Code...
-      UART_PutStr(UART_UART0,"KEY1 ");
-      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+      Lyra_Status = MAPS_Screen_Menu; //Switch to screen saver
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
+    //Press KEY2
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
     {
-      //Put Your Code...
-      UART_PutStr(UART_UART0,"KEY2 ");
-      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
+    //Press KEY3
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
     {
-      //Put Your Code...
-      UART_PutStr(UART_UART0,"KEY3 ");
-      MAPS_Dock_KEY_Delay(500);//Button delay 500ms
+      MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
-    
-    Watch_Render_Current_Time_Clock(RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+    // Display the current menu selection
+    switch(Lyra_Menu_Selection)
+    {
+      case MAPS_Menu_Clock:
+        Watch_Render_Current_Time_Clock(RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+        break;
+      case MAPS_Menu_StopWatch:
+        //Watch_Render_Stop_Watch();
+        break;
+      case MAPS_Menu_AlarmClock:
+        //Watch_Render_Alarm_Clock();
+        break;
+      default:
+        break;
+    }
   }
 }

@@ -52,6 +52,9 @@ typedef enum
 */
 extern const uint8 FONTTYPE8_8[][8];
 extern const uint8 LCM_Freescale_logo[];
+extern const uint8 LCM_Watch_icon[];
+extern const uint8 LCM_Stop_Watch_icon[];
+extern const uint8 LCM_Alarm_Clock_icon[];
 
 /*
 **function declaration
