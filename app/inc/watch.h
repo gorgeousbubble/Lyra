@@ -26,7 +26,8 @@ typedef enum {
 /*
 **variate declaration
 */
-
+extern const Coord LCM_Clock_Dial_coordinate[];
+extern const int LCM_Clock_Dial_coordinate_length;
 
 /*
 **function declaration
@@ -38,6 +39,7 @@ extern void Watch_Render_Current_Time_Wo_Sec_8x16(uint8 x,uint8 y,uint8 ch[],int
 extern void Watch_Render_Current_Time_12x24(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second, ClockSystem clock_system);
 extern void Watch_Render_Current_Time_Wo_Sec_12x24(uint8 x,uint8 y,uint8 ch[],int hour,int minute, ClockSystem clock_system);
 extern void Watch_Render_Current_Time_Clock(int hour,int minute,int second);
+extern void Render_Clock_Current_Time(const Coord *dial, const int dialLen, int hour,int minute,int second);
 
 
 #endif
