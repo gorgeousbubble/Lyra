@@ -248,7 +248,8 @@ void MAPS_Dock_KEY_Incident(void)
     switch(Lyra_Menu_Selection)
     {
       case MAPS_Menu_Clock:
-        Render_Clock_Current_Time(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+        //Render_Clock_Current_Time(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+        Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
         break;
       case MAPS_Menu_StopWatch:
         //Watch_Render_Stop_Watch();

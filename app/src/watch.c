@@ -16,8 +16,10 @@
 #include "watch.h"
 
 const Coord LCM_Clock_Dial_coordinate[] = {{57,2},{58,2},{59,2},{60,2},{61,2},{62,2},{63,2},{64,2},{65,2},{66,2},{67,2},{68,2},{69,2},{70,2},{71,2},{53,3},{54,3},{55,3},{56,3},{71,3},{72,3},{73,3},{74,3},{51,4},{52,4},{75,4},{76,4},{49,5},{50,5},{77,5},{78,5},{47,6},{48,6},{79,6},{80,6},{46,7},{47,7},{57,7},{58,7},{59,7},{60,7},{61,7},{62,7},{63,7},{64,7},{65,7},{66,7},{67,7},{68,7},{69,7},{70,7},{80,7},{81,7},{45,8},{54,8},{55,8},{56,8},{71,8},{72,8},{73,8},{82,8},{44,9},{52,9},{53,9},{64,9},{74,9},{75,9},{83,9},{84,9},{42,10},{43,10},{50,10},{51,10},{64,10},{76,10},{77,10},{84,10},{85,10},{42,11},{49,11},{50,11},{52,11},{64,11},{77,11},{78,11},{85,11},{86,11},{41,12},{48,12},{52,12},{75,12},{79,12},{86,12},{40,13},{47,13},{53,13},{74,13},{80,13},{81,13},{87,13},{39,14},{46,14},{53,14},{74,14},{81,14},{82,14},{88,14},{38,15},{39,15},{45,15},{82,15},{88,15},{89,15},{38,16},{44,16},{83,16},{89,16},{37,17},{43,17},{84,17},{90,17},{37,18},{42,18},{43,18},{84,18},{85,18},{90,18},{36,19},{42,19},{85,19},{91,19},{36,20},{41,20},{44,20},{83,20},{84,20},{86,20},{91,20},{35,21},{41,21},{45,21},{46,21},{81,21},{82,21},{86,21},{92,21},{35,22},{40,22},{41,22},{87,22},{92,22},{35,23},{40,23},{87,23},{92,23},{35,24},{40,24},{87,24},{93,24},{34,25},{39,25},{88,25},{93,25},{34,26},{39,26},{88,26},{93,26},{34,27},{39,27},{88,27},{93,27},{34,28},{39,28},{88,28},{93,28},{34,29},{39,29},{88,29},{93,29},{34,30},{39,30},{62,30},{63,30},{64,30},{65,30},{88,30},{93,30},{34,31},{39,31},{62,31},{65,31},{88,31},{93,31},{34,32},{39,32},{41,32},{42,32},{43,32},{62,32},{65,32},{84,32},{85,32},{86,32},{88,32},{93,32},{34,33},{39,33},{62,33},{63,33},{64,33},{65,33},{88,33},{93,33},{34,34},{39,34},{88,34},{93,34},{34,35},{39,35},{88,35},{93,35},{34,36},{39,36},{88,36},{93,36},{34,37},{39,37},{88,37},{93,37},{34,38},{39,38},{88,38},{93,38},{34,39},{35,39},{40,39},{87,39},{93,39},{35,40},{40,40},{87,40},{92,40},{35,41},{40,41},{41,41},{87,41},{92,41},{35,42},{41,42},{45,42},{46,42},{81,42},{82,42},{86,42},{92,42},{36,43},{41,43},{44,43},{83,43},{84,43},{86,43},{91,43},{36,44},{42,44},{85,44},{91,44},{37,45},{42,45},{43,45},{84,45},{85,45},{90,45},{37,46},{43,46},{84,46},{90,46},{38,47},{44,47},{83,47},{89,47},{38,48},{39,48},{45,48},{82,48},{88,48},{89,48},{39,49},{46,49},{53,49},{74,49},{81,49},{82,49},{88,49},{40,50},{47,50},{53,50},{74,50},{80,50},{81,50},{87,50},{41,51},{48,51},{52,51},{75,51},{79,51},{86,51},{41,52},{42,52},{49,52},{50,52},{52,52},{64,52},{75,52},{77,52},{78,52},{85,52},{86,52},{42,53},{43,53},{50,53},{51,53},{64,53},{76,53},{77,53},{84,53},{85,53},{43,54},{44,54},{52,54},{53,54},{64,54},{74,54},{75,54},{83,54},{84,54},{45,55},{54,55},{55,55},{56,55},{71,55},{72,55},{73,55},{82,55},{46,56},{47,56},{57,56},{58,56},{59,56},{60,56},{61,56},{62,56},{63,56},{64,56},{65,56},{66,56},{67,56},{68,56},{69,56},{70,56},{80,56},{81,56},{47,57},{48,57},{79,57},{80,57},{49,58},{50,58},{77,58},{78,58},{51,59},{52,59},{75,59},{76,59},{53,60},{54,60},{55,60},{72,60},{73,60},{74,60},{56,61},{57,61},{58,61},{59,61},{60,61},{61,61},{62,61},{63,61},{64,61},{65,61},{66,61},{67,61},{68,61},{69,61},{70,61},{71,61},};
+const Coord LCM_Clock_Digit_coordinate[] = {{56,13},{57,13},{58,13},{59,13},{60,13},{61,13},{62,13},{63,13},{64,13},{65,13},{66,13},{67,13},{68,13},{69,13},{70,13},{71,13},{55,14},{56,14},{57,14},{58,14},{59,14},{60,14},{61,14},{62,14},{63,14},{64,14},{65,14},{66,14},{67,14},{68,14},{69,14},{70,14},{71,14},{72,14},{55,15},{56,15},{71,15},{72,15},{55,16},{56,16},{71,16},{72,16},{37,17},{38,17},{39,17},{40,17},{41,17},{42,17},{43,17},{44,17},{45,17},{46,17},{47,17},{48,17},{49,17},{50,17},{51,17},{52,17},{53,17},{54,17},{55,17},{56,17},{57,17},{58,17},{59,17},{60,17},{61,17},{62,17},{63,17},{64,17},{65,17},{66,17},{67,17},{68,17},{69,17},{70,17},{71,17},{72,17},{73,17},{74,17},{75,17},{76,17},{77,17},{78,17},{79,17},{80,17},{81,17},{82,17},{83,17},{84,17},{85,17},{86,17},{87,17},{88,17},{89,17},{90,17},{35,18},{36,18},{37,18},{38,18},{39,18},{40,18},{41,18},{42,18},{43,18},{44,18},{45,18},{46,18},{47,18},{48,18},{49,18},{50,18},{51,18},{52,18},{53,18},{54,18},{55,18},{56,18},{57,18},{58,18},{59,18},{60,18},{61,18},{62,18},{63,18},{64,18},{65,18},{66,18},{67,18},{68,18},{69,18},{70,18},{71,18},{72,18},{73,18},{74,18},{75,18},{76,18},{77,18},{78,18},{79,18},{80,18},{81,18},{82,18},{83,18},{84,18},{85,18},{86,18},{87,18},{88,18},{89,18},{90,18},{91,18},{92,18},{35,19},{36,19},{37,19},{38,19},{89,19},{90,19},{91,19},{92,19},{34,20},{35,20},{36,20},{91,20},{92,20},{93,20},{34,21},{35,21},{36,21},{38,21},{39,21},{40,21},{41,21},{42,21},{43,21},{44,21},{45,21},{46,21},{47,21},{48,21},{49,21},{50,21},{51,21},{52,21},{53,21},{54,21},{55,21},{56,21},{57,21},{58,21},{59,21},{60,21},{61,21},{62,21},{63,21},{64,21},{65,21},{66,21},{67,21},{68,21},{69,21},{70,21},{71,21},{72,21},{73,21},{74,21},{75,21},{76,21},{77,21},{78,21},{79,21},{80,21},{81,21},{82,21},{83,21},{84,21},{85,21},{86,21},{87,21},{88,21},{89,21},{91,21},{92,21},{93,21},{34,22},{35,22},{38,22},{39,22},{40,22},{41,22},{42,22},{43,22},{44,22},{45,22},{46,22},{47,22},{48,22},{49,22},{50,22},{51,22},{52,22},{53,22},{54,22},{55,22},{56,22},{57,22},{58,22},{59,22},{60,22},{61,22},{62,22},{63,22},{64,22},{65,22},{66,22},{67,22},{68,22},{69,22},{70,22},{71,22},{72,22},{73,22},{74,22},{75,22},{76,22},{77,22},{78,22},{79,22},{80,22},{81,22},{82,22},{83,22},{84,22},{85,22},{86,22},{87,22},{88,22},{89,22},{92,22},{93,22},{34,23},{35,23},{38,23},{39,23},{88,23},{89,23},{92,23},{93,23},{34,24},{35,24},{38,24},{39,24},{88,24},{89,24},{92,24},{93,24},{34,25},{35,25},{38,25},{39,25},{88,25},{89,25},{92,25},{93,25},{34,26},{35,26},{38,26},{39,26},{88,26},{89,26},{92,26},{93,26},{34,27},{35,27},{38,27},{39,27},{88,27},{89,27},{92,27},{93,27},{34,28},{35,28},{38,28},{39,28},{63,28},{64,28},{88,28},{89,28},{92,28},{93,28},{34,29},{35,29},{38,29},{39,29},{63,29},{64,29},{88,29},{89,29},{92,29},{93,29},{34,30},{35,30},{38,30},{39,30},{88,30},{89,30},{92,30},{93,30},{34,31},{35,31},{38,31},{39,31},{88,31},{89,31},{92,31},{93,31},{34,32},{35,32},{38,32},{39,32},{88,32},{89,32},{92,32},{93,32},{34,33},{35,33},{38,33},{39,33},{88,33},{89,33},{92,33},{93,33},{34,34},{35,34},{38,34},{39,34},{63,34},{64,34},{88,34},{89,34},{92,34},{93,34},{34,35},{35,35},{38,35},{39,35},{63,35},{64,35},{88,35},{89,35},{92,35},{93,35},{34,36},{35,36},{38,36},{39,36},{88,36},{89,36},{92,36},{93,36},{34,37},{35,37},{38,37},{39,37},{88,37},{89,37},{92,37},{93,37},{34,38},{35,38},{38,38},{39,38},{88,38},{89,38},{92,38},{93,38},{34,39},{35,39},{38,39},{39,39},{88,39},{89,39},{92,39},{93,39},{34,40},{35,40},{38,40},{39,40},{88,40},{89,40},{92,40},{93,40},{34,41},{35,41},{38,41},{39,41},{40,41},{41,41},{42,41},{43,41},{44,41},{45,41},{46,41},{47,41},{48,41},{49,41},{50,41},{51,41},{52,41},{53,41},{54,41},{55,41},{56,41},{57,41},{58,41},{59,41},{60,41},{61,41},{62,41},{63,41},{64,41},{65,41},{66,41},{67,41},{68,41},{69,41},{70,41},{71,41},{72,41},{73,41},{74,41},{75,41},{76,41},{77,41},{78,41},{79,41},{80,41},{81,41},{82,41},{83,41},{84,41},{85,41},{86,41},{87,41},{88,41},{89,41},{92,41},{93,41},{34,42},{35,42},{36,42},{38,42},{39,42},{40,42},{41,42},{42,42},{43,42},{44,42},{45,42},{46,42},{47,42},{48,42},{49,42},{50,42},{51,42},{52,42},{53,42},{54,42},{55,42},{56,42},{57,42},{58,42},{59,42},{60,42},{61,42},{62,42},{63,42},{64,42},{65,42},{66,42},{67,42},{68,42},{69,42},{70,42},{71,42},{72,42},{73,42},{74,42},{75,42},{76,42},{77,42},{78,42},{79,42},{80,42},{81,42},{82,42},{83,42},{84,42},{85,42},{86,42},{87,42},{88,42},{89,42},{91,42},{92,42},{93,42},{34,43},{35,43},{36,43},{91,43},{92,43},{93,43},{35,44},{36,44},{37,44},{38,44},{89,44},{90,44},{91,44},{92,44},{35,45},{36,45},{37,45},{38,45},{39,45},{40,45},{41,45},{42,45},{43,45},{44,45},{45,45},{46,45},{47,45},{48,45},{49,45},{50,45},{51,45},{52,45},{53,45},{54,45},{55,45},{56,45},{57,45},{58,45},{59,45},{60,45},{61,45},{62,45},{63,45},{64,45},{65,45},{66,45},{67,45},{68,45},{69,45},{70,45},{71,45},{72,45},{73,45},{74,45},{75,45},{76,45},{77,45},{78,45},{79,45},{80,45},{81,45},{82,45},{83,45},{84,45},{85,45},{86,45},{87,45},{88,45},{89,45},{90,45},{91,45},{92,45},{37,46},{38,46},{39,46},{40,46},{41,46},{42,46},{43,46},{44,46},{45,46},{46,46},{47,46},{48,46},{49,46},{50,46},{51,46},{52,46},{53,46},{54,46},{55,46},{56,46},{57,46},{58,46},{59,46},{60,46},{61,46},{62,46},{63,46},{64,46},{65,46},{66,46},{67,46},{68,46},{69,46},{70,46},{71,46},{72,46},{73,46},{74,46},{75,46},{76,46},{77,46},{78,46},{79,46},{80,46},{81,46},{82,46},{83,46},{84,46},{85,46},{86,46},{87,46},{88,46},{89,46},{90,46},{40,47},{41,47},{42,47},{43,47},{44,47},{45,47},{46,47},{47,47},{80,47},{81,47},{82,47},{83,47},{84,47},{85,47},{86,47},{87,47},{40,48},{41,48},{42,48},{43,48},{44,48},{45,48},{46,48},{47,48},{80,48},{81,48},{82,48},{83,48},{84,48},{85,48},{86,48},{87,48},{41,49},{42,49},{43,49},{44,49},{45,49},{46,49},{81,49},{82,49},{83,49},{84,49},{85,49},{86,49},};
 
 const int LCM_Clock_Dial_coordinate_length = ARRAY_LENGTH(LCM_Clock_Dial_coordinate);
+const int LCM_Clock_Digit_coordinate_length = ARRAY_LENGTH(LCM_Clock_Digit_coordinate);
 
 /*
  *  @brief      Watch_Render_Current_Time_6x8
@@ -254,443 +256,14 @@ void Watch_Render_Current_Time_Wo_Sec_12x24(uint8 x,uint8 y,uint8 ch[],int hour,
 }
 
 /*
- *  @brief      Watch_Render_Current_Time_Clock
+ *  @brief      Render_Clock_Current_Time_Dial
  *  @param      int             hour            hour integer parameter
  *  @param      int             minute          minute integer parameter
  *  @param      int             second          second integer parameter
  *  @since      v1.0
- *  Sample usage:       Watch_Render_Current_Time_Clock(10,15,30);
+ *  Sample usage:       Render_Clock_Current_Time_Dial(10,15,30);
 */
-void Watch_Render_Current_Time_Clock(int hour,int minute,int second)
-{
-    // Define a structure to hold coordinates
-    struct Coordinate {
-        uint8 x;
-        uint8 y;
-        struct Coordinate* next;
-    };
-    typedef struct Coordinate Coord;
-
-    Coord* head = NULL;
-    Coord* current = NULL;
-
-    uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
-
-    // draw clock circle
-    for (int i = 0; i < 64; i ++) 
-    {
-        uint8 x1 = 0;
-        uint8 x2 = 0;
-        uint8 y = i;
-        float32_t* temp = (float32_t*)malloc(sizeof(float32_t));
-        // calculate the x1 and x2 coordinates
-        arm_sqrt_f32(32 * 32 - (i - 32) * (i - 32), temp);
-        x1 = 64 - (uint8)(*temp);
-        x2 = 64 + (uint8)(*temp);
-        free(temp);
-        if (x1 == x2)
-        {
-            // create a new coordinate node
-            Coord* newNode = (Coord*)malloc(sizeof(Coord));
-            newNode->x = x1;
-            newNode->y = y;
-            newNode->next = NULL;
-
-            // if head is NULL, set head to the new node
-            if (head == NULL) {
-                head = newNode;
-                current = head;
-            } else {
-                current->next = newNode; // link the new node to the list
-                current = newNode; // move current to the new node
-            }
-        } else {
-            // create two coordinate nodes for x1 and x2
-            Coord* newNode1 = (Coord*)malloc(sizeof(Coord));
-            Coord* newNode2 = (Coord*)malloc(sizeof(Coord));
-            newNode1->x = x1;
-            newNode1->y = y;
-            newNode2->x = x2;
-            newNode2->y = y;
-            newNode1->next = newNode2;
-            newNode2->next = NULL;
-
-            // if head is NULL, set head to the first node
-            if (head == NULL) {
-                head = newNode1;
-                current = newNode2; // move current to the second node
-            } else {
-                current->next = newNode1; // link the first node to the list
-                current = newNode2; // move current to the second node
-            }
-        }
-    }
-    // create the bottom coordinate
-    Coord* bottomNode = (Coord*)malloc(sizeof(Coord));
-    bottomNode->x = 64;
-    bottomNode->y = 63;
-    bottomNode->next = NULL;
-    // link the bottom node to the head
-    current->next = bottomNode;
-    current = bottomNode; // move current to the bottom node
-    // draw center point
-    Coord* centerNode = (Coord*)malloc(sizeof(Coord));
-    centerNode->x = 64; // center x coordinate
-    centerNode->y = 32; // center y coordinate
-    centerNode->next = NULL;
-    // link the center node to the list
-    if (head == NULL) {
-        head = centerNode; // if head is NULL, set head to the center node
-        current = head; // move current to the center node
-    } else {
-        current->next = centerNode; // link the center node to the list
-        current = centerNode; // move current to the center node
-    }
-    // draw clock center
-    for (int i = 0; i < 3; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            // calculate the coordinates for the center point
-            uint8 x = 64 + i - 1; // center x coordinate
-            uint8 y = 32 + j - 1; // center y coordinate
-            // create a new coordinate node for the center point
-            Coord* centerPointNode = (Coord*)malloc(sizeof(Coord));
-            centerPointNode->x = x;
-            centerPointNode->y = y;
-            centerPointNode->next = NULL;
-            // link the center point node to the list
-            if (head == NULL) {
-                head = centerPointNode; // if head is NULL, set head to the center point node
-                current = head; // move current to the center point node
-            } else {
-                current->next = centerPointNode; // link the center point node to the list
-                current = centerPointNode; // move current to the center point node
-            }
-        }
-    }
-    // draw clock scale
-    for (int i = 0; i < 12; i++)
-    {
-      for (int j = 0; j < 5; j++)
-      {
-        // calculate the angle for the number
-        float32_t angle = i * 30.0; // 360 degrees / 12 numbers = 30 degrees per number
-        // calculate the coordinates for the number
-        uint8 x = (uint8)(64 + (31 - j) * arm_sin_f32(angle * (3.14159265358979323846 / 180.0)));
-        uint8 y = (uint8)(32 - (31 - j) * arm_cos_f32(angle * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the number
-        Coord* numberNode = (Coord*)malloc(sizeof(Coord));
-        numberNode->x = x;
-        numberNode->y = y;
-        numberNode->next = NULL;
-        // link the number node to the list
-        if (head == NULL) {
-            head = numberNode; // if head is NULL, set head to the number node
-            current = head; // move current to the number node
-        } else {
-            current->next = numberNode; // link the number node to the list
-            current = numberNode; // move current to the number node
-        }
-      }
-    }
-    // draw clock sub scale
-    for (int i = 0; i < 60; i++)
-    {
-      if (i % 5 == 0) continue;
-      for (int j = 0; j < 2; j++)
-      {
-        // calculate the angle for the number
-        float32_t angle = i * 6.0; // 360 degrees / 60 numbers = 6 degrees per number
-        // calculate the coordinates for the number
-        uint8 x = (uint8)(64 + (31 - j) * arm_sin_f32(angle * (3.14159265358979323846 / 180.0)));
-        uint8 y = (uint8)(32 - (31 - j) * arm_cos_f32(angle * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the number
-        Coord* numberNode = (Coord*)malloc(sizeof(Coord));
-        numberNode->x = x;
-        numberNode->y = y;
-        numberNode->next = NULL;
-        // link the number node to the list
-        if (head == NULL) {
-            head = numberNode; // if head is NULL, set head to the number node
-            current = head; // move current to the number node
-        } else {
-            current->next = numberNode; // link the number node to the list
-            current = numberNode; // move current to the number node
-        }
-      }
-    }
-    // draw clock numbers
-    for (int i = 0; i < 12; i++) 
-    {
-      // calculate the angle for the number
-      float32_t angle = i * 30.0; // 360 degrees / 12 numbers = 30 degrees per number
-      // calculate the coordinates for the number
-      uint8 x = (uint8)(64 + 28 * arm_sin_f32(angle * (3.14159265358979323846 / 180.0)));
-      uint8 y = (uint8)(32 - 28 * arm_cos_f32(angle * (3.14159265358979323846 / 180.0)));
-      // draw the number (6x8)
-      //char ch[12][5] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
-      //char ch[12][3] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
-      char ch[12][5] = {"XII", "", "", "III", "", "", "VI", "", "", "IX", "", ""};
-      for (int j = 0; ch[i][j] != '\0'; j++) 
-      {
-        uint8 c = ch[i][j] - 32; // convert character to ASCII value
-        for (int k = 0; k < 6; k++) 
-        {
-          for (int l = 0; l < 8; l++) 
-          {
-            if (Oled_FontLib_6x8[c][k] & (0x01 << l)) 
-            {
-              // if the pixel is set, draw it
-              // calculate the x and y coordinates for the character
-              uint8 char_x = x + j * 6 + k;
-              uint8 char_y = y + l;
-              if (i == 0)
-              {
-                char_x -= 8;
-                char_y += 3;
-              } else if (i == 3)
-              {
-                char_x -= 20;
-                char_y -= 3;
-              } else if (i == 6)
-              {
-                char_x -= 6;
-                char_y -= 10;
-              } else if (i == 9)
-              {
-                char_x += 2;
-                char_y -= 3;
-              }
-              // create a new coordinate node for the character pixel
-              Coord* charNode = (Coord*)malloc(sizeof(Coord));
-              charNode->x = char_x;
-              charNode->y = char_y;
-              charNode->next = NULL;
-              // link the character node to the list
-              if (head == NULL) {
-                  head = charNode; // if head is NULL, set head to the character node
-                  current = head; // move current to the character node
-              } else {
-                  current->next = charNode; // link the character node to the list
-                  current = charNode; // move current to the character node
-              }
-            }
-          }
-        }
-      }
-    }
-    // draw clock hands
-    // calculate the angle for the hour hand
-    float32_t hour_angle = (hour % 12 + minute / 60.0) * 30.0; // 360 degrees / 12 hours = 30 degrees per hour
-    // calculate the angle for the minute hand
-    float32_t minute_angle = (minute + second / 60.0) * 6.0; // 360 degrees / 60 minutes = 6 degrees per minute
-    // calculate the angle for the second hand
-    float32_t second_angle = second * 6.0; // 360 degrees / 60 seconds = 6 degrees per second
-    // calculate the coordinates for the hour hand
-    // the hour hand is 16 pixels long, starting from the center of the clock
-    for (int i = 0; i < 16; i++) 
-    {
-        uint8 hour_x = (uint8)(64 + (i + 1) * arm_sin_f32(hour_angle * (3.14159265358979323846 / 180.0)));
-        uint8 hour_y = (uint8)(32 - (i + 1) * arm_cos_f32(hour_angle * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the hour hand
-        Coord* hourNode = (Coord*)malloc(sizeof(Coord));
-        hourNode->x = hour_x;
-        hourNode->y = hour_y;
-        hourNode->next = NULL;
-        // link the hour hand node to the list
-        if (head == NULL) {
-            head = hourNode; // if head is NULL, set head to the hour hand node
-            current = head; // move current to the hour hand node
-        } else {
-            current->next = hourNode; // link the hour hand node to the list
-            current = hourNode; // move current to the hour hand node
-        }
-    }
-    // add an arrow for the hour hand
-    uint8 bottomhour_x = 64 + (int)(16 * arm_sin_f32(hour_angle * (3.14159265358979323846 / 180.0)));
-    uint8 bottomhour_y = 32 - (int)(16 * arm_cos_f32(hour_angle * (3.14159265358979323846 / 180.0)));
-    // the arrow is 3 pixels long, starting from the end of the hour hand
-    for (int i = 0; i < 3; i++) 
-    {
-        uint8 hour_arrow_x = (uint8)(bottomhour_x - (i + 1) * arm_sin_f32((hour_angle-30.0) * (3.14159265358979323846 / 180.0)));
-        uint8 hour_arrow_y = (uint8)(bottomhour_y + (i + 1) * arm_cos_f32((hour_angle-30.0) * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the hour hand arrow
-        Coord* hourArrowNode = (Coord*)malloc(sizeof(Coord));
-        hourArrowNode->x = hour_arrow_x;
-        hourArrowNode->y = hour_arrow_y;
-        hourArrowNode->next = NULL;
-        // link the hour hand arrow node to the list
-        if (head == NULL) {
-            head = hourArrowNode; // if head is NULL, set head to the hour hand arrow node
-            current = head; // move current to the hour hand arrow node
-        } else {
-            current->next = hourArrowNode; // link the hour hand arrow node to the list
-            current = hourArrowNode; // move current to the hour hand arrow node
-        }
-    }
-    for (int i = 0; i < 3; i++) 
-    {
-        uint8 hour_arrow_x = (uint8)(bottomhour_x - (i + 1) * arm_sin_f32((hour_angle+30.0) * (3.14159265358979323846 / 180.0)));
-        uint8 hour_arrow_y = (uint8)(bottomhour_y + (i + 1) * arm_cos_f32((hour_angle+30.0) * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the hour hand arrow
-        Coord* hourArrowNode = (Coord*)malloc(sizeof(Coord));
-        hourArrowNode->x = hour_arrow_x;
-        hourArrowNode->y = hour_arrow_y;
-        hourArrowNode->next = NULL;
-        // link the hour hand arrow node to the list
-        if (head == NULL) {
-            head = hourArrowNode; // if head is NULL, set head to the hour hand arrow node
-            current = head; // move current to the hour hand arrow node
-        } else {
-            current->next = hourArrowNode; // link the hour hand arrow node to the list
-            current = hourArrowNode; // move current to the hour hand arrow node
-        }
-    }
-    // calculate the coordinates for the minute hand
-    // the minute hand is 20 pixels long, starting from the center of the clock
-    for (int i = 0; i < 20; i++) 
-    {
-        uint8 minute_x = (uint8)(64 + (i + 1) * arm_sin_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-        uint8 minute_y = (uint8)(32 - (i + 1) * arm_cos_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the minute hand
-        Coord* minuteNode = (Coord*)malloc(sizeof(Coord));
-        minuteNode->x = minute_x;
-        minuteNode->y = minute_y;
-        minuteNode->next = NULL;
-        // link the minute hand node to the list
-        if (head == NULL) {
-            head = minuteNode; // if head is NULL, set head to the minute hand node
-            current = head; // move current to the minute hand node
-        } else {
-            current->next = minuteNode; // link the minute hand node to the list
-            current = minuteNode; // move current to the minute hand node
-        }
-    }
-    // add an arrow for the minute hand
-    uint8 bottomminute_x = 64 + (int)(20 * arm_sin_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-    uint8 bottomminute_y = 32 - (int)(20 * arm_cos_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-    // the arrow is 4 pixels long, starting from the end of the minute hand
-    for (int i = 0; i < 4; i++)
-    {
-        uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle-30.0) * (3.14159265358979323846 / 180.0)));
-        uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle-30.0) * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the minute hand arrow
-        Coord* minuteArrowNode = (Coord*)malloc(sizeof(Coord));
-        minuteArrowNode->x = minute_arrow_x;
-        minuteArrowNode->y = minute_arrow_y;
-        minuteArrowNode->next = NULL;
-        // link the minute hand arrow node to the list
-        if (head == NULL) {
-            head = minuteArrowNode; // if head is NULL, set head to the minute hand arrow node
-            current = head; // move current to the minute hand arrow node
-        } else {
-            current->next = minuteArrowNode; // link the minute hand arrow node to the list
-            current = minuteArrowNode; // move current to the minute hand arrow node
-        }
-    }
-    for (int i = 0; i < 4; i++) 
-    {
-        uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle+30.0) * (3.14159265358979323846 / 180.0)));
-        uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle+30.0) * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the minute hand arrow
-        Coord* minuteArrowNode = (Coord*)malloc(sizeof(Coord));
-        minuteArrowNode->x = minute_arrow_x;
-        minuteArrowNode->y = minute_arrow_y;
-        minuteArrowNode->next = NULL;
-        // link the minute hand arrow node to the list
-        if (head == NULL) {
-            head = minuteArrowNode; // if head is NULL, set head to the minute hand arrow node
-            current = head; // move current to the minute hand arrow node
-        } else {
-            current->next = minuteArrowNode; // link the minute hand arrow node to the list
-            current = minuteArrowNode; // move current to the minute hand arrow node
-        }
-    }
-    // calculate the coordinates for the second hand
-    // the second hand is 24 pixels long, starting from the center of the clock
-    for (int i = 0; i < 24; i+=2) 
-    {
-        uint8 second_x = (uint8)(64 + (i + 1) * arm_sin_f32(second_angle * (3.14159265358979323846 / 180.0)));
-        uint8 second_y = (uint8)(32 - (i + 1) * arm_cos_f32(second_angle * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the second hand
-        Coord* secondNode = (Coord*)malloc(sizeof(Coord));
-        secondNode->x = second_x;
-        secondNode->y = second_y;
-        secondNode->next = NULL;
-        // link the second hand node to the list
-        if (head == NULL) {
-            head = secondNode; // if head is NULL, set head to the second hand node
-            current = head; // move current to the second hand node
-        } else {
-            current->next = secondNode; // link the second hand node to the list
-            current = secondNode; // move current to the second hand node
-        }
-    }
-    // add an arrow for the second hand
-    uint8 bottomsecond_x = 64 + (int)(24 * arm_sin_f32(second_angle * (3.14159265358979323846 / 180.0)));
-    uint8 bottomsecond_y = 32 - (int)(24 * arm_cos_f32(second_angle * (3.14159265358979323846 / 180.0)));
-    // the arrow is 5 pixels long, starting from the end of the second hand
-    for (int i = 0; i < 5; i++) 
-    {
-        uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle-30.0) * (3.14159265358979323846 / 180.0)));
-        uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle-30.0) * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the second hand arrow
-        Coord* secondArrowNode = (Coord*)malloc(sizeof(Coord));
-        secondArrowNode->x = second_arrow_x;
-        secondArrowNode->y = second_arrow_y;
-        secondArrowNode->next = NULL;
-        // link the second hand arrow node to the list
-        if (head == NULL) {
-            head = secondArrowNode; // if head is NULL, set head to the second hand arrow node
-            current = head; // move current to the second hand arrow node
-        } else {
-            current->next = secondArrowNode; // link the second hand arrow node to the list
-            current = secondArrowNode; // move current to the second hand arrow node
-        }
-    }
-    for (int i = 0; i < 5; i++) 
-    {
-        uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle+30.0) * (3.14159265358979323846 / 180.0)));
-        uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle+30.0) * (3.14159265358979323846 / 180.0)));
-        // create a new coordinate node for the second hand arrow
-        Coord* secondArrowNode = (Coord*)malloc(sizeof(Coord));
-        secondArrowNode->x = second_arrow_x;
-        secondArrowNode->y = second_arrow_y;
-        secondArrowNode->next = NULL;
-        // link the second hand arrow node to the list
-        if (head == NULL) {
-            head = secondArrowNode; // if head is NULL, set head to the second hand arrow node
-            current = head; // move current to the second hand arrow node
-        } else {
-            current->next = secondArrowNode; // link the second hand arrow node to the list
-            current = secondArrowNode; // move current to the second hand arrow node
-        }
-    }
-    // draw clock dial
-    for (current = head; current != NULL; current = current->next) 
-    {
-        clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
-    }
-    // free the linked list
-    while (head != NULL) 
-    {
-        Coord* temp = head;
-        head = head->next;
-        free(temp);
-    }
-    Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
-}
-
-/*
- *  @brief      Render_Clock_Current_Time
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @since      v1.0
- *  Sample usage:       Render_Clock_Current_Time(10,15,30);
-*/
-void Render_Clock_Current_Time(const Coord *dial, const int dialLen, int hour,int minute,int second)
+void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour,int minute,int second)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -950,6 +523,100 @@ void Render_Clock_Current_Time(const Coord *dial, const int dialLen, int hour,in
     clock[coord->y][coord->x >> 3] |= (0x01 << (7 - (coord->x & 0x07)));
   }
   // render the clock numbers and hands
+  for (current = head; current != NULL; current = current->next) 
+  {
+    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
+  }
+  // free the linked list
+  while (head != NULL) 
+  {
+    CoordNode* temp = head;
+    head = head->next;
+    free(temp);
+  }
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ *  @brief      Render_Clock_Current_Time_Digit
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @param      int             second          second integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Render_Clock_Current_Time_Digit(10,15);
+*/
+void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour,int minute)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  CoordNode* head = NULL;
+  CoordNode* current = NULL;
+  // convert hour and minute to digits
+  for (int i = 0; i < 4; i++)
+  {
+    char ch[4][2] = {"", ""}; // initialize with "00"
+    snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
+    snprintf(ch[2], sizeof(ch[2]), "%d", minute/10); // tens place of minute
+    snprintf(ch[3], sizeof(ch[3]), "%d", minute%10);
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 6; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          if (Oled_FontLib_6x8[c][k] & (0x01 << l))
+          {
+            // if the pixel is set, draw it
+            // calculate the x and y coordinates for the character
+            uint8 char_x = j * 6 + k; // 6 pixels per character
+            uint8 char_y = l;
+            if (i == 0) // hour tens place
+            {
+              char_x += 45; // offset for hour tens place
+              char_y += 28; // offset for hour tens place
+            }
+            else if (i == 1) // hour ones place
+            {
+              char_x += 53; // offset for hour ones place
+              char_y += 28; // offset for hour ones place
+            }
+            else if (i == 2) // minute tens place
+            {
+              char_x += 68; // offset for minute tens place
+              char_y += 28; // offset for minute tens place
+            }
+            else if (i == 3) // minute ones place
+            {
+              char_x += 76; // offset for minute ones place
+              char_y += 28; // offset for minute ones place
+            }
+            // create a new coordinate node for the character pixel
+            CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+            charNode->x = char_x;
+            charNode->y = char_y;
+            charNode->next = NULL;
+            // link the character node to the list
+            if (head == NULL) {
+                head = charNode; // if head is NULL, set head to the character node
+                current = head; // move current to the character node
+            } else {
+                current->next = charNode; // link the character node to the list
+                current = charNode; // move current to the character node
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // draw clock digit
+  for (int i = 0; i < digitLen; i++) 
+  {
+    const Coord *coord = &digit[i];
+    clock[coord->y][coord->x >> 3] |= (0x01 << (7 - (coord->x & 0x07)));
+  }
+  // render the clock numbers
   for (current = head; current != NULL; current = current->next) 
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
