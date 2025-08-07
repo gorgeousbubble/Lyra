@@ -29,10 +29,10 @@ typedef enum
 */
 typedef enum
 {
-  MAPS_Screen_Saver = 0,  //Screen saver
-  MAPS_Screen_Menu = 1,   //Menu screen
-  MAPS_Screen_Normal = 2, //Normal screen
-}MAPS_Screen_Status;
+  MAPS_Screen_Saver = 0,      //Screen saver
+  MAPS_Screen_Menu = 1,       //Menu screen
+  MAPS_Screen_Normal = 2,     //Normal screen
+} MAPS_Screen_Status;
 
 typedef enum
 {
@@ -40,6 +40,13 @@ typedef enum
   MAPS_Menu_StopWatch = 1,    //Menu Stop Watch
   MAPS_Menu_AlarmClock = 2,   //Menu Alarm Clock
 } MAPS_Menu_Selection;
+
+typedef enum
+{
+  MAPS_Clock_Dial = 0,        //Clock Dial
+  MAPS_Clock_Digit = 1,       //Clock Digit
+  MAPS_Clock_Style_Max = 2,   //Maximum clock style
+} MAPS_Clock_Style;
 
 /*
 **variate declaration

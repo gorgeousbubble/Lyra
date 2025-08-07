@@ -28,6 +28,7 @@ PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX]={PTB21,PTB22,PTB23,PTB20};
 
 MAPS_Screen_Status Lyra_Status = MAPS_Screen_Saver; //Screen status
 MAPS_Menu_Selection Lyra_Menu_Selection = MAPS_Menu_Clock; //Menu selection
+MAPS_Clock_Style Lyra_Clock_Style = MAPS_Clock_Dial; //Clock style
 
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
@@ -237,19 +238,35 @@ void MAPS_Dock_KEY_Incident(void)
     //Press KEY2
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
     {
+      Lyra_Clock_Style--; //Switch clock style
+      if(Lyra_Clock_Style < MAPS_Clock_Dial)
+      {
+        Lyra_Clock_Style = MAPS_Clock_Digit; //Reset to maximum clock style
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     //Press KEY3
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
     {
+      Lyra_Clock_Style++; //Switch clock style
+      if(Lyra_Clock_Style >= MAPS_Clock_Style_Max)
+      {
+        Lyra_Clock_Style = MAPS_Clock_Dial; //Reset to clock dial style
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     // Display the current menu selection
     switch(Lyra_Menu_Selection)
     {
       case MAPS_Menu_Clock:
-        //Render_Clock_Current_Time(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
-        Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+        if(Lyra_Clock_Style == MAPS_Clock_Dial)
+        {
+          Render_Clock_Current_Time_Dial(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+        }
+        else if(Lyra_Clock_Style == MAPS_Clock_Digit)
+        {
+          Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+        }
         break;
       case MAPS_Menu_StopWatch:
         //Watch_Render_Stop_Watch();
