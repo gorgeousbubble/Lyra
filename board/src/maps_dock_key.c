@@ -26,9 +26,9 @@
 */
 PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX]={PTB21,PTB22,PTB23,PTB20};
 
-MAPS_Screen_Status Lyra_Status = MAPS_Screen_Saver; //Screen status
-MAPS_Menu_Selection Lyra_Menu_Selection = MAPS_Menu_Clock; //Menu selection
-MAPS_Clock_Style Lyra_Clock_Style = MAPS_Clock_Dial; //Clock style
+int Lyra_Status = 0; //Screen status
+int Lyra_Menu_Selection = 0; //Menu selection
+int Lyra_Clock_Style = 0; //Clock style
 
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
@@ -143,41 +143,65 @@ void MAPS_Dock_KEY_Incident(void)
     //Press KEY0
     if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
     {
-      Lyra_Status = MAPS_Screen_Menu; //Switch to normal screen
+      Lyra_Status++; //Switch to normal screen
+      if (Lyra_Status >= MAPS_Screen_Status_Max)
+      {
+        Lyra_Status = MAPS_Screen_Status_Max - 1;
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
   }
-  else if(Lyra_Status == MAPS_Screen_Menu)
+  else if(MAPS_Screen_StatusN[Lyra_Status] == MAPS_Screen_Menu)
   {
     // Check dock key press status
     //Press KEY0
     if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
     {
-      Lyra_Status = MAPS_Screen_Normal; //Switch to normal screen
+      Lyra_Status++; //Switch to normal screen
+      if (Lyra_Status >= MAPS_Screen_Status_Max)
+      {
+        Lyra_Status = MAPS_Screen_Status_Max - 1;
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     //Press KEY1
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
     {
-      Lyra_Status = MAPS_Screen_Saver; //Return back to screen saver
+      Lyra_Status--; //Return back to screen saver
+      if (Lyra_Status < MAPS_Screen_Saver)
+      {
+        Lyra_Status = MAPS_Screen_Saver;
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     //Press KEY2
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
     {
-      switch(Lyra_Menu_Selection)
+      switch(MAPS_Menu_SelectionN[Lyra_Menu_Selection])
       {
         case MAPS_Menu_Clock:
           Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 0, 5);
-          Lyra_Menu_Selection = MAPS_Menu_AlarmClock; //Switch to Stop Watch
+          Lyra_Menu_Selection--;
+          if (Lyra_Menu_Selection < 0)
+          {
+            Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
+          }
           break;
         case MAPS_Menu_StopWatch:
           Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 0, 0, 5);
-          Lyra_Menu_Selection = MAPS_Menu_Clock; //Switch to Clock
+          Lyra_Menu_Selection--;
+          if (Lyra_Menu_Selection < 0)
+          {
+            Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
+          }
           break;
         case MAPS_Menu_AlarmClock:
           Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, 0, 0, 5);
-          Lyra_Menu_Selection = MAPS_Menu_StopWatch; //Switch to Stop Watch
+          Lyra_Menu_Selection--;
+          if (Lyra_Menu_Selection < 0)
+          {
+            Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
+          }
           break;
         default:
           break;
@@ -187,19 +211,31 @@ void MAPS_Dock_KEY_Incident(void)
     //Press KEY3
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
     {
-      switch(Lyra_Menu_Selection)
+      switch(MAPS_Menu_SelectionN[Lyra_Menu_Selection])
       {
         case MAPS_Menu_Clock:
           Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, 1, 0, 5);
-          Lyra_Menu_Selection = MAPS_Menu_StopWatch; //Switch to Stop Watch
+          Lyra_Menu_Selection++;
+          if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
+          {
+            Lyra_Menu_Selection = 0;
+          }
           break;
         case MAPS_Menu_StopWatch:
           Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 1, 0, 5);
-          Lyra_Menu_Selection = MAPS_Menu_AlarmClock; //Switch to Alarm Clock
+          Lyra_Menu_Selection++;
+          if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
+          {
+            Lyra_Menu_Selection = 0;
+          }
           break;
         case MAPS_Menu_AlarmClock:
           Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 1, 0, 5);
-          Lyra_Menu_Selection = MAPS_Menu_Clock; //Switch to Clock
+          Lyra_Menu_Selection++;
+          if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
+          {
+            Lyra_Menu_Selection = 0;
+          }
           break;
         default:
           break;
@@ -207,7 +243,7 @@ void MAPS_Dock_KEY_Incident(void)
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     // Display the current menu selection
-    switch(Lyra_Menu_Selection)
+    switch(MAPS_Menu_SelectionN[Lyra_Menu_Selection])
     {
       case MAPS_Menu_Clock:
         Oled_I2C_Draw_BMP_128x64(LCM_Watch_icon, OLED_Invert_Color);
@@ -232,31 +268,41 @@ void MAPS_Dock_KEY_Incident(void)
     //Press KEY1
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
     {
-      Lyra_Status = MAPS_Screen_Menu; //Switch to screen saver
+      Lyra_Status--; //Switch to screen saver
+      if (Lyra_Status < MAPS_Screen_Saver)
+      {
+        Lyra_Status = MAPS_Screen_Saver;
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     //Press KEY2
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
     {
-      Lyra_Clock_Style--; //Switch clock style
-      if(Lyra_Clock_Style < MAPS_Clock_Dial)
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Clock)
       {
-        Lyra_Clock_Style = MAPS_Clock_Digit; //Reset to maximum clock style
+        Lyra_Clock_Style--; //Switch clock style
+        if(Lyra_Clock_Style < 0)
+        {
+          Lyra_Clock_Style = MAPS_Clock_Style_Max - 1; //Reset to maximum clock style
+        }
       }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     //Press KEY3
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
     {
-      Lyra_Clock_Style++; //Switch clock style
-      if(Lyra_Clock_Style >= MAPS_Clock_Style_Max)
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Clock)
       {
-        Lyra_Clock_Style = MAPS_Clock_Dial; //Reset to clock dial style
+        Lyra_Clock_Style++; //Switch clock style
+        if(Lyra_Clock_Style >= MAPS_Clock_Style_Max)
+        {
+          Lyra_Clock_Style = 0; //Reset to clock dial style
+        }
       }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     // Display the current menu selection
-    switch(Lyra_Menu_Selection)
+    switch(MAPS_Menu_SelectionN[Lyra_Menu_Selection])
     {
       case MAPS_Menu_Clock:
         if(Lyra_Clock_Style == MAPS_Clock_Dial)

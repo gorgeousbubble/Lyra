@@ -32,6 +32,7 @@ typedef enum
   MAPS_Screen_Saver = 0,      //Screen saver
   MAPS_Screen_Menu = 1,       //Menu screen
   MAPS_Screen_Normal = 2,     //Normal screen
+  MAPS_Screen_Status_Max = 3, //Maximum screen status
 } MAPS_Screen_Status;
 
 typedef enum
@@ -39,6 +40,7 @@ typedef enum
   MAPS_Menu_Clock = 0,        //Menu Clock
   MAPS_Menu_StopWatch = 1,    //Menu Stop Watch
   MAPS_Menu_AlarmClock = 2,   //Menu Alarm Clock
+  MAPS_Menu_Selection_Max = 3, //Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum
@@ -52,6 +54,9 @@ typedef enum
 **variate declaration
 */
 extern uint16 LPTMR_Count;
+extern MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max];
+extern MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max];
+extern MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max];
 
 /*
 **function declaration

@@ -17,6 +17,35 @@
 #include "maps_dock_rocker.h"
 
 /*
+** MAPS Screen Status
+*/
+MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max]=
+{
+  MAPS_Screen_Saver,
+  MAPS_Screen_Menu,
+  MAPS_Screen_Normal,
+};
+
+/*
+** MAPS Menu Selection
+*/
+MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max]=
+{
+  MAPS_Menu_Clock,
+  MAPS_Menu_StopWatch,
+  MAPS_Menu_AlarmClock,
+};
+
+/*
+** MAPS Clock Style
+*/
+MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max]=
+{
+  MAPS_Clock_Dial,
+  MAPS_Clock_Digit,
+};
+
+/*
  *  @brief              main
  *  @note               main function
  *  @since              v1.0
