@@ -67,6 +67,13 @@ typedef struct {
   int Second;
 } RTC_Time;
 
+// stop watch time
+typedef struct {
+  int Minute;
+  int Second;
+  int Centisecond;
+} Stop_Watch_Time;
+
 /*
 **variate declaration
 */
@@ -82,6 +89,8 @@ extern uint32 RTC_Count;
 extern RTC_Time RTC_Time_Now;
 extern uint32 MAX30102_RED;
 extern uint32 MAX30102_IR;
+extern Stop_Watch_Time Stop_Watch_Now;
+extern int Stop_Watch_Count;
 
 /*
 **function declaration

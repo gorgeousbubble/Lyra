@@ -28,9 +28,11 @@ typedef enum {
 */
 extern const Coord LCM_Clock_Dial_coordinate[];
 extern const Coord LCM_Clock_Digit_coordinate[];
+extern const Coord LCM_StopWatch_Digit_coordinate[];
 
 extern const int LCM_Clock_Dial_coordinate_length;
 extern const int LCM_Clock_Digit_coordinate_length;
+extern const int LCM_StopWatch_Digit_coordinate_length;
 
 /*
 **function declaration
@@ -44,6 +46,7 @@ extern void Watch_Render_Current_Time_Wo_Sec_12x24(uint8 x,uint8 y,uint8 ch[],in
 
 extern void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour,int minute,int second);
 extern void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour,int minute);
+extern void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond);
 
 
 #endif

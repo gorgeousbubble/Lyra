@@ -105,6 +105,17 @@ uint32 MAX30102_RED = 0;
 uint32 MAX30102_IR = 0;
 
 /*
+**Stop Watch counter
+*/
+Stop_Watch_Time Stop_Watch_Now = {
+  .Minute = 0,
+  .Second = 0,
+  .Centisecond = 0
+};
+
+int Stop_Watch_Count=0;//Stop Watch count
+
+/*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
  *  @since      v1.0
  */
@@ -150,7 +161,28 @@ void PIT0_IRQHandler(void)
   disable_irq(PIT0_IRQn);
   
   //Put Your Code...
+  Stop_Watch_Count++;
+  if(Stop_Watch_Count >= 10)
+  {
+    Stop_Watch_Count = 0;
+    Stop_Watch_Now.Centisecond++;
+    if(Stop_Watch_Now.Centisecond >= 100)
+    {
+      Stop_Watch_Now.Centisecond = 0;
+      Stop_Watch_Now.Second++;
+      if(Stop_Watch_Now.Second >= 60)
+      {
+        Stop_Watch_Now.Second = 0;
+        Stop_Watch_Now.Minute++;
+        if(Stop_Watch_Now.Minute >= 60)
+        {
+          Stop_Watch_Now.Minute = 0;
+        }
+      }
+    }
+  }
   
+  //Put Your Code...
   PIT0_Count++;
   
   if(PIT0_Count > 100)

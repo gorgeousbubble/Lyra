@@ -316,6 +316,7 @@ void MAPS_Dock_KEY_Incident(void)
         break;
       case MAPS_Menu_StopWatch:
         //Watch_Render_Stop_Watch();
+        Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
         break;
       case MAPS_Menu_AlarmClock:
         //Watch_Render_Alarm_Clock();
