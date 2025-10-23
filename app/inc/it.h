@@ -91,6 +91,7 @@ extern uint32 MAX30102_RED;
 extern uint32 MAX30102_IR;
 extern Stop_Watch_Time Stop_Watch_Now;
 extern int Stop_Watch_Count;
+extern int Stop_Watch_State;
 
 /*
 **function declaration

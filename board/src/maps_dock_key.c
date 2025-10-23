@@ -263,11 +263,25 @@ void MAPS_Dock_KEY_Incident(void)
     //Press KEY0
     if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On)
     {
+      //Check current menu selection is stopwatch
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_StopWatch)
+      {
+        Stop_Watch_State = !Stop_Watch_State; //Toggle stopwatch state
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     //Press KEY1
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
     {
+      //Check current menu selection is stopwatch
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_StopWatch)
+      {
+        Stop_Watch_State = 0; //Stop the stopwatch
+        Stop_Watch_Now.Minute = 0; //Reset minute
+        Stop_Watch_Now.Second = 0; //Reset second
+        Stop_Watch_Now.Centisecond = 0; //Reset centisecond
+      }
+
       Lyra_Status--; //Switch to screen saver
       if (Lyra_Status < MAPS_Screen_Saver)
       {
@@ -278,6 +292,7 @@ void MAPS_Dock_KEY_Incident(void)
     //Press KEY2
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
     {
+      //Check current menu selection is clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Clock)
       {
         Lyra_Clock_Style--; //Switch clock style
@@ -291,6 +306,7 @@ void MAPS_Dock_KEY_Incident(void)
     //Press KEY3
     else if(MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
     {
+      //Check current menu selection is clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Clock)
       {
         Lyra_Clock_Style++; //Switch clock style

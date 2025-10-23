@@ -114,6 +114,7 @@ Stop_Watch_Time Stop_Watch_Now = {
 };
 
 int Stop_Watch_Count=0;//Stop Watch count
+int Stop_Watch_State=0;//Stop Watch state (0: stop, 1: start)
 
 /*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
@@ -161,22 +162,25 @@ void PIT0_IRQHandler(void)
   disable_irq(PIT0_IRQn);
   
   //Put Your Code...
-  Stop_Watch_Count++;
-  if(Stop_Watch_Count >= 10)
+  if (Stop_Watch_State)
   {
-    Stop_Watch_Count = 0;
-    Stop_Watch_Now.Centisecond++;
-    if(Stop_Watch_Now.Centisecond >= 100)
+    Stop_Watch_Count++;
+    if(Stop_Watch_Count >= 10)
     {
-      Stop_Watch_Now.Centisecond = 0;
-      Stop_Watch_Now.Second++;
-      if(Stop_Watch_Now.Second >= 60)
+      Stop_Watch_Count = 0;
+      Stop_Watch_Now.Centisecond++;
+      if(Stop_Watch_Now.Centisecond >= 100)
       {
-        Stop_Watch_Now.Second = 0;
-        Stop_Watch_Now.Minute++;
-        if(Stop_Watch_Now.Minute >= 60)
+        Stop_Watch_Now.Centisecond = 0;
+        Stop_Watch_Now.Second++;
+        if(Stop_Watch_Now.Second >= 60)
         {
-          Stop_Watch_Now.Minute = 0;
+          Stop_Watch_Now.Second = 0;
+          Stop_Watch_Now.Minute++;
+          if(Stop_Watch_Now.Minute >= 60)
+          {
+            Stop_Watch_Now.Minute = 0;
+          }
         }
       }
     }
