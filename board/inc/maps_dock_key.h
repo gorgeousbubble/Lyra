@@ -48,6 +48,7 @@ extern PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX];
 extern int Lyra_Status; //Screen status
 extern int Lyra_Menu_Selection; //Menu selection
 extern int Lyra_Clock_Style; //Clock style
+extern int Lyra_StopWatch_Style; //Stop Watch style
 
 /*
 **function declaration

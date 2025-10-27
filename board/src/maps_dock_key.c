@@ -29,6 +29,7 @@ PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX]={PTB21,PTB22,PTB23,PTB20};
 int Lyra_Status = 0; //Screen status
 int Lyra_Menu_Selection = 0; //Menu selection
 int Lyra_Clock_Style = 0; //Clock style
+int Lyra_StopWatch_Style = 0; //Stop Watch style
 
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
@@ -301,6 +302,15 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Clock_Style = MAPS_Clock_Style_Max - 1; //Reset to maximum clock style
         }
       }
+      //Check current menu selection is stopwatch
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_StopWatch)
+      {
+        Lyra_StopWatch_Style--; //Switch stopwatch style
+        if(Lyra_StopWatch_Style < 0)
+        {
+          Lyra_StopWatch_Style = MAPS_StopWatch_Style_Max - 1; //Reset to maximum stopwatch style
+        }
+      }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
     }
     //Press KEY3
@@ -313,6 +323,15 @@ void MAPS_Dock_KEY_Incident(void)
         if(Lyra_Clock_Style >= MAPS_Clock_Style_Max)
         {
           Lyra_Clock_Style = 0; //Reset to clock dial style
+        }
+      }
+      //Check current menu selection is stopwatch
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_StopWatch)
+      {
+        Lyra_StopWatch_Style++; //Switch stopwatch style
+        if(Lyra_StopWatch_Style >= MAPS_StopWatch_Style_Max)
+        {
+          Lyra_StopWatch_Style = 0; //Reset to stopwatch dial style
         }
       }
       MAPS_Dock_KEY_Delay(100);//Button delay 500ms
@@ -331,8 +350,14 @@ void MAPS_Dock_KEY_Incident(void)
         }
         break;
       case MAPS_Menu_StopWatch:
-        //Watch_Render_Stop_Watch();
-        Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+        if(Lyra_StopWatch_Style == MAPS_StopWatch_Dial)
+        {
+          Render_Stop_Watch_Current_Time_Dial(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+        }
+        else if(Lyra_StopWatch_Style == MAPS_StopWatch_Digital)
+        {
+          Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+        }
         break;
       case MAPS_Menu_AlarmClock:
         //Watch_Render_Alarm_Clock();
