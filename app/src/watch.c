@@ -974,3 +974,23 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
   }
   Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }
+
+/*
+ *  @brief      Render_Alarm_Clock_Show_Alarm_Table
+ *  @since      v1.0
+ *  Sample usage:       Render_Alarm_Clock_Show_Alarm_Table(10,15,90);
+*/
+void Render_Alarm_Clock_Show_Alarm_Table()
+{
+
+}
+
+/*
+ *  @brief      Render_Alarm_Clock_Add_Alarm_Timer
+ *  @since      v1.0
+ *  Sample usage:       Render_Alarm_Clock_Add_Alarm_Timer(10,15,90);
+*/
+void Render_Alarm_Clock_Add_Alarm_Timer()
+{
+
+}
