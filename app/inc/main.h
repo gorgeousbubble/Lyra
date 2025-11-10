@@ -40,6 +40,7 @@ typedef enum
   MAPS_Menu_Clock = 0,        //Menu Clock
   MAPS_Menu_StopWatch = 1,    //Menu Stop Watch
   MAPS_Menu_AlarmClock = 2,   //Menu Alarm Clock
+  //MAPS_Menu_WorldClock = 3,    //Menu World Clock
   MAPS_Menu_Selection_Max = 3, //Maximum menu selection
 } MAPS_Menu_Selection;
 
