@@ -758,5 +758,5 @@ void Render_Alarm_Clock_List()
 void Render_Alarm_Clock_Edit(int hour, int minute, int cursor)
 {
   // render alarm clock edit interface
-  Oled_I2C_Put_Time_Wo_Sec_12x24_24(34, 3, ":", hour, minute);
+  Oled_I2C_Put_Time_Wo_Sec_12x24_24_Cursor(34, 3, ":", hour, minute, cursor);
 }
