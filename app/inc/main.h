@@ -58,6 +58,13 @@ typedef enum
   MAPS_StopWatch_Style_Max = 2,     //Maximum Stop Watch style
 } MAPS_StopWatch_Style;
 
+typedef enum
+{
+  MAPS_AlarmClock_List = 0,     //Alarm Clock List
+  MAPS_AlarmClock_Edit = 1,     //Alarm Clock Edit
+  MAPS_AlarmClock_Mode_Max = 2, //Maximum Alarm Clock mode
+} MAPS_AlarmClock_Mode;
+
 /*
 **variate declaration
 */
@@ -65,6 +72,7 @@ extern uint16 LPTMR_Count;
 extern MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max];
 extern MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max];
 extern MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max];
+extern MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max];
 
 /*
 **function declaration

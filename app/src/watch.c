@@ -26,240 +26,6 @@ const int LCM_StopWatch_Dial_coordinate_length = ARRAY_LENGTH(LCM_StopWatch_Dial
 const int LCM_StopWatch_Digit_coordinate_length = ARRAY_LENGTH(LCM_StopWatch_Digit_coordinate);
 
 /*
- *  @brief      Watch_Render_Current_Time_6x8
- *  @param      uint8           x               x scope is 0~127
- *  @param      uint8           y               y scope is 0~7
- *  @param      uint8           ch[]            separator
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      ClockSystem     clocksystem     clock system (12-hours/24-hours)
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Current_Time_6x8(0,0,":",10,15,30,ClockSystem24);
-*/
-void Watch_Render_Current_Time_6x8(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second, ClockSystem clock_system) 
-{
-  int isAM = TRUE; // Assume AM by default
-  switch (clock_system) 
-  {
-    case ClockSystem12:
-      if (hour > 12) 
-      {
-        hour -= 12; // Convert to 12-hour format
-        isAM = FALSE; // PM
-      }
-      else 
-      {
-        isAM = TRUE; // AM
-      }
-      Oled_I2C_Put_Time_6x8_12(x, y, ch, hour, minute, second, isAM);
-      break;
-    case ClockSystem24:
-      // No conversion needed for 24-hour format
-      Oled_I2C_Put_Time_6x8_24(x, y, ch, hour, minute, second);
-      break;
-    default:
-      ASSERT(0);
-      break; // Invalid clock system
-  }
-}
-
-/*
- *  @brief      Watch_Render_Current_Time_Wo_Sec_6x8
- *  @param      uint8           x               x scope is 0~127
- *  @param      uint8           y               y scope is 0~7
- *  @param      uint8           ch[]            separator
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      ClockSystem     clocksystem     clock system (12-hours/24-hours)
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Current_Time_Wo_Sec_6x8(0,0,":",10,15,30,ClockSystem24);
-*/
-void Watch_Render_Current_Time_Wo_Sec_6x8(uint8 x,uint8 y,uint8 ch[],int hour,int minute,ClockSystem clock_system) 
-{
-  int isAM = TRUE; // Assume AM by default
-  switch (clock_system) 
-  {
-    case ClockSystem12:
-      if (hour > 12) 
-      {
-        hour -= 12; // Convert to 12-hour format
-        isAM = FALSE; // PM
-      }
-      else 
-      {
-        isAM = TRUE; // AM
-      }
-      Oled_I2C_Put_Time_Wo_Sec_6x8_12(x, y, ch, hour, minute, isAM);
-      break;
-    case ClockSystem24:
-      // No conversion needed for 24-hour format
-      Oled_I2C_Put_Time_Wo_Sec_6x8_24(x, y, ch, hour, minute);
-      break;
-    default:
-      ASSERT(0);
-      break; // Invalid clock system
-  }
-}
-
-/*
- *  @brief      Watch_Render_Current_Time_8x16
- *  @param      uint8           x               x scope is 0~127
- *  @param      uint8           y               y scope is 0~7
- *  @param      uint8           ch[]            separator
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      ClockSystem     clocksystem     clock system (12-hours/24-hours)
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Current_Time_8x16(0,0,":",10,15,30,ClockSystem24);
-*/
-void Watch_Render_Current_Time_8x16(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second, ClockSystem clock_system) 
-{
-  int isAM = TRUE; // Assume AM by default
-  switch (clock_system) 
-  {
-    case ClockSystem12:
-      if (hour > 12) 
-      {
-        hour -= 12; // Convert to 12-hour format
-        isAM = FALSE; // PM
-      }
-      else 
-      {
-        isAM = TRUE; // AM
-      }
-      Oled_I2C_Put_Time_8x16_12(x, y, ch, hour, minute, second, isAM);
-      break;
-    case ClockSystem24:
-      // No conversion needed for 24-hour format
-      Oled_I2C_Put_Time_8x16_24(x, y, ch, hour, minute, second);
-      break;
-    default:
-      ASSERT(0);
-      break; // Invalid clock system
-  }
-}
-
-/*
- *  @brief      Watch_Render_Current_Time_Wo_Sec_8x16
- *  @param      uint8           x               x scope is 0~127
- *  @param      uint8           y               y scope is 0~7
- *  @param      uint8           ch[]            separator
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      ClockSystem     clocksystem     clock system (12-hours/24-hours)
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Current_Time_Wo_Sec_8x16(0,0,":",10,15,30,ClockSystem24);
-*/
-void Watch_Render_Current_Time_Wo_Sec_8x16(uint8 x,uint8 y,uint8 ch[],int hour,int minute,ClockSystem clock_system) 
-{
-  int isAM = TRUE; // Assume AM by default
-  switch (clock_system) 
-  {
-    case ClockSystem12:
-      if (hour > 12) 
-      {
-        hour -= 12; // Convert to 12-hour format
-        isAM = FALSE; // PM
-      }
-      else 
-      {
-        isAM = TRUE; // AM
-      }
-      Oled_I2C_Put_Time_Wo_Sec_8x16_12(x, y, ch, hour, minute, isAM);
-      break;
-    case ClockSystem24:
-      // No conversion needed for 24-hour format
-      Oled_I2C_Put_Time_Wo_Sec_8x16_24(x, y, ch, hour, minute);
-      break;
-    default:
-      ASSERT(0);
-      break; // Invalid clock system
-  }
-}
-
-/*
- *  @brief      Watch_Render_Current_Time_12x24
- *  @param      uint8           x               x scope is 0~127
- *  @param      uint8           y               y scope is 0~7
- *  @param      uint8           ch[]            separator
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      ClockSystem     clocksystem     clock system (12-hours/24-hours)
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Current_Time_12x24(0,0,":",10,15,30,ClockSystem24);
-*/
-void Watch_Render_Current_Time_12x24(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second, ClockSystem clock_system) 
-{
-  int isAM = TRUE; // Assume AM by default
-  switch (clock_system) 
-  {
-    case ClockSystem12:
-      if (hour > 12) 
-      {
-        hour -= 12; // Convert to 12-hour format
-        isAM = FALSE; // PM
-      }
-      else 
-      {
-        isAM = TRUE; // AM
-      }
-      Oled_I2C_Put_Time_12x24_12(x, y, ch, hour, minute, second, isAM);
-      break;
-    case ClockSystem24:
-      // No conversion needed for 24-hour format
-      Oled_I2C_Put_Time_12x24_24(x, y, ch, hour, minute, second);
-      break;
-    default:
-      ASSERT(0);
-      break; // Invalid clock system
-  }
-}
-
-/*
- *  @brief      Watch_Render_Current_Time_Wo_Sec_12x24
- *  @param      uint8           x               x scope is 0~127
- *  @param      uint8           y               y scope is 0~7
- *  @param      uint8           ch[]            separator
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      ClockSystem     clocksystem     clock system (12-hours/24-hours)
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Current_Time_Wo_Sec_12x24(0,0,":",10,15,30,ClockSystem24);
-*/
-void Watch_Render_Current_Time_Wo_Sec_12x24(uint8 x,uint8 y,uint8 ch[],int hour,int minute, ClockSystem clock_system) 
-{
-  int isAM = TRUE; // Assume AM by default
-  switch (clock_system) 
-  {
-    case ClockSystem12:
-      if (hour > 12) 
-      {
-        hour -= 12; // Convert to 12-hour format
-        isAM = FALSE; // PM
-      }
-      else 
-      {
-        isAM = TRUE; // AM
-      }
-      Oled_I2C_Put_Time_Wo_Sec_12x24_12(x, y, ch, hour, minute, isAM);
-      break;
-    case ClockSystem24:
-      // No conversion needed for 24-hour format
-      Oled_I2C_Put_Time_Wo_Sec_12x24_24(x, y, ch, hour, minute);
-      break;
-    default:
-      ASSERT(0);
-      break; // Invalid clock system
-  }
-}
-
-/*
  *  @brief      Render_Clock_Current_Time_Dial
  *  @param      int             hour            hour integer parameter
  *  @param      int             minute          minute integer parameter
@@ -976,21 +742,21 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
 }
 
 /*
- *  @brief      Render_Alarm_Clock_Show_Alarm_Table
+ *  @brief      Render_Alarm_Clock_List
  *  @since      v1.0
- *  Sample usage:       Render_Alarm_Clock_Show_Alarm_Table(10,15,90);
+ *  Sample usage:       Render_Alarm_Clock_List(10,15,90);
 */
-void Render_Alarm_Clock_Show_Alarm_Table()
+void Render_Alarm_Clock_List()
 {
-
 }
 
 /*
- *  @brief      Render_Alarm_Clock_Add_Alarm_Timer
+ *  @brief      Render_Alarm_Clock_Edit
  *  @since      v1.0
- *  Sample usage:       Render_Alarm_Clock_Add_Alarm_Timer(10,15,90);
+ *  Sample usage:       Render_Alarm_Clock_Edit(10,15,90);
 */
-void Render_Alarm_Clock_Add_Alarm_Timer()
+void Render_Alarm_Clock_Edit(int hour, int minute, int cursor)
 {
-
+  // render alarm clock edit interface
+  Oled_I2C_Put_Time_Wo_Sec_12x24_24(34, 3, ":", hour, minute);
 }

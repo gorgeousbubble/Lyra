@@ -47,6 +47,15 @@ MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max]=
 };
 
 /*
+** MAPS Alarm Clock Mode
+*/
+MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max]=
+{
+  MAPS_AlarmClock_List,
+  MAPS_AlarmClock_Edit,
+};
+
+/*
  *  @brief              main
  *  @note               main function
  *  @since              v1.0
