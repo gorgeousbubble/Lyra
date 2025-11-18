@@ -18,17 +18,17 @@
 /*
 ** Beep Port Macro
 */
-//Beep port initialization
+// Beep port initialization
 #ifndef BEEP_PORT_INIT
-#define BEEP_PORT_INIT  GPIO_Init(PTE7,GPO,0)
+#define BEEP_PORT_INIT GPIO_Init(PTE7, GPO, 0)
 #endif
-//Beep port high level
+// Beep port high level
 #ifndef BEEP_SET_H
-#define BEEP_SET_H      GPIO_SET(PTE7,1)
+#define BEEP_SET_H GPIO_SET(PTE7, 1)
 #endif
-//Beep port low level
+// Beep port low level
 #ifndef BEEP_SET_L
-#define BEEP_SET_L      GPIO_SET(PTE7,0)
+#define BEEP_SET_L GPIO_SET(PTE7, 0)
 #endif
 
 /*

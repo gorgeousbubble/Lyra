@@ -20,49 +20,49 @@
 */
 typedef enum
 {
-  MAPS_OLED_Off = 0, //OLED off
-  MAPS_OLED_On = 1,  //OLED on
-}MAPS_OLED_Status;
+  MAPS_OLED_Off = 0, // OLED off
+  MAPS_OLED_On = 1,  // OLED on
+} MAPS_OLED_Status;
 
 /*
 **Screen status enumeration
 */
 typedef enum
 {
-  MAPS_Screen_Saver = 0,      //Screen saver
-  MAPS_Screen_Menu = 1,       //Menu screen
-  MAPS_Screen_Normal = 2,     //Normal screen
-  MAPS_Screen_Status_Max = 3, //Maximum screen status
+  MAPS_Screen_Saver = 0,      // Screen saver
+  MAPS_Screen_Menu = 1,       // Menu screen
+  MAPS_Screen_Normal = 2,     // Normal screen
+  MAPS_Screen_Status_Max = 3, // Maximum screen status
 } MAPS_Screen_Status;
 
 typedef enum
 {
-  MAPS_Menu_Clock = 0,        //Menu Clock
-  MAPS_Menu_StopWatch = 1,    //Menu Stop Watch
-  MAPS_Menu_AlarmClock = 2,   //Menu Alarm Clock
-  //MAPS_Menu_WorldClock = 3,    //Menu World Clock
-  MAPS_Menu_Selection_Max = 3, //Maximum menu selection
+  MAPS_Menu_Clock = 0,      // Menu Clock
+  MAPS_Menu_StopWatch = 1,  // Menu Stop Watch
+  MAPS_Menu_AlarmClock = 2, // Menu Alarm Clock
+  // MAPS_Menu_WorldClock = 3,    //Menu World Clock
+  MAPS_Menu_Selection_Max = 3, // Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum
 {
-  MAPS_Clock_Dial = 0,        //Clock Dial
-  MAPS_Clock_Digit = 1,       //Clock Digit
-  MAPS_Clock_Style_Max = 2,   //Maximum clock style
+  MAPS_Clock_Dial = 0,      // Clock Dial
+  MAPS_Clock_Digit = 1,     // Clock Digit
+  MAPS_Clock_Style_Max = 2, // Maximum clock style
 } MAPS_Clock_Style;
 
 typedef enum
 {
-  MAPS_StopWatch_Dial = 0,          //Stop Watch Dial
-  MAPS_StopWatch_Digital = 1,       //Stop Watch Digital
-  MAPS_StopWatch_Style_Max = 2,     //Maximum Stop Watch style
+  MAPS_StopWatch_Dial = 0,      // Stop Watch Dial
+  MAPS_StopWatch_Digital = 1,   // Stop Watch Digital
+  MAPS_StopWatch_Style_Max = 2, // Maximum Stop Watch style
 } MAPS_StopWatch_Style;
 
 typedef enum
 {
-  MAPS_AlarmClock_List = 0,     //Alarm Clock List
-  MAPS_AlarmClock_Edit = 1,     //Alarm Clock Edit
-  MAPS_AlarmClock_Mode_Max = 2, //Maximum Alarm Clock mode
+  MAPS_AlarmClock_List = 0,     // Alarm Clock List
+  MAPS_AlarmClock_Edit = 1,     // Alarm Clock Edit
+  MAPS_AlarmClock_Mode_Max = 2, // Maximum Alarm Clock mode
 } MAPS_AlarmClock_Mode;
 
 /*
@@ -78,6 +78,5 @@ extern MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max];
 **function declaration
 */
 extern void main(void);
-
 
 #endif

@@ -27,76 +27,74 @@
 /*
 **PIT counter
 */
-int PIT0_Count=0;//PIT0 count
-char PIT0_Flag=0;//PIT0 flag
+int PIT0_Count = 0; // PIT0 count
+char PIT0_Flag = 0; // PIT0 flag
 
-int PIT1_Count=0;//PIT1 count
-char PIT1_Flag=0;//PIT1 flag 
+int PIT1_Count = 0; // PIT1 count
+char PIT1_Flag = 0; // PIT1 flag
 
 /*
 **ADC convert
 */
-uint16 ADC_Convert_Result[2]={0};
+uint16 ADC_Convert_Result[2] = {0};
 
 /*
 **MPU6050 sensor
 */
 MPU6050_Sensor MPU6050 = {
-  .Acc = {0, 0, 0},
-  .Gyro = {0, 0, 0}
-};
+    .Acc = {0, 0, 0},
+    .Gyro = {0, 0, 0}};
 
 /*
 **Kalman Filter
 */
 KalmanFilter KF_X = {
-  .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-  .dt = 0.001f,      // Default sampling period of 1ms
-  .Q_angle = 0.001f, // Process noise parameters (angle)
-  .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
-  .R_angle = 0.5f,   // Measure noise parameters
-  .q_bias = 0.0f,    // Initial value of gyroscope offset
-  .angle_f = 0.0f    // Initial Angle
+    .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
+    .dt = 0.001f,      // Default sampling period of 1ms
+    .Q_angle = 0.001f, // Process noise parameters (angle)
+    .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
+    .R_angle = 0.5f,   // Measure noise parameters
+    .q_bias = 0.0f,    // Initial value of gyroscope offset
+    .angle_f = 0.0f    // Initial Angle
 };
 
 KalmanFilter KF_Y = {
-  .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-  .dt = 0.001f,      // Default sampling period of 1ms
-  .Q_angle = 0.001f, // Process noise parameters (angle)
-  .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
-  .R_angle = 0.5f,   // Measure noise parameters
-  .q_bias = 0.0f,    // Initial value of gyroscope offset
-  .angle_f = 0.0f    // Initial Angle
+    .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
+    .dt = 0.001f,      // Default sampling period of 1ms
+    .Q_angle = 0.001f, // Process noise parameters (angle)
+    .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
+    .R_angle = 0.5f,   // Measure noise parameters
+    .q_bias = 0.0f,    // Initial value of gyroscope offset
+    .angle_f = 0.0f    // Initial Angle
 };
 
 KalmanFilter KF_Z = {
-  .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-  .dt = 0.001f,      // Default sampling period of 1ms
-  .Q_angle = 0.001f, // Process noise parameters (angle)
-  .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
-  .R_angle = 0.5f,   // Measure noise parameters
-  .q_bias = 0.0f,    // Initial value of gyroscope offset
-  .angle_f = 0.0f    // Initial Angle
+    .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
+    .dt = 0.001f,      // Default sampling period of 1ms
+    .Q_angle = 0.001f, // Process noise parameters (angle)
+    .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
+    .R_angle = 0.5f,   // Measure noise parameters
+    .q_bias = 0.0f,    // Initial value of gyroscope offset
+    .angle_f = 0.0f    // Initial Angle
 };
 
 Angle MPU6050_Angle = {
-  .Angle_X = 0.0f, //Angle X
-  .Angle_Y = 0.0f, //Angle Y
-  .Angle_Z = 0.0f  //Angle Z
+    .Angle_X = 0.0f, // Angle X
+    .Angle_Y = 0.0f, // Angle Y
+    .Angle_Z = 0.0f  // Angle Z
 };
 
 /*
 **RTC counter
 */
-uint32 RTC_Count=0;
+uint32 RTC_Count = 0;
 RTC_Time RTC_Time_Now = {
-  .Year = 0,
-  .Month = 0,
-  .Day = 0,
-  .Hour = 0,
-  .Minute = 0,
-  .Second = 0
-};
+    .Year = 0,
+    .Month = 0,
+    .Day = 0,
+    .Hour = 0,
+    .Minute = 0,
+    .Second = 0};
 
 /*
 **MAX30102 counter
@@ -108,13 +106,12 @@ uint32 MAX30102_IR = 0;
 **Stop Watch counter
 */
 Stop_Watch_Time Stop_Watch_Now = {
-  .Minute = 0,
-  .Second = 0,
-  .Centisecond = 0
-};
+    .Minute = 0,
+    .Second = 0,
+    .Centisecond = 0};
 
-int Stop_Watch_Count=0;//Stop Watch count
-int Stop_Watch_State=0;//Stop Watch state (0: stop, 1: start)
+int Stop_Watch_Count = 0; // Stop Watch count
+int Stop_Watch_State = 0; // Stop Watch state (0: stop, 1: start)
 
 /*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
@@ -122,14 +119,14 @@ int Stop_Watch_State=0;//Stop Watch state (0: stop, 1: start)
  */
 void PORTC_PTC19_IRQHandler(void)
 {
-  if(IRQ_MARK(C,19))
+  if (IRQ_MARK(C, 19))
   {
-    IRQ_CLEAR(C,19);
+    IRQ_CLEAR(C, 19);
     disable_irq(PORTC_IRQn);
-    
-    //Put Your Code...
-    
-    IRQ_CLEAR(C,19);
+
+    // Put Your Code...
+
+    IRQ_CLEAR(C, 19);
     enable_irq(PORTC_IRQn);
   }
 }
@@ -140,14 +137,14 @@ void PORTC_PTC19_IRQHandler(void)
  */
 void PORTD_PTD15_IRQHandler(void)
 {
-  if(IRQ_MARK(D,15))
+  if (IRQ_MARK(D, 15))
   {
-    IRQ_CLEAR(D,15);
+    IRQ_CLEAR(D, 15);
     disable_irq(PORTD_IRQn);
-    
-    //Put Your Code...
-    
-    IRQ_CLEAR(D,15);
+
+    // Put Your Code...
+
+    IRQ_CLEAR(D, 15);
     enable_irq(PORTD_IRQn);
   }
 }
@@ -160,24 +157,24 @@ void PIT0_IRQHandler(void)
 {
   PIT_Flag_Clear(PIT0);
   disable_irq(PIT0_IRQn);
-  
-  //Put Your Code...
+
+  // Put Your Code...
   if (Stop_Watch_State)
   {
     Stop_Watch_Count++;
-    if(Stop_Watch_Count >= 10)
+    if (Stop_Watch_Count >= 10)
     {
       Stop_Watch_Count = 0;
       Stop_Watch_Now.Centisecond++;
-      if(Stop_Watch_Now.Centisecond >= 100)
+      if (Stop_Watch_Now.Centisecond >= 100)
       {
         Stop_Watch_Now.Centisecond = 0;
         Stop_Watch_Now.Second++;
-        if(Stop_Watch_Now.Second >= 60)
+        if (Stop_Watch_Now.Second >= 60)
         {
           Stop_Watch_Now.Second = 0;
           Stop_Watch_Now.Minute++;
-          if(Stop_Watch_Now.Minute >= 60)
+          if (Stop_Watch_Now.Minute >= 60)
           {
             Stop_Watch_Now.Minute = 0;
           }
@@ -185,31 +182,31 @@ void PIT0_IRQHandler(void)
       }
     }
   }
-  
-  //Put Your Code...
+
+  // Put Your Code...
   PIT0_Count++;
-  
-  if(PIT0_Count > 100)
+
+  if (PIT0_Count > 100)
   {
     PIT0_Count = 100;
   }
-  
-  if(PIT0_Count == 100)
+
+  if (PIT0_Count == 100)
   {
     PIT0_Count = 0;
-    
+
     PIT0_Flag++;
-    
-    if(PIT0_Flag > 3)
+
+    if (PIT0_Flag > 3)
     {
       PIT0_Flag = 0;
     }
-    
-    MAPS_Dock_LED_Turn();//LED turnover
-    ADC_Convert_Result[0] = ADC_Once(ADC0_DP0,ADC_12Bit);//ADC convert
-    ADC_Convert_Result[1] = ADC_Once(ADC0_DM0,ADC_12Bit);//ADC convert
+
+    MAPS_Dock_LED_Turn();                                  // LED turnover
+    ADC_Convert_Result[0] = ADC_Once(ADC0_DP0, ADC_12Bit); // ADC convert
+    ADC_Convert_Result[1] = ADC_Once(ADC0_DM0, ADC_12Bit); // ADC convert
     RTC_Count = RTC_Get_Time();
-    
+
     struct tm time = RTC_Get_Time_Format();
     RTC_Time_Now.Year = time.tm_year + 1900;
     RTC_Time_Now.Month = time.tm_mon + 1;
@@ -218,7 +215,7 @@ void PIT0_IRQHandler(void)
     RTC_Time_Now.Minute = time.tm_min;
     RTC_Time_Now.Second = time.tm_sec;
   }
-  
+
   PIT_Flag_Clear(PIT0);
   enable_irq(PIT0_IRQn);
 }
@@ -231,27 +228,27 @@ void PIT1_IRQHandler(void)
 {
   PIT_Flag_Clear(PIT1);
   disable_irq(PIT1_IRQn);
-  
-  //Put Your Code...
-  
+
+  // Put Your Code...
+
   PIT1_Count++;
-  
-  if(PIT1_Count > 100)
+
+  if (PIT1_Count > 100)
   {
     PIT1_Count = 100;
   }
-  
-  if(PIT1_Count == 100)
+
+  if (PIT1_Count == 100)
   {
     PIT1_Count = 0;
-    
+
     PIT1_Flag++;
-    
-    if(PIT1_Flag > 3)
+
+    if (PIT1_Flag > 3)
     {
       PIT1_Flag = 0;
     }
-    
+
     // MPU6050 sensor data read
     MPU6050.Acc.X = MPU_Get_Acc_X();
     MPU6050.Acc.Y = MPU_Get_Acc_Y();
@@ -264,11 +261,11 @@ void PIT1_IRQHandler(void)
     MPU6050_Angle.Angle_X = Kalman_Filter(&KF_X, MPU6050.Gyro.X, MPU6050.Acc.X);
     MPU6050_Angle.Angle_Y = Kalman_Filter(&KF_Y, MPU6050.Gyro.Y, MPU6050.Acc.Y);
     MPU6050_Angle.Angle_Z = Kalman_Filter(&KF_Z, MPU6050.Gyro.Z, MPU6050.Acc.Z);
-    
+
     // MAX30102 sensor data read
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);
   }
-  
+
   PIT_Flag_Clear(PIT1);
   enable_irq(PIT1_IRQn);
 }
@@ -279,29 +276,26 @@ void PIT1_IRQHandler(void)
  */
 void RTC_IRQHandler(void)
 {
-  if(RTC_SR & RTC_SR_TIF_MASK)//Invalid settings
+  if (RTC_SR & RTC_SR_TIF_MASK) // Invalid settings
   {
     RTC_SR = 0;
     RTC_TSR = 0;
-    
-    //Put Your Code...
-    
+
+    // Put Your Code...
   }
-  
-  if(RTC_SR & RTC_SR_TOF_MASK)//Count overflow
+
+  if (RTC_SR & RTC_SR_TOF_MASK) // Count overflow
   {
     RTC_SR = 0;
     RTC_TSR = 0;
-    
-    //Put Your Code...
-    
+
+    // Put Your Code...
   }
-  
-  if(RTC_SR & RTC_SR_TAF_MASK)//Alarm
+
+  if (RTC_SR & RTC_SR_TAF_MASK) // Alarm
   {
     RTC_TAR = 0;
-    
-    //Put Your Code...
+
+    // Put Your Code...
   }
-  
 }

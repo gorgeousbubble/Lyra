@@ -13,7 +13,8 @@
 #include "kalman_filter.h"
 
 // Initialize Kalman filter
-void Kalman_Init(KalmanFilter* kf) {
+void Kalman_Init(KalmanFilter *kf)
+{
     kf->P[0][0] = 1.0f;
     kf->P[0][1] = 0.0f;
     kf->P[1][0] = 0.0f;
@@ -27,10 +28,11 @@ void Kalman_Init(KalmanFilter* kf) {
 }
 
 // Kalman filter calculation
-float Kalman_Filter(KalmanFilter* kf, float angle_m, float gyro_m) {
+float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
+{
     // Prediction stage
     kf->angle_f += (gyro_m - kf->q_bias) * kf->dt;
-    kf->P[0][0] += kf->dt * (kf->dt*kf->P[1][1] - kf->P[0][1] - kf->P[1][0] + kf->Q_angle);
+    kf->P[0][0] += kf->dt * (kf->dt * kf->P[1][1] - kf->P[0][1] - kf->P[1][0] + kf->Q_angle);
     kf->P[0][1] -= kf->dt * kf->P[1][1];
     kf->P[1][0] -= kf->dt * kf->P[1][1];
     kf->P[1][1] += kf->Q_gyro * kf->dt;
@@ -45,7 +47,7 @@ float Kalman_Filter(KalmanFilter* kf, float angle_m, float gyro_m) {
     // Status update
     kf->angle_f += K[0] * angle_err;
     kf->q_bias += K[1] * angle_err;
-    
+
     // Covariance update
     float P00_temp = kf->P[0][0];
     float P01_temp = kf->P[0][1];

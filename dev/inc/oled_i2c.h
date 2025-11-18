@@ -132,6 +132,7 @@ extern void Oled_I2C_Put_Time_12x24_12(uint8 x,uint8 y,uint8 ch[],int hour,int m
 extern void Oled_I2C_Put_Time_Wo_Sec_12x24_12(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int isAM);
 extern void Oled_I2C_Put_Time_12x24_24(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int second);
 extern void Oled_I2C_Put_Time_Wo_Sec_12x24_24(uint8 x,uint8 y,uint8 ch[],int hour,int minute);
+extern void Oled_I2C_Put_Time_Wo_Sec_12x24_24_Cursor(uint8 x,uint8 y,uint8 ch[],int hour,int minute,int cursor);
 extern void Oled_I2C_Put_Date_6x8(uint8 x,uint8 y,uint8 ch[],int year,int month,int day);
 
 #endif

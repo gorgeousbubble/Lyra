@@ -16,55 +16,63 @@
 #include "max30102.h"
 #include "max30102_algo.h"
 
-LinkedList* IR_Buff = NULL;  //IR LED sensor data
-LinkedList* RED_Buff = NULL; //Red LED sensor data
+LinkedList *IR_Buff = NULL;  // IR LED sensor data
+LinkedList *RED_Buff = NULL; // Red LED sensor data
 
-int32 SPO2 = 0;             //SPO2 value
-int32 Heart_Rate = 0;       //Heart Rate value
+int32 SPO2 = 0;       // SPO2 value
+int32 Heart_Rate = 0; // Heart Rate value
 
 uint32 RD_Duty = 0;
 
-LinkedList* createLinkedList(int capacity) {
-    LinkedList* list = (LinkedList*)malloc(sizeof(LinkedList));
-    list->head = NULL;
-    list->tail = NULL;
-    list->size = 0;
-    list->capacity = capacity;
-    return list;
+LinkedList *createLinkedList(int capacity)
+{
+  LinkedList *list = (LinkedList *)malloc(sizeof(LinkedList));
+  list->head = NULL;
+  list->tail = NULL;
+  list->size = 0;
+  list->capacity = capacity;
+  return list;
 }
 
-void addNode(LinkedList* list, int data) {
-    if (list->size >= list->capacity) {
-        // If the list is full, remove the head node
-        Node* temp = list->head;
-        list->head = list->head->next;
-        free(temp);
-        list->size--;
-    }
-    Node* newNode = (Node*)malloc(sizeof(Node));
-    newNode->data = data;
-    newNode->next = NULL;
+void addNode(LinkedList *list, int data)
+{
+  if (list->size >= list->capacity)
+  {
+    // If the list is full, remove the head node
+    Node *temp = list->head;
+    list->head = list->head->next;
+    free(temp);
+    list->size--;
+  }
+  Node *newNode = (Node *)malloc(sizeof(Node));
+  newNode->data = data;
+  newNode->next = NULL;
 
-    if (list->tail == NULL) {
-        // If the list is empty, set head and tail to the new node
-        list->head = newNode;
-        list->tail = newNode;
-    } else {
-        // Link the new node to the end of the list
-        list->tail->next = newNode;
-        list->tail = newNode;
-    }
-    list->size++;
+  if (list->tail == NULL)
+  {
+    // If the list is empty, set head and tail to the new node
+    list->head = newNode;
+    list->tail = newNode;
+  }
+  else
+  {
+    // Link the new node to the end of the list
+    list->tail->next = newNode;
+    list->tail = newNode;
+  }
+  list->size++;
 }
 
-void freeLinkedList(LinkedList* list) {
-    Node* current = list->head;
-    while (current != NULL) {
-        Node* temp = current;
-        current = current->next;
-        free(temp);
-    }
-    free(list);
+void freeLinkedList(LinkedList *list)
+{
+  Node *current = list->head;
+  while (current != NULL)
+  {
+    Node *temp = current;
+    current = current->next;
+    free(temp);
+  }
+  free(list);
 }
 
 /*
@@ -93,7 +101,7 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Clean(void)
   // Free the linked lists
   freeLinkedList(IR_Buff);
   freeLinkedList(RED_Buff);
-  
+
   // Reset the SPO2 and Heart Rate values
   SPO2 = 0;
   Heart_Rate = 0;
@@ -118,7 +126,7 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
   float temp = 0.0f;
 
   // Check if the linked lists are initialized
-  //pre_data = RED_Buff->tail->data;
+  // pre_data = RED_Buff->tail->data;
 
   // read RED & IR LED sensor data
   MAX30102_ReadFIFO(&red_data, &ir_data);
@@ -128,12 +136,15 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
   addNode(RED_Buff, red_data);
 
   // find the minimum and maximum values in the RED data
-  Node* current = RED_Buff->head;
-  while (current != NULL) {
-    if (current->data < min) {
+  Node *current = RED_Buff->head;
+  while (current != NULL)
+  {
+    if (current->data < min)
+    {
       min = current->data;
     }
-    if (current->data > max) {
+    if (current->data > max)
+    {
       max = current->data;
     }
     current = current->next;
@@ -141,13 +152,13 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
 
   // calculate the current data as the difference from the minimum
   cur_data = RED_Buff->tail->data;
-  if(cur_data > pre_data)//just to determine the brightness of LED according to the deviation of adjacent two AD data
+  if (cur_data > pre_data) // just to determine the brightness of LED according to the deviation of adjacent two AD data
   {
     temp = cur_data - pre_data;
     temp /= (max - min);
     temp *= MAX_BRIGHTNESS;
     brightness -= (int)temp;
-    if(brightness < 0)
+    if (brightness < 0)
       brightness = 0;
   }
   else
@@ -156,16 +167,16 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
     temp /= (max - min);
     temp *= MAX_BRIGHTNESS;
     brightness += (int)temp;
-    if(brightness > MAX_BRIGHTNESS)
+    if (brightness > MAX_BRIGHTNESS)
       brightness = MAX_BRIGHTNESS;
   }
 
   RD_Duty = (uint32)((1 - (float)brightness / 256) * 10000); // Convert brightness to duty cycle
-  if(RD_Duty > 10000)
+  if (RD_Duty > 10000)
   {
     RD_Duty = 10000;
   }
-  else if(RD_Duty <= 0)
+  else if (RD_Duty <= 0)
   {
     RD_Duty = 0;
   }
@@ -178,19 +189,20 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
 
   // calculate SPO2 using the formula
   maxim_heart_rate_and_oxygen_saturation(
-      (uint32*)IR_Buff->head, 
-      IR_Buff->size, 
-      (uint32*)RED_Buff->head, 
-      &spo2, 
-      &spo2_valid, 
-      &heart_rate, 
-      &heart_rate_valid
-  );
+      (uint32 *)IR_Buff->head,
+      IR_Buff->size,
+      (uint32 *)RED_Buff->head,
+      &spo2,
+      &spo2_valid,
+      &heart_rate,
+      &heart_rate_valid);
   // update the global SPO2 and Heart Rate values
-  if(spo2_valid) {
+  if (spo2_valid)
+  {
     SPO2 = spo2;
   }
-  if(heart_rate_valid) {
+  if (heart_rate_valid)
+  {
     Heart_Rate = heart_rate;
   }
 }

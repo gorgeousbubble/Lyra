@@ -15,8 +15,6 @@
 
 #include "common.h"
 
-
-
 /*
 **variate declaration
 */

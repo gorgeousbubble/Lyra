@@ -43,25 +43,24 @@ void Interrupt_Init(void)
   /*PORT_Init_Exit(PTC19,IRQ_EITHER);//PTC19 external interrupt, jump edge trigger
   set_irq_priority(PORTC_IRQn,0);//Interrupt priority 0
   enable_irq(PORTC_IRQn);//Interrupts enable
-  
+
   PORT_Init_Exit(PTD15,IRQ_EITHER);//PTD15 external interrupt, jump edge trigger
   set_irq_priority(PORTD_IRQn,1);//Interrupt priority 1
   enable_irq(PORTD_IRQn);//Interrupts enable*/
-  
-  PIT_Init_ms(PIT0,1);//PIT0 timed interrupt, with a timing cycle of 1ms
-  set_irq_priority(PIT0_IRQn,2);//Interrupt priority 2
-  Set_Vector_Handler(PIT0_VECTORn,PIT0_IRQHandler);
-  enable_irq(PIT0_IRQn);//Interrupts enable
-  
-  PIT_Init_ms(PIT1,1);//PIT1 timed interrupt, with a timing cycle of 1ms
-  set_irq_priority(PIT1_IRQn,3);//Interrupt priority 3
-  Set_Vector_Handler(PIT1_VECTORn,PIT1_IRQHandler);
-  enable_irq(PIT1_IRQn);//Interrupts enable
-  
-  set_irq_priority(RTC_IRQn,4);//Interrupt priority 4
-  Set_Vector_Handler(RTC_VECTORn,RTC_IRQHandler);
-  enable_irq(RTC_IRQn);//Interrupts enable
-  
+
+  PIT_Init_ms(PIT0, 1);           // PIT0 timed interrupt, with a timing cycle of 1ms
+  set_irq_priority(PIT0_IRQn, 2); // Interrupt priority 2
+  Set_Vector_Handler(PIT0_VECTORn, PIT0_IRQHandler);
+  enable_irq(PIT0_IRQn); // Interrupts enable
+
+  PIT_Init_ms(PIT1, 1);           // PIT1 timed interrupt, with a timing cycle of 1ms
+  set_irq_priority(PIT1_IRQn, 3); // Interrupt priority 3
+  Set_Vector_Handler(PIT1_VECTORn, PIT1_IRQHandler);
+  enable_irq(PIT1_IRQn); // Interrupts enable
+
+  set_irq_priority(RTC_IRQn, 4); // Interrupt priority 4
+  Set_Vector_Handler(RTC_VECTORn, RTC_IRQHandler);
+  enable_irq(RTC_IRQn); // Interrupts enable
 }
 
 /*
@@ -70,34 +69,34 @@ void Interrupt_Init(void)
  */
 void AllInit(void)
 {
-  DisableInterrupts;// Close interrupts
+  DisableInterrupts; // Close interrupts
   /*
   **MAPS_Dock
   */
-  MAPS_Dock_LED_Init();//LED initialization
-  MAPS_Dock_LCM_Init();//LCM initialization
-  MAPS_Dock_KEY_ALL_Init();//KEY independent button initialization
-  MAPS_Dock_Rocker_Key_Init();//Rocker joystick button initialization
-  MAPS_Dock_W25Q80_Init();//W25Q80 initialization
-  
+  MAPS_Dock_LED_Init();        // LED initialization
+  MAPS_Dock_LCM_Init();        // LCM initialization
+  MAPS_Dock_KEY_ALL_Init();    // KEY independent button initialization
+  MAPS_Dock_Rocker_Key_Init(); // Rocker joystick button initialization
+  MAPS_Dock_W25Q80_Init();     // W25Q80 initialization
+
   /*
   **MAPS
   */
-  MAPS_LCD_Init();//LCD initialization
-  
+  MAPS_LCD_Init(); // LCD initialization
+
   /*
   **MK64
   */
-  ADC_Init(ADC0_DP0);//ADC0_DP0 channel initialization
-  ADC_Init(ADC0_DM0);//ADC0_DM0 channel initialization
-  I2C_Init(I2C_I2C0,400000);//I2C0 initialization, baud rate 400Kbps
-  UART_Init(UART_UART0,115200);//UART0 initialization, baud rate 115200Bps
-  //DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
-  MPU6050_Init();//MPU6050 initialization
-  Oled_I2C_Init();//Oled initialization
-  MAX30102_Init();//MAX30102 initialization
-  RTC_Init();//RTC initialization
-  //Beep_Init();//Beep initialization
+  ADC_Init(ADC0_DP0);            // ADC0_DP0 channel initialization
+  ADC_Init(ADC0_DM0);            // ADC0_DM0 channel initialization
+  I2C_Init(I2C_I2C0, 400000);    // I2C0 initialization, baud rate 400Kbps
+  UART_Init(UART_UART0, 115200); // UART0 initialization, baud rate 115200Bps
+  // DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
+  MPU6050_Init();  // MPU6050 initialization
+  Oled_I2C_Init(); // Oled initialization
+  MAX30102_Init(); // MAX30102 initialization
+  RTC_Init();      // RTC initialization
+  // Beep_Init();//Beep initialization
 
   // set current time
   /*struct tm timeinfo = {
@@ -109,7 +108,7 @@ void AllInit(void)
     .tm_sec = 0             // Second (0-59)
   };
   RTC_Set_Time_Format(&timeinfo);//Set RTC time format*/
-  
+
   /*// set alarm time
   struct tm alarm_time = {
     .tm_year = 2025 - 1900, // Year since 1900
@@ -120,19 +119,18 @@ void AllInit(void)
     .tm_sec = 0             // Second (0-59)
   };
   RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
-  
+
   /*
   **Kalman Filter
   */
-  Kalman_Init(&KF_X);//Kalman filter initialization
-  Kalman_Init(&KF_Y);//Kalman filter initialization
-  Kalman_Init(&KF_Z);//Kalman filter initialization
-  
-  
+  Kalman_Init(&KF_X); // Kalman filter initialization
+  Kalman_Init(&KF_Y); // Kalman filter initialization
+  Kalman_Init(&KF_Z); // Kalman filter initialization
+
   /*
   **Interrupts
   */
-  Interrupt_Init();//Interrupt initialization
-  
+  Interrupt_Init(); // Interrupt initialization
+
   EnableInterrupts;
 }

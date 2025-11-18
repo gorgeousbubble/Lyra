@@ -17,49 +17,51 @@
 
 #define MAX_BRIGHTNESS 255
 
-//Health Sensor Port Macro
-//INT port initialization
+// Health Sensor Port Macro
+// INT port initialization
 #ifndef MAX30102_PORT_INIT_INT
-#define MAX30102_PORT_INIT_INT  GPIO_Init(PTA10,GPI,0)
+#define MAX30102_PORT_INIT_INT GPIO_Init(PTA10, GPI, 0)
 #endif
-//IRD port initialization
+// IRD port initialization
 #ifndef MAX30102_PORT_INIT_IRD
-#define MAX30102_PORT_INIT_IRD  GPIO_Init(PTA7,GPO,0)
+#define MAX30102_PORT_INIT_IRD GPIO_Init(PTA7, GPO, 0)
 #endif
-//RD port initialization (FTM)
+// RD port initialization (FTM)
 #ifndef MAX30102_PORT_INIT_RD
-#define MAX30102_PORT_INIT_RD   FTM_PWM_Init(FTM_FTM0,FTM_CH4,50,0);
+#define MAX30102_PORT_INIT_RD FTM_PWM_Init(FTM_FTM0, FTM_CH4, 50, 0);
 #endif
-//IRD port high level
+// IRD port high level
 #ifndef MAX30102_SET_IRD_H
-#define MAX30102_SET_IRD_H      GPIO_SET(PTA7,1)
+#define MAX30102_SET_IRD_H GPIO_SET(PTA7, 1)
 #endif
-//IRD port low level
+// IRD port low level
 #ifndef MAX30102_SET_IRD_L
-#define MAX30102_SET_IRD_L      GPIO_SET(PTA7,0)
+#define MAX30102_SET_IRD_L GPIO_SET(PTA7, 0)
 #endif
-//INT port input signal
+// INT port input signal
 #ifndef MAX30102_GET_INT_IN
-#define MAX30102_GET_INT_IN     GPIO_GET(PTA10)
+#define MAX30102_GET_INT_IN GPIO_GET(PTA10)
 #endif
 
 /*
 **variate declaration
 */
-typedef struct Node {
+typedef struct Node
+{
     uint32 data;
-    struct Node* next;
+    struct Node *next;
 } Node;
 
-typedef struct {
-    Node* head;
-    Node* tail;
+typedef struct
+{
+    Node *head;
+    Node *tail;
     int size;
     int capacity;
 } LinkedList;
 
-extern int32 SPO2;             //SPO2 value
-extern int32 Heart_Rate;       //Heart Rate value
+extern int32 SPO2;       // SPO2 value
+extern int32 Heart_Rate; // Heart Rate value
 extern uint32 RD_Duty;
 
 /*

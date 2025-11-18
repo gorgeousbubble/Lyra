@@ -33,7 +33,7 @@ void Beep_On(void)
     BEEP_SET_H;
 }
 
-/* 
+/*
 ** @brief      Beep Off
 ** @since      v1.0
 */

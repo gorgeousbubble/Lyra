@@ -19,40 +19,40 @@
 /*
 ** MAPS Screen Status
 */
-MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max]=
-{
-  MAPS_Screen_Saver,
-  MAPS_Screen_Menu,
-  MAPS_Screen_Normal,
+MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max] =
+    {
+        MAPS_Screen_Saver,
+        MAPS_Screen_Menu,
+        MAPS_Screen_Normal,
 };
 
 /*
 ** MAPS Menu Selection
 */
-MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max]=
-{
-  MAPS_Menu_Clock,
-  MAPS_Menu_StopWatch,
-  MAPS_Menu_AlarmClock,
-  //MAPS_Menu_WorldClock,
+MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] =
+    {
+        MAPS_Menu_Clock,
+        MAPS_Menu_StopWatch,
+        MAPS_Menu_AlarmClock,
+        // MAPS_Menu_WorldClock,
 };
 
 /*
 ** MAPS Clock Style
 */
-MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max]=
-{
-  MAPS_Clock_Dial,
-  MAPS_Clock_Digit,
+MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max] =
+    {
+        MAPS_Clock_Dial,
+        MAPS_Clock_Digit,
 };
 
 /*
 ** MAPS Alarm Clock Mode
 */
-MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max]=
-{
-  MAPS_AlarmClock_List,
-  MAPS_AlarmClock_Edit,
+MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max] =
+    {
+        MAPS_AlarmClock_List,
+        MAPS_AlarmClock_Edit,
 };
 
 /*
@@ -63,15 +63,15 @@ MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max]=
  */
 void main(void)
 {
-  Site_t Site={0,0};
-  
-  AllInit(); //initialization
-  
-  MAPS_LCDC_BMP_From_SD("0:/Mitsuha.bmp",Site);//load image
-  
-  for(;;)
+  Site_t Site = {0, 0};
+
+  AllInit(); // initialization
+
+  MAPS_LCDC_BMP_From_SD("0:/Mitsuha.bmp", Site); // load image
+
+  for (;;)
   {
-    MAPS_Dock_KEY_Incident();//Independent button serial port transmission
-    MAPS_Dock_Rocker_Key_LCM_Control();//LCM display
+    MAPS_Dock_KEY_Incident();           // Independent button serial port transmission
+    MAPS_Dock_Rocker_Key_LCM_Control(); // LCM display
   }
 }
