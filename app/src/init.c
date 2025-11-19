@@ -11,6 +11,7 @@
  */
 
 #include "adc.h"
+#include "animation.h"
 #include "beep.h"
 #include "ftm.h"
 #include "health.h"
@@ -33,6 +34,7 @@
 #include "rtc.h"
 #include "system_init.h"
 #include "uart.h"
+#include "watch.h"
 
 /*
  *  @brief      Interrupt_Init     Interrupt initialization
@@ -133,4 +135,17 @@ void AllInit(void)
   Interrupt_Init(); // Interrupt initialization
 
   EnableInterrupts;
+}
+
+/*
+ *  @brief      ReadConf     Application confiugration read
+ *  @since      v1.0
+ */
+void ReadConf(void)
+{
+  /*
+  **MAPS_Dock
+  */
+  //MAPS_Dock_W25Q80_Erase_Chip(); // Erase W25Q80 chip
+  Read_Alarm_Clock_E2PROM_To_List(); // Read MAPS Dock configuration from W25Q80
 }

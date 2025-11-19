@@ -18,26 +18,26 @@
 /*
 **I2C addresses
 */
-#define I2C_ADR_24C02   0x50    //24C02 address(E2PROM)
-#define I2C_ADR_CS43L22 0x4A    //CS43L22 address
+#define I2C_ADR_24C02 0x50   // 24C02 address(E2PROM)
+#define I2C_ADR_CS43L22 0x4A // CS43L22 address
 
 /*
 **Internal register address
 */
-//24C02
-#define I2C_24C02_MAX_ADR       0x00000100      //24C02 maximum addresses 255Byte
+// 24C02
+#define I2C_24C02_MAX_ADR 0x00000100 // 24C02 maximum addresses 255Byte
 
 /*
 **I2C communication related macros
 */
-#define MAPS_Dock_I2C_Delay(us) DELAY_US(us)    //I2C delay us
+#define MAPS_Dock_I2C_Delay(us) DELAY_US(us) // I2C delay us
 
 /*
 **function declaration
 */
-extern void MAPS_Dock_24C02_Write_Byte(uint8 Addr,uint8 Data);
+extern void MAPS_Dock_24C02_Write_Byte(uint8 Addr, uint8 Data);
 extern uint8 MAPS_Dock_24C02_Read_Byte(uint8 Addr);
-extern void MAPS_Dock_24C02_Write_Buff(uint8 Addr,uint8 *Buff);
-extern void MAPS_Dock_24C02_Read_Buff(uint8 Addr,uint8 *Buff,uint8 Length);
+extern void MAPS_Dock_24C02_Write_Buff(uint8 Addr, uint8 *Buff);
+extern void MAPS_Dock_24C02_Read_Buff(uint8 Addr, uint8 *Buff, uint8 Length);
 
 #endif

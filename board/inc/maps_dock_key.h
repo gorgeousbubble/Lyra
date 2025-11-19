@@ -22,33 +22,33 @@
 */
 typedef enum
 {
-  MAPS_Dock_KEY0,       //Independent button KEY0
-  MAPS_Dock_KEY1,       //Independent button KEY1
-  MAPS_Dock_KEY2,       //Independent button KEY2
-  MAPS_Dock_KEY3,       //Independent button KEY3
+  MAPS_Dock_KEY0, // Independent button KEY0
+  MAPS_Dock_KEY1, // Independent button KEY1
+  MAPS_Dock_KEY2, // Independent button KEY2
+  MAPS_Dock_KEY3, // Independent button KEY3
   MAPS_Dock_KEY_MAX,
-}MAPS_Dock_KEYn;
+} MAPS_Dock_KEYn;
 
 /*
 **Independent key state enumeration
 */
 typedef enum
 {
-  MAPS_Dock_KEY_On,     //Independent button press down
-  MAPS_Dock_KEY_Off,    //Independent button pops up
-}MAPS_Dock_KEY_Status;
+  MAPS_Dock_KEY_On,  // Independent button press down
+  MAPS_Dock_KEY_Off, // Independent button pops up
+} MAPS_Dock_KEY_Status;
 
-//Independent key macro
-#define MAPS_Dock_KEY_Delay(ms) DELAY_MS(ms)    //Button delay in ms
+// Independent key macro
+#define MAPS_Dock_KEY_Delay(ms) DELAY_MS(ms) // Button delay in ms
 
 /*
 **variate declaration
 */
 extern PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX];
-extern int Lyra_Status; //Screen status
-extern int Lyra_Menu_Selection; //Menu selection
-extern int Lyra_Clock_Style; //Clock style
-extern int Lyra_StopWatch_Style; //Stop Watch style
+extern int Lyra_Status;          // Screen status
+extern int Lyra_Menu_Selection;  // Menu selection
+extern int Lyra_Clock_Style;     // Clock style
+extern int Lyra_StopWatch_Style; // Stop Watch style
 
 /*
 **function declaration

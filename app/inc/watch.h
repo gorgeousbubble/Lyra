@@ -16,13 +16,17 @@
 #include "common.h"
 
 /*
-**Watch clock system enumeration (12-hours, 24-hours)
+**structure definition
 */
-typedef enum
+// alarm clock time
+struct Alarm_Clock_Time
 {
-  ClockSystem12, // 12-hours
-  ClockSystem24, // 24-hours
-} ClockSystem;
+  int hour;
+  int minute;
+  struct Alarm_Clock_Time* next;
+};
+
+typedef struct Alarm_Clock_Time Alarm_Clock_Time;
 
 /*
 **variate declaration
@@ -37,6 +41,10 @@ extern const int LCM_Clock_Digit_coordinate_length;
 extern const int LCM_StopWatch_Dial_coordinate_length;
 extern const int LCM_StopWatch_Digit_coordinate_length;
 
+extern uint8 Alarm_Clock_Array[16];
+extern Alarm_Clock_Time* Alarm_Clock_List;
+extern int Alarm_Clock_Max_Len;
+
 /*
 **function declaration
 */
@@ -46,5 +54,11 @@ extern void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dia
 extern void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond);
 extern void Render_Alarm_Clock_List();
 extern void Render_Alarm_Clock_Edit(int hour, int minute, int cursor);
+
+extern void Save_Alarm_Clock_Time_To_List(int hour, int minute);
+extern void Delete_Alarm_Clock_Time_From_List(int hour, int minute);
+extern void Clean_Alarm_Clock_List();
+extern void Write_Alarm_Clock_List_To_E2PROM();
+extern void Read_Alarm_Clock_E2PROM_To_List();
 
 #endif

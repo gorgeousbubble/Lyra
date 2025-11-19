@@ -66,6 +66,7 @@ void main(void)
   Site_t Site = {0, 0};
 
   AllInit(); // initialization
+  ReadConf(); // read configuration from e2prom
 
   MAPS_LCDC_BMP_From_SD("0:/Mitsuha.bmp", Site); // load image
 

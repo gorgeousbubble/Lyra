@@ -285,6 +285,13 @@ void MAPS_Dock_KEY_Incident(void)
         }
         else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
         {
+          // save alarm clock time to list
+          int hour = Lyra_AlarmClock_Edit_Number[0] * 10 + Lyra_AlarmClock_Edit_Number[1];
+          int minute = Lyra_AlarmClock_Edit_Number[2] * 10 + Lyra_AlarmClock_Edit_Number[3];
+          Save_Alarm_Clock_Time_To_List(hour, minute);
+          // write alarm clock list to e2prom
+          Write_Alarm_Clock_List_To_E2PROM();
+
           Lyra_AlarmClock_Mode--; // Switch to list mode
           if (Lyra_AlarmClock_Mode < MAPS_AlarmClock_List)
           {

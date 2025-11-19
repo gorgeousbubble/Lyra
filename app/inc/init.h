@@ -24,5 +24,6 @@
 */
 extern void Interrupt_Init(void);
 extern void AllInit(void);
+extern void ReadConf(void);
 
 #endif

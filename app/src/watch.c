@@ -12,6 +12,7 @@
 
 #include "animation.h"
 #include "conf.h"
+#include "maps_dock_w25q80.h"
 #include "oled_i2c.h"
 #include "watch.h"
 
@@ -24,6 +25,13 @@ const int LCM_Clock_Dial_coordinate_length = ARRAY_LENGTH(LCM_Clock_Dial_coordin
 const int LCM_Clock_Digit_coordinate_length = ARRAY_LENGTH(LCM_Clock_Digit_coordinate);
 const int LCM_StopWatch_Dial_coordinate_length = ARRAY_LENGTH(LCM_StopWatch_Dial_coordinate);
 const int LCM_StopWatch_Digit_coordinate_length = ARRAY_LENGTH(LCM_StopWatch_Digit_coordinate);
+
+/*
+**Alarm Clock timer
+*/
+uint8 Alarm_Clock_Array[16] = {0};// Alarm clock time array
+Alarm_Clock_Time* Alarm_Clock_List = NULL;// Pointer to the head of the alarm clock linked list
+int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
 
 /*
  *  @brief      Render_Clock_Current_Time_Dial
@@ -759,4 +767,146 @@ void Render_Alarm_Clock_Edit(int hour, int minute, int cursor)
 {
   // render alarm clock edit interface
   Oled_I2C_Put_Time_Wo_Sec_12x24_24_Cursor(34, 3, ":", hour, minute, cursor);
+}
+
+
+/*
+ *  @brief      Save_Alarm_Clock_Time_To_List
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+*/
+void Save_Alarm_Clock_Time_To_List(int hour, int minute)
+{
+  // check alarm clock list not full
+  Alarm_Clock_Time* current = Alarm_Clock_List;
+  int count = 0;
+  while (current != NULL) {
+      count++;
+      current = current->next;
+  }
+  if (count >= Alarm_Clock_Max_Len) {
+      return; // alarm clock list full, do not save
+  }
+  // save alarm clock edit data to alarm clock list
+  Alarm_Clock_Time* newAlarm = (Alarm_Clock_Time*)malloc(sizeof(Alarm_Clock_Time));
+  newAlarm->hour = hour;
+  newAlarm->minute = minute;
+  newAlarm->next = NULL;
+  // add new alarm clock to the end of the list
+  if (Alarm_Clock_List == NULL) {
+      Alarm_Clock_List = newAlarm;
+  } else {
+      Alarm_Clock_Time* current = Alarm_Clock_List;
+      while (current->next != NULL) {
+          current = current->next;
+      }
+      current->next = newAlarm;
+  }
+  return;
+}
+
+/*
+ *  @brief      Delete_Alarm_Clock_Time_From_List
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+*/
+void Delete_Alarm_Clock_Time_From_List(int hour, int minute)
+{
+  // delete alarm clock time from list
+  Alarm_Clock_Time* current = Alarm_Clock_List;
+  Alarm_Clock_Time* previous = NULL;
+  while (current != NULL) {
+      if (current->hour == hour && current->minute == minute) {
+          // found the alarm clock time to delete
+          if (previous == NULL) {
+              // deleting the head of the list
+              Alarm_Clock_List = current->next;
+          } else {
+              previous->next = current->next;
+          }
+          free(current);
+          return;
+      }
+      previous = current;
+      current = current->next;
+  }
+}
+
+/*
+ *  @brief      Clean_Alarm_Clock_List
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+*/
+void Clean_Alarm_Clock_List()
+{
+  // free alarm clock list
+  Alarm_Clock_Time* current = Alarm_Clock_List;
+  while (current != NULL) {
+      Alarm_Clock_Time* temp = current;
+      current = current->next;
+      free(temp);
+  }
+  Alarm_Clock_List = NULL;
+}
+
+/*
+ *  @brief      Write_Alarm_Clock_List_To_E2PROM
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+*/
+void Write_Alarm_Clock_List_To_E2PROM()
+{
+  // save alarm clock list to array
+  Alarm_Clock_Time* current = Alarm_Clock_List;
+  int count = 0;
+  int i = 0;
+  while (current != NULL && count < Alarm_Clock_Max_Len) {
+      Alarm_Clock_Array[i] = (uint8)current->hour;
+      Alarm_Clock_Array[i+1] = (uint8)current->minute;
+      current = current->next;
+      i += 2;
+  }
+  // write alarm clock array to e2prom
+  MAPS_Dock_W25Q80_Write_Page(0, 0, Alarm_Clock_Array, 16);
+}
+
+/*
+ *  @brief      Read_Alarm_Clock_E2PROM_To_List
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+*/
+void Read_Alarm_Clock_E2PROM_To_List()
+{
+  // read alarm clock from e2prom to array
+  MAPS_Dock_W25Q80_Read_Page(0, 0, Alarm_Clock_Array, 16);
+  // read alarm clock array to list
+  for (int i = 0; i < 16; i += 2) {
+      if (Alarm_Clock_Array[i] == 0xFF && Alarm_Clock_Array[i+1] == 0xFF) {
+          break; // end of alarm clock list
+      }
+      Alarm_Clock_Time* newAlarm = (Alarm_Clock_Time*)malloc(sizeof(Alarm_Clock_Time));
+      newAlarm->hour = (int)Alarm_Clock_Array[i];
+      newAlarm->minute = (int)Alarm_Clock_Array[i+1];
+      newAlarm->next = NULL;
+      // add new alarm clock to the end of the list
+      if (Alarm_Clock_List == NULL) {
+          Alarm_Clock_List = newAlarm;
+      } else {
+          Alarm_Clock_Time* current = Alarm_Clock_List;
+          while (current->next != NULL) {
+              current = current->next;
+          }
+          current->next = newAlarm;
+      }
+  }
 }
