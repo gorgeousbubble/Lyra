@@ -312,6 +312,18 @@ void MAPS_Dock_KEY_Incident(void)
         Stop_Watch_Now.Second = 0;      // Reset second
         Stop_Watch_Now.Centisecond = 0; // Reset centisecond
       }
+      // Check current menu selection is alarm clock
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AlarmClock)
+      {
+        if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
+        {
+          Lyra_AlarmClock_Mode--; // Switch to list mode
+          if (Lyra_AlarmClock_Mode < MAPS_AlarmClock_List)
+          {
+            Lyra_AlarmClock_Mode = MAPS_AlarmClock_List;
+          }
+        }
+      }
 
       Lyra_Status--; // Switch to screen saver
       if (Lyra_Status < MAPS_Screen_Saver)

@@ -765,13 +765,14 @@ void Render_Alarm_Clock_List()
   while (p != NULL && n < Alarm_Clock_Max_Len)
   {
     // convert hour and minute to digits
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
     {
-      char ch[4][2] = {"", ""}; // initialize with "00"
+      char ch[5][2] = {"", ""}; // initialize with "00"
       snprintf(ch[0], sizeof(ch[0]), "%d", p->hour/10); // tens place of hour
       snprintf(ch[1], sizeof(ch[1]), "%d", p->hour%10);
-      snprintf(ch[2], sizeof(ch[2]), "%d", p->minute/10); // tens place of minute
-      snprintf(ch[3], sizeof(ch[3]), "%d", p->minute%10);
+      snprintf(ch[2], sizeof(ch[2]), "%s", ":"); // separator
+      snprintf(ch[3], sizeof(ch[3]), "%d", p->minute/10); // tens place of minute
+      snprintf(ch[4], sizeof(ch[4]), "%d", p->minute%10);
       for (int j = 0; ch[i][j] != '\0'; j++)
       {
         uint8 c = ch[i][j] - 32; // convert character to ASCII value
@@ -795,14 +796,19 @@ void Render_Alarm_Clock_List()
                 char_x += 6; // offset for hour ones place
                 char_y += 0 + n * 8; // offset for hour ones place
               }
-              else if (i == 2) // minute tens place
+              else if (i == 2) // separator
               {
-                char_x += 12; // offset for minute tens place
+                char_x += 12; // offset for separator
+                char_y += 0 + n * 8; // offset for separator
+              }
+              else if (i == 3) // minute tens place
+              {
+                char_x += 18; // offset for minute tens place
                 char_y += 0 + n * 8; // offset for minute tens place
               }
-              else if (i == 3) // minute ones place
+              else if (i == 4) // minute ones place
               {
-                char_x += 18; // offset for minute ones place
+                char_x += 24; // offset for minute ones place
                 char_y += 0 + n * 8; // offset for minute ones place
               }
               // create a new coordinate node for the character pixel
@@ -848,8 +854,90 @@ void Render_Alarm_Clock_List()
 */
 void Render_Alarm_Clock_Edit(int hour, int minute, int cursor)
 {
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  CoordNode* head = NULL;
+  CoordNode* current = NULL;
   // render alarm clock edit interface
-  Oled_I2C_Put_Time_Wo_Sec_12x24_24_Cursor(34, 3, ":", hour, minute, cursor);
+  for (int i = 0; i < 5; i++)
+  {
+    char ch[5][2] = {"", ""}; // initialize with "00"
+    snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
+    snprintf(ch[2], sizeof(ch[2]), "%s", ":"); // separator
+    snprintf(ch[3], sizeof(ch[3]), "%d", minute/10); // tens place of minute
+    snprintf(ch[4], sizeof(ch[4]), "%d", minute%10);
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 12; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          for (int m = 0; m < 3; m++)
+          {
+            if ((((i < 2 && i == cursor) || (i > 2 && i == cursor + 1))?(Oled_FontLib_12x24[c * 36 + m * 12 + k]|Oled_FontLib_12x24[63 * 36 + m * 12 + k]):Oled_FontLib_12x24[c * 36 + m * 12 + k]) & (0x01 << l))
+            {
+              // if the pixel is set, draw it
+              // calculate the x and y coordinates for the character
+              uint8 char_x = j * 12 + k; // 12 pixels per character
+              uint8 char_y = l + m * 8;
+              if (i == 0) // hour tens place
+              {
+                char_x += 34; // offset for hour tens place
+                char_y += 0; // offset for hour tens place
+              }
+              else if (i == 1) // hour ones place
+              {
+                char_x += 46; // offset for hour ones place
+                char_y += 0; // offset for hour ones place
+              }
+              else if (i == 2) // minute tens place
+              {
+                char_x += 58; // offset for minute tens place
+                char_y += 0; // offset for minute tens place
+              }
+              else if (i == 3) // minute ones place
+              {
+                char_x += 70; // offset for minute ones place
+                char_y += 0; // offset for minute ones place
+              }
+              else if (i == 4) // minute ones place
+              {
+                char_x += 82; // offset for minute ones place
+                char_y += 0; // offset for minute ones place
+              }
+              // create a new coordinate node for the character pixel
+              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+              charNode->x = char_x;
+              charNode->y = char_y;
+              charNode->next = NULL;
+              // link the character node to the list
+              if (head == NULL) {
+                  head = charNode; // if head is NULL, set head to the character node
+                  current = head; // move current to the character node
+              } else {
+                  current->next = charNode; // link the character node to the list
+                  current = charNode; // move current to the character node
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  // render the clock numbers
+  for (current = head; current != NULL; current = current->next) 
+  {
+    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
+  }
+  // free the linked list
+  while (head != NULL) 
+  {
+    CoordNode* temp = head;
+    head = head->next;
+    free(temp);
+  }
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }
 
 
