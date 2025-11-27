@@ -31,6 +31,7 @@ int Lyra_Menu_Selection = 0;              // Menu selection
 int Lyra_Clock_Style = 0;                 // Clock style
 int Lyra_StopWatch_Style = 0;             // Stop Watch style
 int Lyra_AlarmClock_Mode = 0;             // Alarm Clock mode
+int Lyra_AlarmClock_List_Cursor = 0;      // Alarm Clock list cursor
 int Lyra_AlarmClock_Edit_Cursor = 0;      // Alarm Clock edit cursor
 int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
 
@@ -356,7 +357,19 @@ void MAPS_Dock_KEY_Incident(void)
       // Check current menu selection is alarm clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AlarmClock)
       {
-        if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
+        if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
+        {
+          Lyra_AlarmClock_List_Cursor++; // Move alarm clock list cursor down
+          if (Lyra_AlarmClock_List_Cursor >= Get_Alarm_Clock_List_Len())
+          {
+            Lyra_AlarmClock_List_Cursor = Get_Alarm_Clock_List_Len(); // Reset to minimum alarm clock list cursor position
+          }
+          if (Lyra_AlarmClock_List_Cursor >= Alarm_Clock_Max_Len)
+          {
+            Lyra_AlarmClock_List_Cursor = Alarm_Clock_Max_Len - 1; // Reset to maximum alarm clock list cursor position
+          }
+        }
+        else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
         {
           Lyra_AlarmClock_Edit_Number[Lyra_AlarmClock_Edit_Cursor]++; // Increase alarm clock edit number
           if (Lyra_AlarmClock_Edit_Cursor == 0)                       // Hour tens
@@ -435,7 +448,15 @@ void MAPS_Dock_KEY_Incident(void)
       // Check current menu selection is alarm clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AlarmClock)
       {
-        if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
+        if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
+        {
+          Lyra_AlarmClock_List_Cursor--; // Move alarm clock list cursor up
+          if (Lyra_AlarmClock_List_Cursor < 0)
+          {
+            Lyra_AlarmClock_List_Cursor = 0; // Reset to minimum alarm clock list cursor position
+          }
+        }
+        else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
         {
           Lyra_AlarmClock_Edit_Cursor++; // Move alarm clock edit cursor down
           if (Lyra_AlarmClock_Edit_Cursor >= 4)
@@ -472,7 +493,7 @@ void MAPS_Dock_KEY_Incident(void)
     case MAPS_Menu_AlarmClock:
       if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
       {
-        Render_Alarm_Clock_List();
+        Render_Alarm_Clock_List(Lyra_AlarmClock_List_Cursor);
       }
       else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
       {
