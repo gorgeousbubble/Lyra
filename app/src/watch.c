@@ -948,6 +948,33 @@ int Get_Alarm_Clock_List_Len()
 }
 
 /*
+ *  @brief      Get_Alarm_Clock_List_Time
+ *  @param      int             index           index of the alarm clock time in the list
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Get_Alarm_Clock_List_Len(10,15,90);
+*/
+void Get_Alarm_Clock_List_Time(int index, int* hour, int* minute)
+{
+  // get alarm clock time from list by index
+  Alarm_Clock_Time* current = Alarm_Clock_List;
+  int count = 0;
+  while (current != NULL) {
+      if (count == index) {
+          *hour = current->hour;
+          *minute = current->minute;
+          return; // found the alarm clock time
+      }
+      count++;
+      current = current->next;
+  }
+  // if not found, set hour and minute to 0
+  *hour = 0;
+  *minute = 0;
+}
+
+/*
  *  @brief      Clean_Alarm_Clock_List
  *  @param      int             hour            hour integer parameter
  *  @param      int             minute          minute integer parameter

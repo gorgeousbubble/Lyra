@@ -58,6 +58,7 @@ extern void Render_Alarm_Clock_Edit(int hour, int minute, int cursor);
 extern void Save_Alarm_Clock_Time_To_List(int hour, int minute);
 extern void Delete_Alarm_Clock_Time_From_List(int hour, int minute);
 extern int Get_Alarm_Clock_List_Len();
+extern void Get_Alarm_Clock_List_Time(int index, int* hour, int* minute);
 extern void Clean_Alarm_Clock_List();
 extern void Write_Alarm_Clock_List_To_E2PROM();
 extern void Read_Alarm_Clock_E2PROM_To_List();

@@ -278,6 +278,18 @@ void MAPS_Dock_KEY_Incident(void)
       {
         if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
         {
+          // get alarm clock time from list
+          int hour = 0;
+          int minute = 0;
+          // get alarm clock time from list
+          Get_Alarm_Clock_List_Time(Lyra_AlarmClock_List_Cursor, &hour, &minute);
+          // set alarm clock edit number
+          Lyra_AlarmClock_Edit_Number[0] = hour / 10; // Hour tens
+          Lyra_AlarmClock_Edit_Number[1] = hour % 10; // Hour
+          Lyra_AlarmClock_Edit_Number[2] = minute / 10; // Minute tens
+          Lyra_AlarmClock_Edit_Number[3] = minute % 10; // Minute
+          Lyra_AlarmClock_Edit_Cursor = 0; // Reset edit cursor  
+
           Lyra_AlarmClock_Mode++; // Switch to edit mode
           if (Lyra_AlarmClock_Mode >= MAPS_AlarmClock_Mode_Max)
           {
