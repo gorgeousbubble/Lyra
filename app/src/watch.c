@@ -869,16 +869,10 @@ void Render_Alarm_Clock_Edit(int hour, int minute, int cursor)
  *  @since      v1.0
  *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
 */
-void Save_Alarm_Clock_Time_To_List(int hour, int minute)
+void Add_Alarm_Clock_Time_To_List(int hour, int minute)
 {
   // check alarm clock list not full
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  int count = 0;
-  while (current != NULL) {
-      count++;
-      current = current->next;
-  }
-  if (count >= Alarm_Clock_Max_Len) {
+  if (Get_Alarm_Clock_List_Len() >= Alarm_Clock_Max_Len) {
       return; // alarm clock list full, do not save
   }
   // save alarm clock edit data to alarm clock list
@@ -900,19 +894,44 @@ void Save_Alarm_Clock_Time_To_List(int hour, int minute)
 }
 
 /*
- *  @brief      Delete_Alarm_Clock_Time_From_List
+ *  @brief      Mod_Alarm_Clock_Time_To_List
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Mod_Alarm_Clock_Edit(10,15,90);
+*/
+void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute)
+{
+  // modify index specifc alarm clock time in list
+  Alarm_Clock_Time* current = Alarm_Clock_List;
+  int count = 0;
+  while (current != NULL) {
+      if (count == index) {
+          // found the alarm clock time to modify
+          current->hour = hour;
+          current->minute = minute;
+          return; // modified the alarm clock time
+      }
+      current = current->next;
+      count++;
+  }
+}
+
+/*
+ *  @brief      Del_Alarm_Clock_Time_From_List
  *  @param      int             hour            hour integer parameter
  *  @param      int             minute          minute integer parameter
  *  @since      v1.0
  *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
 */
-void Delete_Alarm_Clock_Time_From_List(int hour, int minute)
+void Del_Alarm_Clock_Time_From_List(int index)
 {
-  // delete alarm clock time from list
+  // delete index specifc alarm clock time from list
   Alarm_Clock_Time* current = Alarm_Clock_List;
   Alarm_Clock_Time* previous = NULL;
+  int count = 0;
   while (current != NULL) {
-      if (current->hour == hour && current->minute == minute) {
+      if (count == index) {
           // found the alarm clock time to delete
           if (previous == NULL) {
               // deleting the head of the list
@@ -921,11 +940,39 @@ void Delete_Alarm_Clock_Time_From_List(int hour, int minute)
               previous->next = current->next;
           }
           free(current);
-          return;
+          return; // deleted the alarm clock time
       }
       previous = current;
       current = current->next;
+      count++;
   }
+}
+
+/*
+ *  @brief      Get_Alarm_Clock_Time_From_List
+ *  @param      int             index           index of the alarm clock time in the list
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Get_Alarm_Clock_List_Len(10,15,90);
+*/
+void Get_Alarm_Clock_Time_From_List(int index, int* hour, int* minute)
+{
+  // get alarm clock time from list by index
+  Alarm_Clock_Time* current = Alarm_Clock_List;
+  int count = 0;
+  while (current != NULL) {
+      if (count == index) {
+          *hour = current->hour;
+          *minute = current->minute;
+          return; // found the alarm clock time
+      }
+      count++;
+      current = current->next;
+  }
+  // if not found, set hour and minute to 0
+  *hour = 0;
+  *minute = 0;
 }
 
 /*
@@ -945,33 +992,6 @@ int Get_Alarm_Clock_List_Len()
       current = current->next;
   }
   return count;
-}
-
-/*
- *  @brief      Get_Alarm_Clock_List_Time
- *  @param      int             index           index of the alarm clock time in the list
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @since      v1.0
- *  Sample usage:       Get_Alarm_Clock_List_Len(10,15,90);
-*/
-void Get_Alarm_Clock_List_Time(int index, int* hour, int* minute)
-{
-  // get alarm clock time from list by index
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  int count = 0;
-  while (current != NULL) {
-      if (count == index) {
-          *hour = current->hour;
-          *minute = current->minute;
-          return; // found the alarm clock time
-      }
-      count++;
-      current = current->next;
-  }
-  // if not found, set hour and minute to 0
-  *hour = 0;
-  *minute = 0;
 }
 
 /*
@@ -1006,6 +1026,11 @@ void Write_Alarm_Clock_List_To_E2PROM()
   Alarm_Clock_Time* current = Alarm_Clock_List;
   int count = 0;
   int i = 0;
+  // fill the alarm clock array with 0xFF
+  for (int j = 0; j < Alarm_Clock_Max_Len * 2; j++) {
+      Alarm_Clock_Array[j] = 0xFF;
+  }
+  // write alarm clock list to array
   while (current != NULL && count < Alarm_Clock_Max_Len) {
       Alarm_Clock_Array[i] = (uint8)current->hour;
       Alarm_Clock_Array[i+1] = (uint8)current->minute;

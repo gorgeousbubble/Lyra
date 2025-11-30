@@ -281,8 +281,9 @@ void MAPS_Dock_KEY_Incident(void)
           // get alarm clock time from list
           int hour = 0;
           int minute = 0;
+
           // get alarm clock time from list
-          Get_Alarm_Clock_List_Time(Lyra_AlarmClock_List_Cursor, &hour, &minute);
+          Get_Alarm_Clock_Time_From_List(Lyra_AlarmClock_List_Cursor, &hour, &minute);
           // set alarm clock edit number
           Lyra_AlarmClock_Edit_Number[0] = hour / 10; // Hour tens
           Lyra_AlarmClock_Edit_Number[1] = hour % 10; // Hour
@@ -301,9 +302,24 @@ void MAPS_Dock_KEY_Incident(void)
           // save alarm clock time to list
           int hour = Lyra_AlarmClock_Edit_Number[0] * 10 + Lyra_AlarmClock_Edit_Number[1];
           int minute = Lyra_AlarmClock_Edit_Number[2] * 10 + Lyra_AlarmClock_Edit_Number[3];
-          Save_Alarm_Clock_Time_To_List(hour, minute);
+          
+          //get alarm clock list length
+          if (Get_Alarm_Clock_List_Len() > Lyra_AlarmClock_List_Cursor)
+          {
+            // modify existing alarm clock time in list
+            Mod_Alarm_Clock_Time_To_List(Lyra_AlarmClock_List_Cursor, hour, minute);
+          }
+          else
+          {
+            // add new alarm clock time to list
+            Add_Alarm_Clock_Time_To_List(hour, minute);
+          }
           // write alarm clock list to e2prom
           Write_Alarm_Clock_List_To_E2PROM();
+          // clean alarm clock list
+          Clean_Alarm_Clock_List();
+          // read alarm clock time from E2PROM
+          Read_Alarm_Clock_E2PROM_To_List();
 
           Lyra_AlarmClock_Mode--; // Switch to list mode
           if (Lyra_AlarmClock_Mode < MAPS_AlarmClock_List)
@@ -330,6 +346,15 @@ void MAPS_Dock_KEY_Incident(void)
       {
         if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
         {
+          // delete alarm clock time from list
+          Del_Alarm_Clock_Time_From_List(Lyra_AlarmClock_List_Cursor);
+          // write alarm clock list to e2prom
+          Write_Alarm_Clock_List_To_E2PROM();
+          // clean alarm clock list
+          Clean_Alarm_Clock_List();
+          // read alarm clock time from E2PROM
+          Read_Alarm_Clock_E2PROM_To_List();
+
           Lyra_AlarmClock_Mode--; // Switch to list mode
           if (Lyra_AlarmClock_Mode < MAPS_AlarmClock_List)
           {
