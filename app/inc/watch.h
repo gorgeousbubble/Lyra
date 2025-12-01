@@ -53,7 +53,7 @@ extern void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitL
 extern void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond);
 extern void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond);
 extern void Render_Alarm_Clock_List(int cursor);
-extern void Render_Alarm_Clock_Edit(int hour, int minute, int cursor);
+extern void Render_Alarm_Clock_Edit(int hour, int minute, int cursor, int number);
 
 extern void Add_Alarm_Clock_Time_To_List(int hour, int minute);
 extern void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute);

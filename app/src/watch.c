@@ -838,13 +838,53 @@ void Render_Alarm_Clock_List(int cursor)
  *  @since      v1.0
  *  Sample usage:       Render_Alarm_Clock_Edit(10,15,90);
 */
-void Render_Alarm_Clock_Edit(int hour, int minute, int cursor)
+void Render_Alarm_Clock_Edit(int hour, int minute, int cursor, int number)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
   CoordNode* current = NULL;
   // render alarm clock edit interface
   char ch[5][2] = {"", ""}; // initialize with "00"
+  // render alarm clock edit title
+  snprintf(ch[0], sizeof(ch[0]), "%d", number + 1); // tens place of hour
+  snprintf(ch[1], sizeof(ch[1]), "%s", "#");
+  for (int i = 0; i < 2; i++)
+  {
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 12; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          for (int m = 0; m < 3; m++)
+          {
+            if ((Oled_FontLib_12x24[c * 36 + m * 12 + k]) & (0x01 << l))
+            {
+              // if the pixel is set, draw it
+              // calculate the x and y coordinates for the character
+              uint8 char_x = 52 + i * 12 + j * 12 + k; // 12 pixels per character
+              uint8 char_y = l + m * 8 + 8; // 8 pixels per line, 20 pixels offset for the first line
+              // create a new coordinate node for the character pixel
+              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+              charNode->x = char_x;
+              charNode->y = char_y;
+              charNode->next = NULL;
+              // link the character node to the list
+              if (head == NULL) {
+                  head = charNode; // if head is NULL, set head to the character node
+                  current = head; // move current to the character node
+              } else {
+                  current->next = charNode; // link the character node to the list
+                  current = charNode; // move current to the character node
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  // render alarm clock edit text
   snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
   snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
   snprintf(ch[2], sizeof(ch[2]), "%s", ":"); // separator
@@ -866,7 +906,7 @@ void Render_Alarm_Clock_Edit(int hour, int minute, int cursor)
               // if the pixel is set, draw it
               // calculate the x and y coordinates for the character
               uint8 char_x = 34 + i * 12 + j * 12 + k; // 12 pixels per character
-              uint8 char_y = l + m * 8 + 20; // 8 pixels per line, 20 pixels offset for the first line
+              uint8 char_y = l + m * 8 + 32; // 8 pixels per line, 20 pixels offset for the first line
               // create a new coordinate node for the character pixel
               CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
               charNode->x = char_x;
