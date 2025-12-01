@@ -778,6 +778,46 @@ void Render_Alarm_Clock_List(int cursor)
     p = p->next;
     n++;
   }
+  // if cursor is large than list length, show arrow at the end
+  if (cursor >= n)
+  {
+    char ch[2][2] = {"", ""};
+    snprintf(ch[0], sizeof(ch[0]), "%s", "<"); // pointer
+    snprintf(ch[1], sizeof(ch[1]), "%s", "-"); // pointer
+    for (int i = 0; i < 2; i++)
+    {
+      for (int j = 0; ch[i][j] != '\0'; j++)
+      {
+        uint8 c = ch[i][j] - 32; // convert character to ASCII value
+        for (int k = 0; k < 6; k++) 
+        {
+          for (int l = 0; l < 8; l++)
+          {
+            if (Oled_FontLib_6x8[c][k] & (0x01 << l))
+            {
+              // if the pixel is set, draw it
+              // calculate the x and y coordinates for the character
+              uint8 char_x = 85 + i * 6 + j * 6 + k; // 6 pixels per character
+              uint8 char_y = l + n * 8;
+              // create a new coordinate node for the character pixel
+              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+              charNode->x = char_x;
+              charNode->y = char_y;
+              charNode->next = NULL;
+              // link the character node to the list
+              if (head == NULL) {
+                  head = charNode; // if head is NULL, set head to the character node
+                  current = head; // move current to the character node
+              } else {
+                  current->next = charNode; // link the character node to the list
+                  current = charNode; // move current to the character node
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   // render the clock numbers
   for (current = head; current != NULL; current = current->next) 
   {

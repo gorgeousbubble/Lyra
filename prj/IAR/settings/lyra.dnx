@@ -59,7 +59,7 @@
         <EnforceMemoryConfiguration>1</EnforceMemoryConfiguration>
     </ArmDriver>
     <DebugChecksum>
-        <Checksum>337257887</Checksum>
+        <Checksum>1222904728</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -127,12 +127,11 @@
         <Bp0>_ 0 "EMUL_DATA" "PIT_Flag_Clear" 0 0 0 0 4294967295</Bp0>
         <Bp1>_ 0 "TDL_EMUL_TRACE_START" "disable_irq" 0 0 0 0 4294967295</Bp1>
         <Bp2>_ 0 "EMUL_CODE" "0xa05e" 0 0 1 "" 0 "" 0</Bp2>
-        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.1054.3" 0 0 1 "" 0 "" 0</Bp3>
-        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.930.21" 0 0 1 "" 0 "" 0</Bp4>
-        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.1026.21" 0 0 1 "" 0 "" 0</Bp5>
-        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.1056.12" 0 0 1 "" 0 "" 0</Bp6>
-        <Bp7>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.1041.3" 0 0 1 "" 0 "" 0</Bp7>
-        <Count>8</Count>
+        <Bp3>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.931.7" 0 0 1 "" 0 "" 0</Bp3>
+        <Bp4>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.1066.21" 0 0 1 "" 0 "" 0</Bp4>
+        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.1047.21" 0 0 1 "" 0 "" 0</Bp5>
+        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\watch.c}.1028.21" 0 0 1 "" 0 "" 0</Bp6>
+        <Count>7</Count>
     </Breakpoints2>
     <DriverProfiling>
         <Enabled>0</Enabled>
