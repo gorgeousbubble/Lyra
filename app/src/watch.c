@@ -1118,6 +1118,7 @@ void Write_Alarm_Clock_List_To_E2PROM()
       i += 2;
   }
   // write alarm clock array to e2prom
+  MAPS_Dock_W25Q80_Erase_Block(0x00000000, ERASE_SECTOR_SIZE); // erase first block
   MAPS_Dock_W25Q80_Write_Page(0, 0, Alarm_Clock_Array, 16);
 }
 

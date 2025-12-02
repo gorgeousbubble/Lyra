@@ -121,7 +121,7 @@ void MAPS_Dock_W25Q80_Erase_Chip(void)
  *  @since      v1.0
  *  Sample usage:       MAPS_Dock_W25Q80_Erase_Block();//W25Q80 chip sector erase
  */
-void MAPS_Dock_W25Q80_Erase_Block(uint32 Address,uint8 Block_Size)
+void MAPS_Dock_W25Q80_Erase_Block(uint32 Address,uint16 Block_Size)
 {
   uint8 CMD[4]={0};
   
