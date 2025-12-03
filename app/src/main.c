@@ -35,6 +35,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] =
         MAPS_Menu_StopWatch,
         MAPS_Menu_AlarmClock,
         // MAPS_Menu_WorldClock,
+        MAPS_Menu_SpiritLevel,
 };
 
 /*

@@ -141,7 +141,7 @@ MAPS_Dock_KEY_Status MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEYn MAPS_Dock_KEYx)
  */
 void MAPS_Dock_KEY_Incident(void)
 {
-  // Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 1, 2);
+  // render screen saver
   if (Lyra_Status == MAPS_Screen_Saver)
   {
     Oled_I2C_Draw_BMP_128x64(LCM_Freescale_logo, OLED_Invert_Color);
@@ -185,7 +185,7 @@ void MAPS_Dock_KEY_Incident(void)
       switch (MAPS_Menu_SelectionN[Lyra_Menu_Selection])
       {
       case MAPS_Menu_Clock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 0, 5);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, 0, 0, 5);
         Lyra_Menu_Selection--;
         if (Lyra_Menu_Selection < 0)
         {
@@ -202,6 +202,14 @@ void MAPS_Dock_KEY_Incident(void)
         break;
       case MAPS_Menu_AlarmClock:
         Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, 0, 0, 5);
+        Lyra_Menu_Selection--;
+        if (Lyra_Menu_Selection < 0)
+        {
+          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
+        }
+        break;
+      case MAPS_Menu_SpiritLevel:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 0, 5);
         Lyra_Menu_Selection--;
         if (Lyra_Menu_Selection < 0)
         {
@@ -235,7 +243,15 @@ void MAPS_Dock_KEY_Incident(void)
         }
         break;
       case MAPS_Menu_AlarmClock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 1, 0, 5);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, 1, 0, 5);
+        Lyra_Menu_Selection++;
+        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
+        {
+          Lyra_Menu_Selection = 0;
+        }
+        break;
+      case MAPS_Menu_SpiritLevel:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 1, 0, 5);
         Lyra_Menu_Selection++;
         if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
         {
@@ -258,6 +274,9 @@ void MAPS_Dock_KEY_Incident(void)
       break;
     case MAPS_Menu_AlarmClock:
       Oled_I2C_Draw_BMP_128x64(LCM_Alarm_Clock_icon, OLED_Invert_Color);
+      break;
+    case MAPS_Menu_SpiritLevel:
+      Oled_I2C_Draw_BMP_128x64(LCM_Spirit_Level_icon, OLED_Invert_Color);
       break;
     default:
       break;
