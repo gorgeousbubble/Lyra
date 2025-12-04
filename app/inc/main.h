@@ -40,10 +40,10 @@ typedef enum
   MAPS_Menu_Clock = 0,      // Menu Clock
   MAPS_Menu_StopWatch = 1,  // Menu Stop Watch
   MAPS_Menu_AlarmClock = 2, // Menu Alarm Clock
-  // MAPS_Menu_WorldClock = 3,    //Menu World Clock
-  MAPS_Menu_SpiritLevel = 3,   // Menu Spirit Level
-  MAPS_Menu_Configure_Adjust = 4, // Menu Configure Adjust
-  MAPS_Menu_Selection_Max = 5, // Maximum menu selection
+  MAPS_Menu_WorldClock = 3,    //Menu World Clock
+  MAPS_Menu_SpiritLevel = 4,   // Menu Spirit Level
+  MAPS_Menu_Configure_Adjust = 5, // Menu Configure Adjust
+  MAPS_Menu_Selection_Max = 6, // Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum

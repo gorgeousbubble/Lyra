@@ -208,8 +208,16 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
         }
         break;
+      case MAPS_Menu_WorldClock:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 0, 5);
+        Lyra_Menu_Selection--;
+        if (Lyra_Menu_Selection < 0)
+        {
+          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
+        }
+        break;
       case MAPS_Menu_SpiritLevel:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 0, 5);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, 0, 0, 5);
         Lyra_Menu_Selection--;
         if (Lyra_Menu_Selection < 0)
         {
@@ -251,7 +259,15 @@ void MAPS_Dock_KEY_Incident(void)
         }
         break;
       case MAPS_Menu_AlarmClock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, 1, 0, 5);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, 1, 0, 5);
+        Lyra_Menu_Selection++;
+        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
+        {
+          Lyra_Menu_Selection = 0;
+        }
+        break;
+      case MAPS_Menu_WorldClock:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, 1, 0, 5);
         Lyra_Menu_Selection++;
         if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
         {
@@ -290,6 +306,9 @@ void MAPS_Dock_KEY_Incident(void)
       break;
     case MAPS_Menu_AlarmClock:
       Oled_I2C_Draw_BMP_128x64(LCM_Alarm_Clock_icon, OLED_Invert_Color);
+      break;
+    case MAPS_Menu_WorldClock:
+      Oled_I2C_Draw_BMP_128x64(LCM_World_Clock_icon, OLED_Invert_Color);
       break;
     case MAPS_Menu_SpiritLevel:
       Oled_I2C_Draw_BMP_128x64(LCM_Spirit_Level_icon, OLED_Invert_Color);
