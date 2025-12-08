@@ -359,8 +359,9 @@ void MAPS_Dock_KEY_Incident(void)
           // save alarm clock time to list
           int hour = Lyra_AlarmClock_Edit_Number[0] * 10 + Lyra_AlarmClock_Edit_Number[1];
           int minute = Lyra_AlarmClock_Edit_Number[2] * 10 + Lyra_AlarmClock_Edit_Number[3];
-          
-          //get alarm clock list length
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // get alarm clock list length
           if (Get_Alarm_Clock_List_Len() > Lyra_AlarmClock_List_Cursor)
           {
             // modify existing alarm clock time in list
@@ -403,6 +404,8 @@ void MAPS_Dock_KEY_Incident(void)
       {
         if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
         {
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
           // delete alarm clock time from list
           Del_Alarm_Clock_Time_From_List(Lyra_AlarmClock_List_Cursor);
           // write alarm clock list to e2prom
