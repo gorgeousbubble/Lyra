@@ -440,6 +440,9 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_Clock_Style < 0)
         {
           Lyra_Clock_Style = MAPS_Clock_Style_Max - 1; // Reset to maximum clock style
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 0, 0, 5);
+        } else {
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 0, 0, 5);
         }
       }
       // Check current menu selection is stopwatch
@@ -449,6 +452,9 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_StopWatch_Style < 0)
         {
           Lyra_StopWatch_Style = MAPS_StopWatch_Style_Max - 1; // Reset to maximum stopwatch style
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 0, 0, 5);
+        } else {
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 0, 0, 5);
         }
       }
       // Check current menu selection is alarm clock
@@ -531,6 +537,9 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_Clock_Style >= MAPS_Clock_Style_Max)
         {
           Lyra_Clock_Style = 0; // Reset to clock dial style
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 1, 0, 5);
+        } else {
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 1, 0, 5);
         }
       }
       // Check current menu selection is stopwatch
@@ -540,6 +549,9 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_StopWatch_Style >= MAPS_StopWatch_Style_Max)
         {
           Lyra_StopWatch_Style = 0; // Reset to stopwatch dial style
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 1, 0, 5);
+        } else {
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 1, 0, 5);
         }
       }
       // Check current menu selection is alarm clock
