@@ -35,11 +35,13 @@ extern const Coord LCM_Clock_Dial_coordinate[];
 extern const Coord LCM_Clock_Digit_coordinate[];
 extern const Coord LCM_StopWatch_Dial_coordinate[];
 extern const Coord LCM_StopWatch_Digit_coordinate[];
+extern const Coord LCM_WorldClock_shanghai_coordinate[];
 
 extern const int LCM_Clock_Dial_coordinate_length;
 extern const int LCM_Clock_Digit_coordinate_length;
 extern const int LCM_StopWatch_Dial_coordinate_length;
 extern const int LCM_StopWatch_Digit_coordinate_length;
+extern const int LCM_WorldClock_shanghai_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time* Alarm_Clock_List;
@@ -54,6 +56,7 @@ extern void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dia
 extern void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond);
 extern void Render_Alarm_Clock_List(int cursor);
 extern void Render_Alarm_Clock_Edit(int hour, int minute, int cursor, int number);
+extern void Render_World_Clock_Time(const Coord *city, const int cityLen, int hour, int minute);
 
 extern void Add_Alarm_Clock_Time_To_List(int hour, int minute);
 extern void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute);

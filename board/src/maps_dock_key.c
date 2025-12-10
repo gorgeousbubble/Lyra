@@ -34,6 +34,7 @@ int Lyra_AlarmClock_Mode = 0;             // Alarm Clock mode
 int Lyra_AlarmClock_List_Cursor = 0;      // Alarm Clock list cursor
 int Lyra_AlarmClock_Edit_Cursor = 0;      // Alarm Clock edit cursor
 int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
+int Lyra_WorldClock_Time_Cursor = 0;  // World Clock time cursor
 
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
@@ -608,6 +609,9 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Render_Alarm_Clock_Edit(Lyra_AlarmClock_Edit_Number[0] * 10 + Lyra_AlarmClock_Edit_Number[1], Lyra_AlarmClock_Edit_Number[2] * 10 + Lyra_AlarmClock_Edit_Number[3], Lyra_AlarmClock_Edit_Cursor, Lyra_AlarmClock_List_Cursor);
       }
+      break;
+    case MAPS_Menu_WorldClock:
+      Render_World_Clock_Time(LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, 0, 0);
       break;
     default:
       break;

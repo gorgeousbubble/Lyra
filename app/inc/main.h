@@ -67,6 +67,22 @@ typedef enum
   MAPS_AlarmClock_Mode_Max = 2, // Maximum Alarm Clock mode
 } MAPS_AlarmClock_Mode;
 
+typedef enum
+{
+  MAPS_WorldClock_Timezone_Beijing = 0, // Beijing Timezone (+8)
+  MAPS_WorldClock_Timezone_Shanghai = 1, // Shanghai Timezone (+8)
+  MAPS_WorldClock_Timezone_Max = 2, // Maximum World Clock timezone
+} MAPS_WorldClock_Timezone;
+
+typedef struct MAPS_WorldClock_Time
+{
+  MAPS_WorldClock_Timezone timezone; // World Clock timezone
+  char name[20];                     // Timezone name
+  int hour_offset;                   // Hour offset from UTC
+  int minute_offset;                 // Minute offset from UTC
+} MAPS_WorldClock_Time;
+
+
 /*
 **variate declaration
 */
@@ -75,6 +91,8 @@ extern MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max];
 extern MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max];
 extern MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max];
 extern MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max];
+extern MAPS_WorldClock_Timezone MAPS_WorldClock_TimezoneN[MAPS_WorldClock_Timezone_Max];
+extern MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max];
 
 /*
 **function declaration

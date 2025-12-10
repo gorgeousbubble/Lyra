@@ -19,8 +19,7 @@
 /*
 ** MAPS Screen Status
 */
-MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max] =
-    {
+MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max] = {
         MAPS_Screen_Saver,
         MAPS_Screen_Menu,
         MAPS_Screen_Normal,
@@ -29,8 +28,7 @@ MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max] =
 /*
 ** MAPS Menu Selection
 */
-MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] =
-    {
+MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
         MAPS_Menu_Clock,
         MAPS_Menu_StopWatch,
         MAPS_Menu_AlarmClock,
@@ -42,8 +40,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] =
 /*
 ** MAPS Clock Style
 */
-MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max] =
-    {
+MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max] = {
         MAPS_Clock_Dial,
         MAPS_Clock_Digit,
 };
@@ -51,10 +48,25 @@ MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max] =
 /*
 ** MAPS Alarm Clock Mode
 */
-MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max] =
-    {
+MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max] = {
         MAPS_AlarmClock_List,
         MAPS_AlarmClock_Edit,
+};
+
+/*
+** MAPS World Clock Timezone
+*/
+MAPS_WorldClock_Timezone MAPS_WorldClock_TimezoneN[MAPS_WorldClock_Timezone_Max] = {
+  MAPS_WorldClock_Timezone_Beijing,
+  MAPS_WorldClock_Timezone_Shanghai,
+};
+
+/*
+** MAPS World Clock Timezone Array
+*/
+MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max] = {
+  {MAPS_WorldClock_Timezone_Beijing, "Beijing", 8, 0},
+  {MAPS_WorldClock_Timezone_Shanghai, "Shanghai", 8, 0},
 };
 
 /*
