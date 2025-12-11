@@ -71,7 +71,9 @@ typedef enum
 {
   MAPS_WorldClock_Timezone_Beijing = 0, // Beijing Timezone (+8)
   MAPS_WorldClock_Timezone_Shanghai = 1, // Shanghai Timezone (+8)
-  MAPS_WorldClock_Timezone_Max = 2, // Maximum World Clock timezone
+  MAPS_WorldClock_Timezone_Hongkong = 2, // Hong Kong Timezone (+8)
+  MAPS_WorldClock_Timezone_Taipei = 3,   // Taipei Timezone (+8)
+  MAPS_WorldClock_Timezone_Max = 4, // Maximum World Clock timezone
 } MAPS_WorldClock_Timezone;
 
 typedef struct MAPS_WorldClock_Time

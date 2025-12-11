@@ -526,6 +526,28 @@ void MAPS_Dock_KEY_Incident(void)
           }
         }
       }
+      // check current menu selection is world clock
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_WorldClock)
+      {
+        Lyra_WorldClock_Time_Cursor--; // Move world clock time cursor up
+        if (Lyra_WorldClock_Time_Cursor < 0)
+        {
+          Lyra_WorldClock_Time_Cursor = MAPS_WorldClock_Timezone_Max - 1; // Reset to minimum world clock time cursor position
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, 0, 0, 5);
+        } else {
+          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Beijing) {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, 0, 0, 5);
+          }
+          else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, 0, 0, 5);
+          }
+          else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Hongkong)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, 0, 0, 5);
+          }
+        }
+      }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
     // Press KEY3
@@ -575,6 +597,28 @@ void MAPS_Dock_KEY_Incident(void)
           }
         }
       }
+      // check current menu selection is world clock
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_WorldClock)
+      {
+        Lyra_WorldClock_Time_Cursor++; // Move world clock time cursor up
+        if (Lyra_WorldClock_Time_Cursor >= MAPS_WorldClock_Timezone_Max)
+        {
+          Lyra_WorldClock_Time_Cursor = 0; // Reset to minimum world clock time cursor position
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, 1, 0, 5);
+        } else {
+          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai) {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, 1, 0, 5);
+          }
+          else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Hongkong)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, 1, 0, 5);
+          }
+          else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Taipei)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, 1, 0, 5);
+          }
+        }
+      }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
     // Display the current menu selection
@@ -611,7 +655,22 @@ void MAPS_Dock_KEY_Incident(void)
       }
       break;
     case MAPS_Menu_WorldClock:
-      Render_World_Clock_Time(LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, 0, 0);
+      if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Beijing)
+      {
+        Render_World_Clock_Time(LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, 0, 0);
+      }
+      else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai)
+      {
+        Render_World_Clock_Time(LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, 0, 0);
+      }
+      else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Hongkong)
+      {
+        Render_World_Clock_Time(LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, 0, 0);
+      }
+      else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Taipei)
+      {
+        Render_World_Clock_Time(LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, 0, 0);
+      }
       break;
     default:
       break;
