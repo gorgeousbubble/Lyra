@@ -79,8 +79,6 @@ typedef enum
 typedef struct MAPS_WorldClock_Time
 {
   MAPS_WorldClock_Timezone timezone; // World Clock timezone
-  char country[20];                  // Country name
-  char city[20];                     // city name
   int hour_offset;                 // Hour offset from UTC
   int minute_offset;               // Minute offset from UTC
 } MAPS_WorldClock_Time;

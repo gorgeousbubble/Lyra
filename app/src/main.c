@@ -67,10 +67,10 @@ MAPS_WorldClock_Timezone MAPS_WorldClock_TimezoneN[MAPS_WorldClock_Timezone_Max]
 ** MAPS World Clock Timezone Array
 */
 MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max] = {
-  {MAPS_WorldClock_Timezone_Beijing, "China", "Beijing", 8, 0},
-  {MAPS_WorldClock_Timezone_Shanghai, "China", "Shanghai", 8, 0},
-  {MAPS_WorldClock_Timezone_Hongkong, "China", "Hongkong", 8, 0},
-  {MAPS_WorldClock_Timezone_Taipei, "China", "Taipei", 8, 0},
+  {MAPS_WorldClock_Timezone_Beijing, 8, 0},
+  {MAPS_WorldClock_Timezone_Shanghai, 8, 0},
+  {MAPS_WorldClock_Timezone_Hongkong, 8, 0},
+  {MAPS_WorldClock_Timezone_Taipei, 8, 0},
 };
 
 /*

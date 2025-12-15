@@ -1040,6 +1040,147 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClo
       }
     }
   }
+  // switch timezone
+  int x_offset = 0;
+  int n = 0;
+  // render city
+  switch (time.timezone)
+  {
+  case MAPS_WorldClock_Timezone_Beijing:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "B"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "J");
+    x_offset = 10;
+    n = 2;
+    break;
+  case MAPS_WorldClock_Timezone_Shanghai:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "S"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "H");
+    x_offset = 10;
+    n = 2;
+    break;
+  case MAPS_WorldClock_Timezone_Hongkong:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "H"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "K");
+    x_offset = 10;
+    n = 2;
+    break;
+  case MAPS_WorldClock_Timezone_Taipei:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "T"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "P");
+    x_offset = 10;
+    n = 2;
+    break;
+  default:
+    break;
+  }
+  for (int i = 0; i < n; i++)
+  {
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 6; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          if (Oled_FontLib_6x8[c][k] & (0x01 << l))
+          {
+            // if the pixel is set, draw it
+            // calculate the x and y coordinates for the character
+            uint8 char_x = x_offset + i * 6 + j * 6 + k; // 6 pixels per character
+            uint8 char_y = l + 24;
+            // create a new coordinate node for the character pixel
+            CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+            charNode->x = char_x;
+            charNode->y = char_y;
+            charNode->next = NULL;
+            // link the character node to the list
+            if (head == NULL) {
+                head = charNode; // if head is NULL, set head to the character node
+                current = head; // move current to the character node
+            } else {
+                current->next = charNode; // link the character node to the list
+                current = charNode; // move current to the character node
+            }
+          }
+        }
+      }
+    }
+  }
+  // render country
+  switch (time.timezone)
+  {
+  case MAPS_WorldClock_Timezone_Beijing:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "C"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "h");
+    snprintf(ch[2], sizeof(ch[2]), "%s", "i");
+    snprintf(ch[3], sizeof(ch[3]), "%s", "n");
+    snprintf(ch[4], sizeof(ch[4]), "%s", "a");
+    x_offset = 1;
+    n = 5;
+    break;
+  case MAPS_WorldClock_Timezone_Shanghai:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "C"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "h");
+    snprintf(ch[2], sizeof(ch[2]), "%s", "i");
+    snprintf(ch[3], sizeof(ch[3]), "%s", "n");
+    snprintf(ch[4], sizeof(ch[4]), "%s", "a");
+    x_offset = 1;
+    n = 5;
+    break;
+  case MAPS_WorldClock_Timezone_Hongkong:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "C"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "h");
+    snprintf(ch[2], sizeof(ch[2]), "%s", "i");
+    snprintf(ch[3], sizeof(ch[3]), "%s", "n");
+    snprintf(ch[4], sizeof(ch[4]), "%s", "a");
+    x_offset = 1;
+    n = 5;
+    break;
+  case MAPS_WorldClock_Timezone_Taipei:
+    snprintf(ch[0], sizeof(ch[0]), "%s", "C"); // tens place of hour
+    snprintf(ch[1], sizeof(ch[1]), "%s", "h");
+    snprintf(ch[2], sizeof(ch[2]), "%s", "i");
+    snprintf(ch[3], sizeof(ch[3]), "%s", "n");
+    snprintf(ch[4], sizeof(ch[4]), "%s", "a");
+    x_offset = 1;
+    n = 5;
+    break;
+  default:
+    break;
+  }
+  for (int i = 0; i < n; i++)
+  {
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 6; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          if (Oled_FontLib_6x8[c][k] & (0x01 << l))
+          {
+            // if the pixel is set, draw it
+            // calculate the x and y coordinates for the character
+            uint8 char_x = x_offset + i * 6 + j * 6 + k; // 6 pixels per character
+            uint8 char_y = l + 32;
+            // create a new coordinate node for the character pixel
+            CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+            charNode->x = char_x;
+            charNode->y = char_y;
+            charNode->next = NULL;
+            // link the character node to the list
+            if (head == NULL) {
+                head = charNode; // if head is NULL, set head to the character node
+                current = head; // move current to the character node
+            } else {
+                current->next = charNode; // link the character node to the list
+                current = charNode; // move current to the character node
+            }
+          }
+        }
+      }
+    }
+  }
 
   // draw clock digit
   for (int i = 0; i < cityLen; i++) 
