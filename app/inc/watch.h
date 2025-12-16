@@ -39,6 +39,9 @@ extern const Coord LCM_WorldClock_shanghai_coordinate[];
 extern const Coord LCM_WorldClock_beijing_coordinate[];
 extern const Coord LCM_WorldClock_hongkong_coordinate[];
 extern const Coord LCM_WorldClock_taipei_coordinate[];
+extern const Coord LCM_WorldClock_seoul_coordinate[];
+extern const Coord LCM_WorldClock_tokyo_coordinate[];
+extern const Coord LCM_WorldClock_sydney_coordinate[];
 
 extern const int LCM_Clock_Dial_coordinate_length;
 extern const int LCM_Clock_Digit_coordinate_length;
@@ -48,6 +51,9 @@ extern const int LCM_WorldClock_shanghai_coordinate_length;
 extern const int LCM_WorldClock_beijing_coordinate_length;
 extern const int LCM_WorldClock_hongkong_coordinate_length;
 extern const int LCM_WorldClock_taipei_coordinate_length;
+extern const int LCM_WorldClock_seoul_coordinate_length;
+extern const int LCM_WorldClock_tokyo_coordinate_length;
+extern const int LCM_WorldClock_sydney_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time* Alarm_Clock_List;

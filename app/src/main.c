@@ -61,6 +61,9 @@ MAPS_WorldClock_Timezone MAPS_WorldClock_TimezoneN[MAPS_WorldClock_Timezone_Max]
   MAPS_WorldClock_Timezone_Shanghai,
   MAPS_WorldClock_Timezone_Hongkong,
   MAPS_WorldClock_Timezone_Taipei,
+  MAPS_WorldClock_Timezone_Seoul,
+  MAPS_WorldClock_Timezone_Tokyo,
+  MAPS_WorldClock_Timezone_Sydney,
 };
 
 /*
@@ -71,6 +74,9 @@ MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max
   {MAPS_WorldClock_Timezone_Shanghai, 8, 0},
   {MAPS_WorldClock_Timezone_Hongkong, 8, 0},
   {MAPS_WorldClock_Timezone_Taipei, 8, 0},
+  {MAPS_WorldClock_Timezone_Seoul, 9, 0},
+  {MAPS_WorldClock_Timezone_Tokyo, 9, 0},
+  {MAPS_WorldClock_Timezone_Sydney, 10, 0},
 };
 
 /*
