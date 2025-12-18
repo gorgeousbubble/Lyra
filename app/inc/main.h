@@ -73,10 +73,13 @@ typedef enum
   MAPS_WorldClock_Timezone_Shanghai = 1, // Shanghai Timezone (+8)
   MAPS_WorldClock_Timezone_Hongkong = 2, // Hong Kong Timezone (+8)
   MAPS_WorldClock_Timezone_Taipei = 3,   // Taipei Timezone (+8)
-  MAPS_WorldClock_Timezone_Seoul = 4,    // Seoul Timezone (+9)
-  MAPS_WorldClock_Timezone_Tokyo = 5,    // Tokyo Timezone (+9)
-  MAPS_WorldClock_Timezone_Sydney = 6,    // Sydney Timezone (+10)
-  MAPS_WorldClock_Timezone_Max = 7, // Maximum World Clock timezone
+  MAPS_WorldClock_Timezone_Singapore = 4, // Singapore Timezone (+8)
+  MAPS_WorldClock_Timezone_Seoul = 5,    // Seoul Timezone (+9)
+  MAPS_WorldClock_Timezone_Tokyo = 6,    // Tokyo Timezone (+9)
+  MAPS_WorldClock_Timezone_Sydney = 7,    // Sydney Timezone (+10)
+  MAPS_WorldClock_Timezone_SanFrancisco = 8, // San Francisco Timezone (-8)
+  MAPS_WorldClock_Timezone_NewYork = 9,    // New York Timezone (-5)
+  MAPS_WorldClock_Timezone_Max = 10, // Maximum World Clock timezone
 } MAPS_WorldClock_Timezone;
 
 typedef struct MAPS_WorldClock_Time
