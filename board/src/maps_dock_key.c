@@ -441,9 +441,11 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_Clock_Style < 0)
         {
           Lyra_Clock_Style = MAPS_Clock_Style_Max - 1; // Reset to maximum clock style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 0, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 0, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 0, 0, 5);
         } else {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 0, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 0, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 0, 0, 5);
         }
       }
       // Check current menu selection is stopwatch
@@ -453,9 +455,11 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_StopWatch_Style < 0)
         {
           Lyra_StopWatch_Style = MAPS_StopWatch_Style_Max - 1; // Reset to maximum stopwatch style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 0, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_Buf, LCM_StopWatch_Dial_Buf_Size, LCM_StopWatch_Digit_Buf, LCM_StopWatch_Digit_Buf_Size, 0, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 0, 0, 5);
         } else {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 0, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_Buf, LCM_StopWatch_Digit_Buf_Size, LCM_StopWatch_Dial_Buf, LCM_StopWatch_Dial_Buf_Size, 0, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 0, 0, 5);
         }
       }
       // Check current menu selection is alarm clock
@@ -584,9 +588,11 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_Clock_Style >= MAPS_Clock_Style_Max)
         {
           Lyra_Clock_Style = 0; // Reset to clock dial style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 1, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 1, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 1, 0, 5);
         } else {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 1, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 1, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 1, 0, 5);
         }
       }
       // Check current menu selection is stopwatch
@@ -596,9 +602,11 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_StopWatch_Style >= MAPS_StopWatch_Style_Max)
         {
           Lyra_StopWatch_Style = 0; // Reset to stopwatch dial style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 1, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_Buf, LCM_StopWatch_Digit_Buf_Size, LCM_StopWatch_Dial_Buf, LCM_StopWatch_Dial_Buf_Size, 1, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 1, 0, 5);
         } else {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 1, 0, 5);
+          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_Buf, LCM_StopWatch_Dial_Buf_Size, LCM_StopWatch_Digit_Buf, LCM_StopWatch_Digit_Buf_Size, 1, 0, 5);
+          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 1, 0, 5);
         }
       }
       // Check current menu selection is alarm clock
@@ -675,21 +683,21 @@ void MAPS_Dock_KEY_Incident(void)
     case MAPS_Menu_Clock:
       if (Lyra_Clock_Style == MAPS_Clock_Dial)
       {
-        Render_Clock_Current_Time_Dial(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+        Render_Clock_Current_Time_Dial(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, &LCM_Clock_Dial_Buf, &LCM_Clock_Dial_Buf_Size, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
       }
       else if (Lyra_Clock_Style == MAPS_Clock_Digit)
       {
-        Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+        Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, &LCM_Clock_Digit_Buf, &LCM_Clock_Digit_Buf_Size, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
       }
       break;
     case MAPS_Menu_StopWatch:
       if (Lyra_StopWatch_Style == MAPS_StopWatch_Dial)
       {
-        Render_Stop_Watch_Current_Time_Dial(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+        Render_Stop_Watch_Current_Time_Dial(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, &LCM_StopWatch_Dial_Buf, &LCM_StopWatch_Dial_Buf_Size, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
       }
       else if (Lyra_StopWatch_Style == MAPS_StopWatch_Digital)
       {
-        Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+        Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, &LCM_StopWatch_Digit_Buf, &LCM_StopWatch_Digit_Buf_Size, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
       }
       break;
     case MAPS_Menu_AlarmClock:

@@ -47,6 +47,16 @@ const int LCM_WorldClock_singapore_coordinate_length = ARRAY_LENGTH(LCM_WorldClo
 const int LCM_WorldClock_sanfrancisco_coordinate_length = ARRAY_LENGTH(LCM_WorldClock_sanfrancisco_coordinate);
 const int LCM_WorldClock_newyork_coordinate_length = ARRAY_LENGTH(LCM_WorldClock_newyork_coordinate);
 
+Coord *LCM_Clock_Dial_Buf = NULL;// Clock dial buffer
+Coord *LCM_Clock_Digit_Buf = NULL;// Clock digit buffer
+Coord *LCM_StopWatch_Dial_Buf = NULL;// Stopwatch dial buffer
+Coord *LCM_StopWatch_Digit_Buf = NULL;// Stopwatch digit buffer
+
+int LCM_Clock_Dial_Buf_Size = 0;// Clock dial buffer size
+int LCM_Clock_Digit_Buf_Size = 0;// Clock digit buffer size
+int LCM_StopWatch_Dial_Buf_Size = 0;// Stopwatch dial buffer size
+int LCM_StopWatch_Digit_Buf_Size = 0;// Stopwatch digit buffer size
+
 /*
 **Alarm Clock timer
 */
@@ -62,7 +72,7 @@ int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
  *  @since      v1.0
  *  Sample usage:       Render_Clock_Current_Time_Dial(10,15,30);
 */
-void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour,int minute,int second)
+void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, Coord** buff, int* buffSize, int hour,int minute,int second)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -326,6 +336,38 @@ void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int ho
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
+  // clen the buff if buff is not NULL
+  if (buff != NULL)
+  {
+    if (*buff != NULL)
+    {
+      free(*buff);
+      *buff = NULL;
+    }
+    // calculate the length of the linked list
+    CoordNode* temp = head;
+    int len = 0;
+    for (temp = head; temp != NULL; temp = temp->next) 
+    {
+      len++;
+    }
+    // allocate buffer
+    *buffSize = dialLen + len;
+    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
+    // copy the coordinates to the buffer
+    for (int i = 0; i < dialLen; i++) 
+    {
+      (*buff)[i].x = dial[i].x;
+      (*buff)[i].y = dial[i].y;
+    }
+    temp = head;
+    for (int i = 0; i < len; i++) 
+    {
+      (*buff)[dialLen + i].x = temp->x;
+      (*buff)[dialLen + i].y = temp->y;
+      temp = temp->next;
+    }
+  }
   // free the linked list
   while (head != NULL) 
   {
@@ -344,7 +386,7 @@ void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int ho
  *  @since      v1.0
  *  Sample usage:       Render_Clock_Current_Time_Digit(10,15);
 */
-void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour,int minute)
+void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, Coord** buff, int* buffSize, int hour,int minute)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -420,6 +462,38 @@ void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
+  // clen the buff if buff is not NULL
+  if (buff != NULL)
+  {
+    if (*buff != NULL)
+    {
+      free(*buff);
+      *buff = NULL;
+    }
+    // calculate the length of the linked list
+    CoordNode* temp = head;
+    int len = 0;
+    for (temp = head; temp != NULL; temp = temp->next) 
+    {
+      len++;
+    }
+     // allocate buffer
+    *buffSize = digitLen + len;
+    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
+    // copy the coordinates to the buffer
+    for (int i = 0; i < digitLen; i++) 
+    {
+      (*buff)[i].x = digit[i].x;
+      (*buff)[i].y = digit[i].y;
+    }
+    temp = head;
+    for (int i = 0; i < len; i++) 
+    {
+      (*buff)[digitLen + i].x = temp->x;
+      (*buff)[digitLen + i].y = temp->y;
+      temp = temp->next;
+    }
+  }
   // free the linked list
   while (head != NULL) 
   {
@@ -438,7 +512,7 @@ void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int
  *  @since      v1.0
  *  Sample usage:       Watch_Render_Stop_Watch_Time_Dial(10,15,90);
 */
-void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond)
+void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, Coord** buff, int* buffSize, int minute, int second, int centisecond)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -642,6 +716,38 @@ void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, i
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
+  // clen the buff if buff is not NULL
+  if (buff != NULL)
+  {
+    if (*buff != NULL)
+    {
+      free(*buff);
+      *buff = NULL;
+    }
+    // calculate the length of the linked list
+    CoordNode* temp = head;
+    int len = 0;
+    for (temp = head; temp != NULL; temp = temp->next) 
+    {
+      len++;
+    }
+    // allocate buffer
+    *buffSize = dialLen + len;
+    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
+    // copy the coordinates to the buffer
+    for (int i = 0; i < dialLen; i++) 
+    {
+      (*buff)[i].x = dial[i].x;
+      (*buff)[i].y = dial[i].y;
+    }
+    temp = head;
+    for (int i = 0; i < len; i++) 
+    {
+      (*buff)[dialLen + i].x = temp->x;
+      (*buff)[dialLen + i].y = temp->y;
+      temp = temp->next;
+    }
+  }
   // free the linked list
   while (head != NULL) 
   {
@@ -660,7 +766,7 @@ void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, i
  *  @since      v1.0
  *  Sample usage:       Watch_Render_Stop_Watch_Time_Digit(10,15,90);
 */
-void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond)
+void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, Coord** buff, int* buffSize, int minute, int second, int centisecond)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -718,6 +824,38 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
   for (current = head; current != NULL; current = current->next) 
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
+  }
+   // clen the buff if buff is not NULL
+  if (buff != NULL)
+  {
+    if (*buff != NULL)
+    {
+      free(*buff);
+      *buff = NULL;
+    }
+    // calculate the length of the linked list
+    CoordNode* temp = head;
+    int len = 0;
+    for (temp = head; temp != NULL; temp = temp->next) 
+    {
+      len++;
+    }
+     // allocate buffer
+    *buffSize = digitLen + len;
+    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
+    // copy the coordinates to the buffer
+    for (int i = 0; i < digitLen; i++) 
+    {
+      (*buff)[i].x = digit[i].x;
+      (*buff)[i].y = digit[i].y;
+    }
+    temp = head;
+    for (int i = 0; i < len; i++) 
+    {
+      (*buff)[digitLen + i].x = temp->x;
+      (*buff)[digitLen + i].y = temp->y;
+      temp = temp->next;
+    }
   }
   // free the linked list
   while (head != NULL) 

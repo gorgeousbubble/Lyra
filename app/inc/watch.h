@@ -61,6 +61,16 @@ extern const int LCM_WorldClock_singapore_coordinate_length;
 extern const int LCM_WorldClock_sanfrancisco_coordinate_length;
 extern const int LCM_WorldClock_newyork_coordinate_length;
 
+extern Coord *LCM_Clock_Dial_Buf;// Clock dial buffer
+extern Coord *LCM_Clock_Digit_Buf;// Clock digit buffer
+extern Coord *LCM_StopWatch_Dial_Buf;// Stopwatch dial buffer
+extern Coord *LCM_StopWatch_Digit_Buf;// Stopwatch digit buffer
+
+extern int LCM_Clock_Dial_Buf_Size;// Clock dial buffer size
+extern int LCM_Clock_Digit_Buf_Size;// Clock digit buffer size
+extern int LCM_StopWatch_Dial_Buf_Size;// Stopwatch dial buffer size
+extern int LCM_StopWatch_Digit_Buf_Size;// Stopwatch digit buffer size
+
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time* Alarm_Clock_List;
 extern int Alarm_Clock_Max_Len;
@@ -68,10 +78,10 @@ extern int Alarm_Clock_Max_Len;
 /*
 **function declaration
 */
-extern void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour, int minute, int second);
-extern void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute);
-extern void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond);
-extern void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond);
+extern void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, Coord** buff, int* buffSize, int hour, int minute, int second);
+extern void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, Coord** buff, int* buffSize, int hour, int minute);
+extern void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, Coord** buff, int* buffSize, int minute, int second, int centisecond);
+extern void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, Coord** buff, int* buffSize, int minute, int second, int centisecond);
 extern void Render_Alarm_Clock_List(int cursor);
 extern void Render_Alarm_Clock_Edit(int hour, int minute, int cursor, int number);
 extern void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute);
