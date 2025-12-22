@@ -51,11 +51,31 @@ Coord *LCM_Clock_Dial_Buf = NULL;// Clock dial buffer
 Coord *LCM_Clock_Digit_Buf = NULL;// Clock digit buffer
 Coord *LCM_StopWatch_Dial_Buf = NULL;// Stopwatch dial buffer
 Coord *LCM_StopWatch_Digit_Buf = NULL;// Stopwatch digit buffer
+Coord *LCM_WorldClock_shanghai_Buf = NULL;// World clock Shanghai buffer
+Coord *LCM_WorldClock_beijing_Buf = NULL;// World clock Beijing buffer
+Coord *LCM_WorldClock_hongkong_Buf = NULL;// World clock Hong Kong
+Coord *LCM_WorldClock_taipei_Buf = NULL;// World clock Taipei buffer
+Coord *LCM_WorldClock_seoul_Buf = NULL;// World clock Seoul buffer
+Coord *LCM_WorldClock_tokyo_Buf = NULL;// World clock Tokyo buffer
+Coord *LCM_WorldClock_sydney_Buf = NULL;// World clock Sydney buffer
+Coord *LCM_WorldClock_singapore_Buf = NULL;// World clock Singapore buffer
+Coord *LCM_WorldClock_sanfrancisco_Buf = NULL;// World clock San Francisco buffer
+Coord *LCM_WorldClock_newyork_Buf = NULL;// World clock New York buffer
 
 int LCM_Clock_Dial_Buf_Size = 0;// Clock dial buffer size
 int LCM_Clock_Digit_Buf_Size = 0;// Clock digit buffer size
 int LCM_StopWatch_Dial_Buf_Size = 0;// Stopwatch dial buffer size
 int LCM_StopWatch_Digit_Buf_Size = 0;// Stopwatch digit buffer size
+int LCM_WorldClock_shanghai_Buf_Size = 0;// World clock Shanghai buffer size
+int LCM_WorldClock_beijing_Buf_Size = 0;// World clock Beijing buffer
+int LCM_WorldClock_hongkong_Buf_Size = 0;// World clock Hong Kong buffer size
+int LCM_WorldClock_taipei_Buf_Size = 0;// World clock Taipei buffer size
+int LCM_WorldClock_seoul_Buf_Size = 0;// World clock Seoul buffer size
+int LCM_WorldClock_tokyo_Buf_Size = 0;// World clock Tokyo buffer size
+int LCM_WorldClock_sydney_Buf_Size = 0;// World clock Sydney buffer size
+int LCM_WorldClock_singapore_Buf_Size = 0;// World clock Singapore
+int LCM_WorldClock_sanfrancisco_Buf_Size = 0;// World clock San Francisco buffer size
+int LCM_WorldClock_newyork_Buf_Size = 0;// World clock New York buffer size
 
 /*
 **Alarm Clock timer
@@ -825,7 +845,7 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
-   // clen the buff if buff is not NULL
+  // clen the buff if buff is not NULL
   if (buff != NULL)
   {
     if (*buff != NULL)
@@ -1105,7 +1125,7 @@ void Render_Alarm_Clock_Edit(int hour, int minute, int cursor, int number)
  *  @since      v1.0
  *  Sample usage:       Render_World_Clock_Time(10,15,90);
 */
-void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute)
+void Render_World_Clock_Time(const Coord *city, const int cityLen, Coord** buff, int* buffSize, MAPS_WorldClock_Time time, int hour, int minute)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -1479,6 +1499,38 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClo
   for (current = head; current != NULL; current = current->next) 
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
+  }
+  // clen the buff if buff is not NULL
+  if (buff != NULL)
+  {
+    if (*buff != NULL)
+    {
+      free(*buff);
+      *buff = NULL;
+    }
+    // calculate the length of the linked list
+    CoordNode* temp = head;
+    int len = 0;
+    for (temp = head; temp != NULL; temp = temp->next) 
+    {
+      len++;
+    }
+     // allocate buffer
+    *buffSize = cityLen + len;
+    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
+    // copy the coordinates to the buffer
+    for (int i = 0; i < cityLen; i++) 
+    {
+      (*buff)[i].x = city[i].x;
+      (*buff)[i].y = city[i].y;
+    }
+    temp = head;
+    for (int i = 0; i < len; i++) 
+    {
+      (*buff)[cityLen + i].x = temp->x;
+      (*buff)[cityLen + i].y = temp->y;
+      temp = temp->next;
+    }
   }
   // free the linked list
   while (head != NULL) 
