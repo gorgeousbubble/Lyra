@@ -1754,3 +1754,173 @@ void Read_Alarm_Clock_E2PROM_To_List()
       }
   }
 }
+
+/*
+ *  @brief      Clean_Dynamic_Cache_Array
+ *  @param      int             menu       menu page index integer parameter
+ *  @param      int             app        app page index integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Clean_Dynamic_Cache_Array(10,15,90);
+*/
+void Clean_Dynamic_Cache_Array(int menu, int app)
+{
+  // clean unused dynamic cache array for free heap memory
+  switch (menu)
+  {
+  case MAPS_Menu_Clock:
+    // clean stop watch cache array
+    Free_Cache_Array(&LCM_StopWatch_Dial_Buf, &LCM_StopWatch_Dial_Buf_Size);
+    Free_Cache_Array(&LCM_StopWatch_Digit_Buf, &LCM_StopWatch_Digit_Buf_Size);
+    // clean world clock cache array
+    Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+    break;
+  case MAPS_Menu_StopWatch:
+    // clean clock cache array
+    Free_Cache_Array(&LCM_Clock_Dial_Buf, &LCM_Clock_Dial_Buf_Size);
+    Free_Cache_Array(&LCM_Clock_Digit_Buf, &LCM_Clock_Digit_Buf_Size);
+    // clean world clock cache array
+    Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+    Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+    break;
+  case MAPS_Menu_WorldClock:
+    // clean clock cache array
+    Free_Cache_Array(&LCM_Clock_Dial_Buf, &LCM_Clock_Dial_Buf_Size);
+    Free_Cache_Array(&LCM_Clock_Digit_Buf, &LCM_Clock_Digit_Buf_Size);
+    // clean stop watch cache array
+    Free_Cache_Array(&LCM_StopWatch_Dial_Buf, &LCM_StopWatch_Dial_Buf_Size);
+    Free_Cache_Array(&LCM_StopWatch_Digit_Buf, &LCM_StopWatch_Digit_Buf_Size);
+    switch (app)
+    {
+      case MAPS_WorldClock_Timezone_Beijing:
+        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_Shanghai:
+        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_Hongkong:
+        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_Taipei:
+        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_Singapore:
+        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_Seoul:
+        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_Tokyo:
+        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_Sydney:
+        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_SanFrancisco:
+        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+        break;
+      case MAPS_WorldClock_Timezone_NewYork:
+        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
+        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
+        break;
+      default:
+        break;
+    }
+    break;
+  default:
+    break;
+  }
+}
+
+/*
+ *  @brief      Free_Cache_Array
+ *  @param      Coord**          buff            buffer pointer parameter
+ *  @param      int             buffSize        buffer size integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Free_Cache_Array(10,15,90);
+*/
+void Free_Cache_Array(Coord** buff, int* buffSize)
+{
+  // free cache array for free heap memory
+  if (buff != NULL && *buff != NULL)
+  {
+    free(*buff);
+    *buff = NULL;
+    *buffSize = 0;
+  }
+}

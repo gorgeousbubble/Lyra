@@ -115,4 +115,7 @@ extern void Clean_Alarm_Clock_List();
 extern void Write_Alarm_Clock_List_To_E2PROM();
 extern void Read_Alarm_Clock_E2PROM_To_List();
 
+extern void Clean_Dynamic_Cache_Array(int menu, int app);
+extern void Free_Cache_Array(Coord** buff, int* buffSize);
+
 #endif

@@ -441,11 +441,39 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_Clock_Style < 0)
         {
           Lyra_Clock_Style = MAPS_Clock_Style_Max - 1; // Reset to maximum clock style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 0, 0, 5);
-          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 0, 0, 5);
+          if (LCM_Clock_Dial_Buf != NULL && LCM_Clock_Digit_Buf != NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 0, 0, 5);
+          } 
+          else if (LCM_Clock_Dial_Buf != NULL && LCM_Clock_Digit_Buf == NULL) 
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 0, 0, 5);
+          } 
+          else if (LCM_Clock_Dial_Buf == NULL && LCM_Clock_Digit_Buf != NULL) 
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 0, 0, 5);
+          } 
+          else 
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 0, 0, 5);
+          }
         } else {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 0, 0, 5);
-          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 0, 0, 5);
+          if (LCM_Clock_Digit_Buf != NULL && LCM_Clock_Dial_Buf != NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 0, 0, 5);
+          }
+          else if (LCM_Clock_Digit_Buf != NULL && LCM_Clock_Dial_Buf == NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 0, 0, 5);
+          }
+          else if (LCM_Clock_Digit_Buf == NULL && LCM_Clock_Dial_Buf != NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 0, 0, 5);
+          }
+          else
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 0, 0, 5);
+          }
         }
       }
       // Check current menu selection is stopwatch
@@ -598,11 +626,39 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_Clock_Style >= MAPS_Clock_Style_Max)
         {
           Lyra_Clock_Style = 0; // Reset to clock dial style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 1, 0, 5);
-          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 1, 0, 5);
+          if (LCM_Clock_Digit_Buf != NULL && LCM_Clock_Dial_Buf != NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 1, 0, 5);
+          }
+          else if (LCM_Clock_Digit_Buf != NULL && LCM_Clock_Dial_Buf == NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 1, 0, 5);
+          }
+          else if (LCM_Clock_Digit_Buf == NULL && LCM_Clock_Dial_Buf != NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, 1, 0, 5);
+          }
+          else
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 1, 0, 5);
+          }
         } else {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 1, 0, 5);
-          //Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 1, 0, 5);
+          if (LCM_Clock_Digit_Buf != NULL && LCM_Clock_Dial_Buf != NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 1, 0, 5);
+          }
+          else if (LCM_Clock_Digit_Buf != NULL && LCM_Clock_Dial_Buf == NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_Buf, LCM_Clock_Dial_Buf_Size, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 1, 0, 5);
+          }
+          else if (LCM_Clock_Digit_Buf == NULL && LCM_Clock_Dial_Buf != NULL)
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_Buf, LCM_Clock_Digit_Buf_Size, 1, 0, 5);
+          }
+          else
+          {
+            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 1, 0, 5);
+          }
         }
       }
       // Check current menu selection is stopwatch
@@ -709,6 +765,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, &LCM_Clock_Digit_Buf, &LCM_Clock_Digit_Buf_Size, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
       }
+      Clean_Dynamic_Cache_Array(MAPS_Menu_SelectionN[Lyra_Menu_Selection], Lyra_Clock_Style);
       break;
     case MAPS_Menu_StopWatch:
       if (Lyra_StopWatch_Style == MAPS_StopWatch_Dial)
@@ -719,6 +776,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, &LCM_StopWatch_Digit_Buf, &LCM_StopWatch_Digit_Buf_Size, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
       }
+      Clean_Dynamic_Cache_Array(MAPS_Menu_SelectionN[Lyra_Menu_Selection], Lyra_StopWatch_Style);
       break;
     case MAPS_Menu_AlarmClock:
       if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
@@ -771,6 +829,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Render_World_Clock_Time(LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, &LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size, MAPS_WorldClock_Timezone_Array[9], RTC_Time_Now.Hour - 13, RTC_Time_Now.Minute);
       }
+      Clean_Dynamic_Cache_Array(MAPS_Menu_SelectionN[Lyra_Menu_Selection], Lyra_WorldClock_Time_Cursor);
       break;
     default:
       break;
