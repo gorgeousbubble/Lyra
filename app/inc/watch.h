@@ -69,9 +69,9 @@ extern int Alarm_Clock_Max_Len;
 **function declaration
 */
 extern void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int hour,int minute,int second);
-extern void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour,int minute);
-extern void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen,  int minute,int second,int centisecond);
-extern void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen,  int minute,int second,int centisecond);
+extern void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute);
+extern void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen,  int minute,int second, int centisecond);
+extern void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen,  int minute,int second, int centisecond);
 extern void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute);
 extern void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour, int minute, int second);
 extern void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute);

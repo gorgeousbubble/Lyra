@@ -56,7 +56,7 @@ typedef enum
 typedef enum
 {
   MAPS_StopWatch_Dial = 0,      // Stop Watch Dial
-  MAPS_StopWatch_Digital = 1,   // Stop Watch Digital
+  MAPS_StopWatch_Digit = 1,   // Stop Watch Digital
   MAPS_StopWatch_Style_Max = 2, // Maximum Stop Watch style
 } MAPS_StopWatch_Style;
 

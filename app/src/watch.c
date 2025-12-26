@@ -66,7 +66,7 @@ int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
  *  @since      v1.0
  *  Sample usage:       Calc_Clock_Current_Time_Dial(&array, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 10, 30, 45);
 */
-void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int hour,int minute,int second)
+void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int hour, int minute, int second)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -358,7 +358,7 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
  *  @since      v1.0
  *  Sample usage:       Calc_Clock_Current_Time_Digit(&array, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
 */
-void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour,int minute)
+void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;

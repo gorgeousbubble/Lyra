@@ -13,6 +13,7 @@
 #ifndef __MAPS_DOCK_KEY_H__
 #define __MAPS_DOCK_KEY_H__
 
+#include "animation.h"
 #include "common.h"
 #include "main.h"
 #include "port.h"
@@ -58,5 +59,9 @@ extern void MAPS_Dock_KEY_KEYn_Init(MAPS_Dock_KEYn MAPS_Dock_KEYx);
 extern uint8 MAPS_Dock_KEY_KEYn_Get(MAPS_Dock_KEYn MAPS_Dock_KEYx);
 extern MAPS_Dock_KEY_Status MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEYn MAPS_Dock_KEYx);
 extern void MAPS_Dock_KEY_Incident(void);
+
+extern void Calc_Dynamic_Animation_Cache_Array(Coord** buff, int* buffSize, const uint8 array[64][16]);
+extern void Release_Dynamic_Animation_Cache(CoordCache* array, int len);
+extern void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int index[2]);
 
 #endif

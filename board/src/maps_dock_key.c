@@ -36,6 +36,8 @@ int Lyra_AlarmClock_Edit_Cursor = 0;      // Alarm Clock edit cursor
 int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
 int Lyra_WorldClock_Time_Cursor = 0;  // World Clock time cursor
 
+CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
+
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
  *  @since      v1.0
@@ -437,28 +439,40 @@ void MAPS_Dock_KEY_Incident(void)
       // Check current menu selection is clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Clock)
       {
+        int index[2] = {MAPS_Clock_Dial, MAPS_Clock_Digit};
         Lyra_Clock_Style--; // Switch clock style
         if (Lyra_Clock_Style < 0)
         {
           Lyra_Clock_Style = MAPS_Clock_Style_Max - 1; // Reset to maximum clock style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 0, 0, 5);
+          index[0] = MAPS_Clock_Dial;
+          index[1] = MAPS_Clock_Digit;
         } 
         else 
         {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 0, 0, 5);
+          index[0] = MAPS_Clock_Digit;
+          index[1] = MAPS_Clock_Dial;
         }
+        Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 0, 0, 5);
       }
       // Check current menu selection is stopwatch
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_StopWatch)
       {
+        int index[2] = {MAPS_StopWatch_Dial, MAPS_StopWatch_Digit};
         Lyra_StopWatch_Style--; // Switch stopwatch style
         if (Lyra_StopWatch_Style < 0)
         {
           Lyra_StopWatch_Style = MAPS_StopWatch_Style_Max - 1; // Reset to maximum stopwatch style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 0, 0, 5);
-        } else {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 0, 0, 5);
+          index[0] = MAPS_StopWatch_Dial;
+          index[1] = MAPS_StopWatch_Digit;
         }
+        else 
+        {
+          index[0] = MAPS_StopWatch_Digit;
+          index[1] = MAPS_StopWatch_Dial;
+        }
+        Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 0, 0, 5);
       }
       // Check current menu selection is alarm clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AlarmClock)
@@ -531,50 +545,64 @@ void MAPS_Dock_KEY_Incident(void)
       // check current menu selection is world clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_WorldClock)
       {
+        int index[2] = {MAPS_WorldClock_Timezone_Beijing, MAPS_WorldClock_Timezone_Shanghai};
         Lyra_WorldClock_Time_Cursor--; // Move world clock time cursor up
         if (Lyra_WorldClock_Time_Cursor < 0)
         {
           Lyra_WorldClock_Time_Cursor = MAPS_WorldClock_Timezone_Max - 1; // Reset to minimum world clock time cursor position
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, 0, 0, 5);
+          index[0] = MAPS_WorldClock_Timezone_Beijing;
+          index[1] = MAPS_WorldClock_Timezone_NewYork;
         } 
         else 
         {
-          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Beijing) {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, 0, 0, 5);
+          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Beijing) 
+          {
+            index[0] = MAPS_WorldClock_Timezone_Shanghai;
+            index[1] = MAPS_WorldClock_Timezone_Beijing;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Hongkong;
+            index[1] = MAPS_WorldClock_Timezone_Shanghai;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Hongkong)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Taipei;
+            index[1] = MAPS_WorldClock_Timezone_Hongkong;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Taipei)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_singapore_coordinate, LCM_WorldClock_singapore_coordinate_length, LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Singapore;
+            index[1] = MAPS_WorldClock_Timezone_Taipei;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Singapore)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_seoul_coordinate, LCM_WorldClock_seoul_coordinate_length, LCM_WorldClock_singapore_coordinate, LCM_WorldClock_singapore_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Seoul;
+            index[1] = MAPS_WorldClock_Timezone_Singapore;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Seoul)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_tokyo_coordinate, LCM_WorldClock_tokyo_coordinate_length, LCM_WorldClock_seoul_coordinate, LCM_WorldClock_seoul_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Tokyo;
+            index[1] = MAPS_WorldClock_Timezone_Seoul;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Tokyo)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_sydney_coordinate, LCM_WorldClock_sydney_coordinate_length, LCM_WorldClock_tokyo_coordinate, LCM_WorldClock_tokyo_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Sydney;
+            index[1] = MAPS_WorldClock_Timezone_Tokyo;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Sydney)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_sanfrancisco_coordinate, LCM_WorldClock_sanfrancisco_coordinate_length, LCM_WorldClock_sydney_coordinate, LCM_WorldClock_sydney_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_SanFrancisco;
+            index[1] = MAPS_WorldClock_Timezone_Sydney;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_SanFrancisco)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, LCM_WorldClock_sanfrancisco_coordinate, LCM_WorldClock_sanfrancisco_coordinate_length, 0, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_NewYork;
+            index[1] = MAPS_WorldClock_Timezone_SanFrancisco;
           }
         }
+        Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 0, 0, 5);
       }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
@@ -584,30 +612,40 @@ void MAPS_Dock_KEY_Incident(void)
       // Check current menu selection is clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Clock)
       {
+        int index[2] = {MAPS_Clock_Dial, MAPS_Clock_Digit};
         Lyra_Clock_Style++; // Switch clock style
         if (Lyra_Clock_Style >= MAPS_Clock_Style_Max)
         {
           Lyra_Clock_Style = 0; // Reset to clock dial style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 1, 0, 5);
+          index[0] = MAPS_Clock_Digit;
+          index[1] = MAPS_Clock_Dial;
         } 
         else 
         {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 1, 0, 5);
+          index[0] = MAPS_Clock_Dial;
+          index[1] = MAPS_Clock_Digit;
         }
+        Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
       }
       // Check current menu selection is stopwatch
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_StopWatch)
       {
+        int index[2] = {MAPS_StopWatch_Dial, MAPS_StopWatch_Digit};
         Lyra_StopWatch_Style++; // Switch stopwatch style
         if (Lyra_StopWatch_Style >= MAPS_StopWatch_Style_Max)
         {
           Lyra_StopWatch_Style = 0; // Reset to stopwatch dial style
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 1, 0, 5);
+          index[0] = MAPS_StopWatch_Digit;
+          index[1] = MAPS_StopWatch_Dial;
         } 
         else 
         {
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 1, 0, 5);
+          index[0] = MAPS_StopWatch_Dial;
+          index[1] = MAPS_StopWatch_Digit;
         }
+        Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
       }
       // Check current menu selection is alarm clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AlarmClock)
@@ -632,50 +670,64 @@ void MAPS_Dock_KEY_Incident(void)
       // check current menu selection is world clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_WorldClock)
       {
+        int index[2] = {MAPS_WorldClock_Timezone_Beijing, MAPS_WorldClock_Timezone_Shanghai};
         Lyra_WorldClock_Time_Cursor++; // Move world clock time cursor up
         if (Lyra_WorldClock_Time_Cursor >= MAPS_WorldClock_Timezone_Max)
         {
           Lyra_WorldClock_Time_Cursor = 0; // Reset to minimum world clock time cursor position
-          Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, 1, 0, 5);
+          index[0] = MAPS_WorldClock_Timezone_NewYork;
+          index[1] = MAPS_WorldClock_Timezone_Beijing;
         } 
         else 
         {
-          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai) {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, 1, 0, 5);
+          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai) 
+          {
+            index[0] = MAPS_WorldClock_Timezone_Beijing;
+            index[1] = MAPS_WorldClock_Timezone_Shanghai;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Hongkong)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Shanghai;
+            index[1] = MAPS_WorldClock_Timezone_Hongkong;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Taipei)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Hongkong;
+            index[1] = MAPS_WorldClock_Timezone_Taipei;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Singapore)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, LCM_WorldClock_singapore_coordinate, LCM_WorldClock_singapore_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Taipei;
+            index[1] = MAPS_WorldClock_Timezone_Singapore;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Seoul)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_singapore_coordinate, LCM_WorldClock_singapore_coordinate_length, LCM_WorldClock_seoul_coordinate, LCM_WorldClock_seoul_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Singapore;
+            index[1] = MAPS_WorldClock_Timezone_Seoul;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Tokyo)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_seoul_coordinate, LCM_WorldClock_seoul_coordinate_length, LCM_WorldClock_tokyo_coordinate, LCM_WorldClock_tokyo_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Seoul;
+            index[1] = MAPS_WorldClock_Timezone_Tokyo;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Sydney)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_tokyo_coordinate, LCM_WorldClock_tokyo_coordinate_length, LCM_WorldClock_sydney_coordinate, LCM_WorldClock_sydney_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Tokyo;
+            index[1] = MAPS_WorldClock_Timezone_Sydney;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_SanFrancisco)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_sydney_coordinate, LCM_WorldClock_sydney_coordinate_length, LCM_WorldClock_sanfrancisco_coordinate, LCM_WorldClock_sanfrancisco_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_Sydney;
+            index[1] = MAPS_WorldClock_Timezone_SanFrancisco;
           }
           else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_NewYork)
           {
-            Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_WorldClock_sanfrancisco_coordinate, LCM_WorldClock_sanfrancisco_coordinate_length, LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, 1, 0, 5);
+            index[0] = MAPS_WorldClock_Timezone_SanFrancisco;
+            index[1] = MAPS_WorldClock_Timezone_NewYork;
           }
         }
+        Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
       }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
@@ -697,7 +749,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Render_Stop_Watch_Current_Time_Dial(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
       }
-      else if (Lyra_StopWatch_Style == MAPS_StopWatch_Digital)
+      else if (Lyra_StopWatch_Style == MAPS_StopWatch_Digit)
       {
         Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
       }
@@ -757,5 +809,201 @@ void MAPS_Dock_KEY_Incident(void)
     default:
       break;
     }
+  }
+}
+
+/*
+ *  @brief      Calc_Dynamic_Animation_Cache_Array
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Calc_Dynamic_Animation_Cache_Array(10,15,90);
+*/
+void Calc_Dynamic_Animation_Cache_Array(Coord** buff, int* buffSize, const uint8 array[64][16])
+{
+  CoordNode* head = NULL;
+  CoordNode* current = NULL;
+  int counter = 0;
+  // if buff is not NULL free the memory
+  if (*buff != NULL)
+  {
+    free(*buff);
+    *buff = NULL;
+    *buffSize = 0;
+  }
+  // conver array to coordinate array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
+    {
+      for (int k = 0; k < 8; k++)
+      {
+        if (array[i][j] & (0x01 << (7 - k)))
+        {
+          // if the pixel is set, add to coordinate array
+          uint8 x = j * 8 + k;
+          uint8 y = i;
+          // create a new coordinate node for the pixel
+          CoordNode* node = (CoordNode*)malloc(sizeof(CoordNode));
+          node->x = x;
+          node->y = y;
+          node->next = NULL;
+          // link the coordinate node to the list
+          if (head == NULL) {
+              head = node; // if head is NULL, set head to the coordinate node
+              current = head; // move current to the coordinate node
+          } else {
+              current->next = node; // link the coordinate node to the list
+              current = node; // move current to the coordinate node
+          }
+          // increment counter
+          counter++;
+        }
+      }
+    }
+  }
+  // return the coordinate array
+  *buffSize = counter;
+  *buff = (Coord*)malloc(sizeof(Coord) * counter);
+  int index = 0;
+  for (current = head; current != NULL; current = current->next) 
+  {
+    (*buff)[index].x = current->x;
+    (*buff)[index].y = current->y;
+    index++;
+  }
+  // free the linked list
+  while (head != NULL) 
+  {
+    CoordNode* temp = head;
+    head = head->next;
+    free(temp);
+  }
+}
+
+/*
+ *  @brief      Release_Dynamic_Animation_Cache
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Release_Dynamic_Animation_Cache(10,15,90);
+*/
+void Release_Dynamic_Animation_Cache(CoordCache* array, int len)
+{
+  for (int i = 0; i < len; i++)
+  {
+    // free dynamic animation cache
+    if (array[i].coord != NULL)
+    {
+      free(array[i].coord);
+      array[i].coord = NULL;
+      array[i].length = 0;
+    }
+  }
+}
+
+/*
+ *  @brief      Refresh_Dynamic_Animation_Cache
+ *  @param      int             hour            hour integer parameter
+ *  @param      int             minute          minute integer parameter
+ *  @since      v1.0
+ *  Sample usage:       Refresh_Dynamic_Animation_Cache(10,15,90);
+*/
+void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int index[2])
+{
+  uint8 cache[64][16] = {0x00}; // 64 rows, 128 columns
+  // release dynamic animation cache
+  Release_Dynamic_Animation_Cache(array, len);
+  // load dynamic animation cache according to menu and source and destination index
+  switch (menu)
+  {
+  case MAPS_Menu_Clock:
+    for (int i = 0; i < len; i++)
+    {
+      switch (index[i])
+      {
+        case MAPS_Clock_Dial:
+          Calc_Clock_Current_Time_Dial((uint8*)cache, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_Clock_Digit:
+          Calc_Clock_Current_Time_Digit((uint8*)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        default:
+          break;
+      } 
+    }
+    break;
+  case MAPS_Menu_StopWatch:
+    for (int i = 0; i < len; i++)
+    {
+      switch (index[i])
+      {
+        case MAPS_StopWatch_Dial:
+          Calc_Stop_Watch_Current_Time_Dial((uint8*)cache, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_StopWatch_Digit:
+          Calc_Stop_Watch_Current_Time_Digit((uint8*)cache, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        default:
+          break;
+      } 
+    }
+    break;
+  case MAPS_Menu_WorldClock:
+    for (int i = 0; i < len; i++)
+    {
+      switch (index[i])
+      {
+        case MAPS_WorldClock_Timezone_Beijing:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, MAPS_WorldClock_Timezone_Array[0], RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_Shanghai:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, MAPS_WorldClock_Timezone_Array[1], RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_Hongkong:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, MAPS_WorldClock_Timezone_Array[2], RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_Taipei:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, MAPS_WorldClock_Timezone_Array[3], RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_Singapore:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_singapore_coordinate, LCM_WorldClock_singapore_coordinate_length, MAPS_WorldClock_Timezone_Array[4], RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_Seoul:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_seoul_coordinate, LCM_WorldClock_seoul_coordinate_length, MAPS_WorldClock_Timezone_Array[5], RTC_Time_Now.Hour + 1, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_Tokyo:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_tokyo_coordinate, LCM_WorldClock_tokyo_coordinate_length, MAPS_WorldClock_Timezone_Array[6], RTC_Time_Now.Hour + 1, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_Sydney:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_sydney_coordinate, LCM_WorldClock_sydney_coordinate_length, MAPS_WorldClock_Timezone_Array[7], RTC_Time_Now.Hour + 2, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_SanFrancisco:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_sanfrancisco_coordinate, LCM_WorldClock_sanfrancisco_coordinate_length, MAPS_WorldClock_Timezone_Array[8], RTC_Time_Now.Hour - 16, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_WorldClock_Timezone_NewYork:
+          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, MAPS_WorldClock_Timezone_Array[9], RTC_Time_Now.Hour - 13, RTC_Time_Now.Minute);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        default:
+          break;
+      } 
+    }
+    break;
+  default:
+    break;
   }
 }

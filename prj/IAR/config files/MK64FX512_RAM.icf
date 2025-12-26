@@ -10,8 +10,8 @@ define symbol __ICFEDIT_region_ROM_end__   = 0x00080000;//ROM 512KB
 define symbol __ICFEDIT_region_RAM_start__ = 0x1fff0000;
 define symbol __ICFEDIT_region_RAM_end__   = 0x20000000;//SRAM:SRAM1:64KB SRAM2:192KB SRAM3:4KB
 /*-Sizes-*/
-define symbol __ICFEDIT_size_cstack__ = 0x2000;
-define symbol __ICFEDIT_size_heap__   = 0x4000;
+define symbol __ICFEDIT_size_cstack__ = 0x2000;//stack size 8KB
+define symbol __ICFEDIT_size_heap__   = 0x10000;//heap size 64KB
 /**** End of ICF editor section. ###ICF###*/
 // allocate for FlexNVM (128KB)
 define symbol __region_FlexNVM_start__  = 0x10000000;
