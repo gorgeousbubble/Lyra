@@ -47,36 +47,6 @@ const int LCM_WorldClock_singapore_coordinate_length = ARRAY_LENGTH(LCM_WorldClo
 const int LCM_WorldClock_sanfrancisco_coordinate_length = ARRAY_LENGTH(LCM_WorldClock_sanfrancisco_coordinate);
 const int LCM_WorldClock_newyork_coordinate_length = ARRAY_LENGTH(LCM_WorldClock_newyork_coordinate);
 
-Coord *LCM_Clock_Dial_Buf = NULL;// Clock dial buffer
-Coord *LCM_Clock_Digit_Buf = NULL;// Clock digit buffer
-Coord *LCM_StopWatch_Dial_Buf = NULL;// Stopwatch dial buffer
-Coord *LCM_StopWatch_Digit_Buf = NULL;// Stopwatch digit buffer
-Coord *LCM_WorldClock_shanghai_Buf = NULL;// World clock Shanghai buffer
-Coord *LCM_WorldClock_beijing_Buf = NULL;// World clock Beijing buffer
-Coord *LCM_WorldClock_hongkong_Buf = NULL;// World clock Hong Kong
-Coord *LCM_WorldClock_taipei_Buf = NULL;// World clock Taipei buffer
-Coord *LCM_WorldClock_seoul_Buf = NULL;// World clock Seoul buffer
-Coord *LCM_WorldClock_tokyo_Buf = NULL;// World clock Tokyo buffer
-Coord *LCM_WorldClock_sydney_Buf = NULL;// World clock Sydney buffer
-Coord *LCM_WorldClock_singapore_Buf = NULL;// World clock Singapore buffer
-Coord *LCM_WorldClock_sanfrancisco_Buf = NULL;// World clock San Francisco buffer
-Coord *LCM_WorldClock_newyork_Buf = NULL;// World clock New York buffer
-
-int LCM_Clock_Dial_Buf_Size = 0;// Clock dial buffer size
-int LCM_Clock_Digit_Buf_Size = 0;// Clock digit buffer size
-int LCM_StopWatch_Dial_Buf_Size = 0;// Stopwatch dial buffer size
-int LCM_StopWatch_Digit_Buf_Size = 0;// Stopwatch digit buffer size
-int LCM_WorldClock_shanghai_Buf_Size = 0;// World clock Shanghai buffer size
-int LCM_WorldClock_beijing_Buf_Size = 0;// World clock Beijing buffer
-int LCM_WorldClock_hongkong_Buf_Size = 0;// World clock Hong Kong buffer size
-int LCM_WorldClock_taipei_Buf_Size = 0;// World clock Taipei buffer size
-int LCM_WorldClock_seoul_Buf_Size = 0;// World clock Seoul buffer size
-int LCM_WorldClock_tokyo_Buf_Size = 0;// World clock Tokyo buffer size
-int LCM_WorldClock_sydney_Buf_Size = 0;// World clock Sydney buffer size
-int LCM_WorldClock_singapore_Buf_Size = 0;// World clock Singapore
-int LCM_WorldClock_sanfrancisco_Buf_Size = 0;// World clock San Francisco buffer size
-int LCM_WorldClock_newyork_Buf_Size = 0;// World clock New York buffer size
-
 /*
 **Alarm Clock timer
 */
@@ -85,14 +55,18 @@ Alarm_Clock_Time* Alarm_Clock_List = NULL;// Pointer to the head of the alarm cl
 int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
 
 /*
- *  @brief      Render_Clock_Current_Time_Dial
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
+ *  @brief      Calc_Clock_Current_Time_Dial
+ *  @param      uint8* array        OUT   Pointer to the array to store the clock dial coordinates
+ *  @param      const Coord *dial   IN    Pointer to the dial coordinate array
+ *  @param      const int dialLen   IN    Length of the dial coordinate array
+ *  @param      int hour            IN    Current hour
+ *  @param      int minute          IN    Current minute
+ *  @param      int second          IN    Current second
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Render_Clock_Current_Time_Dial(10,15,30);
+ *  Sample usage:       Calc_Clock_Current_Time_Dial(&array, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 10, 30, 45);
 */
-void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, Coord** buff, int* buffSize, int hour,int minute,int second)
+void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int hour,int minute,int second)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -356,38 +330,6 @@ void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, Coord*
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
-  // clen the buff if buff is not NULL
-  if (buff != NULL)
-  {
-    if (*buff != NULL)
-    {
-      free(*buff);
-      *buff = NULL;
-    }
-    // calculate the length of the linked list
-    CoordNode* temp = head;
-    int len = 0;
-    for (temp = head; temp != NULL; temp = temp->next) 
-    {
-      len++;
-    }
-    // allocate buffer
-    *buffSize = dialLen + len;
-    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
-    // copy the coordinates to the buffer
-    for (int i = 0; i < dialLen; i++) 
-    {
-      (*buff)[i].x = dial[i].x;
-      (*buff)[i].y = dial[i].y;
-    }
-    temp = head;
-    for (int i = 0; i < len; i++) 
-    {
-      (*buff)[dialLen + i].x = temp->x;
-      (*buff)[dialLen + i].y = temp->y;
-      temp = temp->next;
-    }
-  }
   // free the linked list
   while (head != NULL) 
   {
@@ -395,18 +337,28 @@ void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, Coord*
     head = head->next;
     free(temp);
   }
-  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+  // return the clock array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
+    {
+      *array++ = clock[i][j];
+    }
+  }
 }
 
 /*
- *  @brief      Render_Clock_Current_Time_Digit
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
+ *  @brief      Calc_Clock_Current_Time_Digit
+ *  @param      uint8* array        OUT   Pointer to the array to store the clock dial coordinates
+ *  @param      const Coord *dial   IN    Pointer to the dial coordinate array
+ *  @param      const int dialLen   IN    Length of the dial coordinate array
+ *  @param      int hour            IN    Current hour
+ *  @param      int minute          IN    Current minute
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Render_Clock_Current_Time_Digit(10,15);
+ *  Sample usage:       Calc_Clock_Current_Time_Digit(&array, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
 */
-void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, Coord** buff, int* buffSize, int hour,int minute)
+void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour,int minute)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -482,38 +434,6 @@ void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, Coo
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
-  // clen the buff if buff is not NULL
-  if (buff != NULL)
-  {
-    if (*buff != NULL)
-    {
-      free(*buff);
-      *buff = NULL;
-    }
-    // calculate the length of the linked list
-    CoordNode* temp = head;
-    int len = 0;
-    for (temp = head; temp != NULL; temp = temp->next) 
-    {
-      len++;
-    }
-     // allocate buffer
-    *buffSize = digitLen + len;
-    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
-    // copy the coordinates to the buffer
-    for (int i = 0; i < digitLen; i++) 
-    {
-      (*buff)[i].x = digit[i].x;
-      (*buff)[i].y = digit[i].y;
-    }
-    temp = head;
-    for (int i = 0; i < len; i++) 
-    {
-      (*buff)[digitLen + i].x = temp->x;
-      (*buff)[digitLen + i].y = temp->y;
-      temp = temp->next;
-    }
-  }
   // free the linked list
   while (head != NULL) 
   {
@@ -521,18 +441,29 @@ void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, Coo
     head = head->next;
     free(temp);
   }
-  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+  // return the clock array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
+    {
+      *array++ = clock[i][j];
+    }
+  }
 }
 
 /*
- *  @brief      Render_Stop_Watch_Current_Time_Dial
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      int             centisecond     centisecond integer parameter
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Stop_Watch_Time_Dial(10,15,90);
+ * @brief      Calc_Stop_Watch_Current_Time_Dial
+ * @param      uint8* array        OUT   Pointer to the array to store the stopwatch dial coordinates
+ * @param      const Coord *dial   IN    Pointer to the dial coordinate array
+ * @param      const int dialLen   IN    Length of the dial coordinate array
+ * @param      int minute          IN    Current minute
+ * @param      int second          IN    Current second
+ * @param      int centisecond     IN    Current centisecond
+ * @return     void
+ * @since      v1.0
+ * Sample usage:       Calc_Stop_Watch_Current_Time_Dial(&array, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 10, 30, 45);
 */
-void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, Coord** buff, int* buffSize, int minute, int second, int centisecond)
+void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int minute, int second, int centisecond)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -736,38 +667,6 @@ void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, C
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
-  // clen the buff if buff is not NULL
-  if (buff != NULL)
-  {
-    if (*buff != NULL)
-    {
-      free(*buff);
-      *buff = NULL;
-    }
-    // calculate the length of the linked list
-    CoordNode* temp = head;
-    int len = 0;
-    for (temp = head; temp != NULL; temp = temp->next) 
-    {
-      len++;
-    }
-    // allocate buffer
-    *buffSize = dialLen + len;
-    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
-    // copy the coordinates to the buffer
-    for (int i = 0; i < dialLen; i++) 
-    {
-      (*buff)[i].x = dial[i].x;
-      (*buff)[i].y = dial[i].y;
-    }
-    temp = head;
-    for (int i = 0; i < len; i++) 
-    {
-      (*buff)[dialLen + i].x = temp->x;
-      (*buff)[dialLen + i].y = temp->y;
-      temp = temp->next;
-    }
-  }
   // free the linked list
   while (head != NULL) 
   {
@@ -775,18 +674,29 @@ void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, C
     head = head->next;
     free(temp);
   }
-  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+  // return the clock array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
+    {
+      *array++ = clock[i][j];
+    }
+  }
 }
 
 /*
- *  @brief      Render_Stop_Watch_Current_Time_Digit
- *  @param      int             minute          minute integer parameter
- *  @param      int             second          second integer parameter
- *  @param      int             centisecond     centisecond integer parameter
- *  @since      v1.0
- *  Sample usage:       Watch_Render_Stop_Watch_Time_Digit(10,15,90);
+ * @brief      Calc_Stop_Watch_Current_Time_Digit
+ * @param      uint8* array        OUT   Pointer to the array to store the stopwatch digit coordinates
+ * @param      const Coord *digit  IN    Pointer to the digit coordinate array
+ * @param      const int digitLen  IN    Length of the digit coordinate array
+ * @param      int minute          IN    Current minute
+ * @param      int second          IN    Current second
+ * @param      int centisecond     IN    Current centisecond
+ * @return     void
+ * @since      v1.0
+ * Sample usage:       Calc_Stop_Watch_Current_Time_Digit(&array, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 10, 30, 45);
 */
-void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, Coord** buff, int* buffSize, int minute, int second, int centisecond)
+void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int minute, int second, int centisecond)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -845,38 +755,6 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
-  // clen the buff if buff is not NULL
-  if (buff != NULL)
-  {
-    if (*buff != NULL)
-    {
-      free(*buff);
-      *buff = NULL;
-    }
-    // calculate the length of the linked list
-    CoordNode* temp = head;
-    int len = 0;
-    for (temp = head; temp != NULL; temp = temp->next) 
-    {
-      len++;
-    }
-     // allocate buffer
-    *buffSize = digitLen + len;
-    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
-    // copy the coordinates to the buffer
-    for (int i = 0; i < digitLen; i++) 
-    {
-      (*buff)[i].x = digit[i].x;
-      (*buff)[i].y = digit[i].y;
-    }
-    temp = head;
-    for (int i = 0; i < len; i++) 
-    {
-      (*buff)[digitLen + i].x = temp->x;
-      (*buff)[digitLen + i].y = temp->y;
-      temp = temp->next;
-    }
-  }
   // free the linked list
   while (head != NULL) 
   {
@@ -884,248 +762,29 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
     head = head->next;
     free(temp);
   }
-  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+  // return the clock array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
+    {
+      *array++ = clock[i][j];
+    }
+  }
 }
 
 /*
- *  @brief      Render_Alarm_Clock_List
- *  @since      v1.0
- *  Sample usage:       Render_Alarm_Clock_List(10,15,90);
+ * @brief      Calc_World_Clock_Time
+ * @param      uint8* array        OUT   Pointer to the array to store the world clock time coordinates
+ * @param      const Coord *city   IN    Pointer to the city coordinate array
+ * @param      const int cityLen   IN    Length of the city coordinate array
+ * @param      MAPS_WorldClock_Time time IN    World clock time structure
+ * @param      int hour            IN    Local hour
+ * @param      int minute          IN    Local minute
+ * @return     void
+ * @since      v1.0
+ * Sample usage:       Calc_World_Clock_Time(&array, LCM_WorldClock_City_coordinate, LCM_WorldClock_City_coordinate_length, time, 10, 30);
 */
-void Render_Alarm_Clock_List(int cursor)
-{
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
-  CoordNode* head = NULL;
-  CoordNode* current = NULL;
-  // render alarm clock list
-  Alarm_Clock_Time* p = Alarm_Clock_List;
-  int n = 0;
-  while (p != NULL && n < Alarm_Clock_Max_Len)
-  {
-    // convert hour and minute to digits
-    char ch[9][2] = {"", ""}; // initialize with "00"
-    snprintf(ch[0], sizeof(ch[0]), "%d", n + 1);
-    snprintf(ch[1], sizeof(ch[1]), "%s", "#");
-    snprintf(ch[2], sizeof(ch[2]), "%d", p->hour/10); // tens place of hour
-    snprintf(ch[3], sizeof(ch[3]), "%d", p->hour%10);
-    snprintf(ch[4], sizeof(ch[4]), "%s", ":"); // separator
-    snprintf(ch[5], sizeof(ch[5]), "%d", p->minute/10); // tens place of minute
-    snprintf(ch[6], sizeof(ch[6]), "%d", p->minute%10);
-    if (cursor == n) // highlight the current cursor
-    {
-      snprintf(ch[7], sizeof(ch[7]), "%s", "<"); // pointer
-      snprintf(ch[8], sizeof(ch[8]), "%s", "-"); // pointer
-    }
-    else
-    {
-      snprintf(ch[7], sizeof(ch[7]), "%s", ""); // no pointer
-      snprintf(ch[8], sizeof(ch[8]), "%s", ""); // no pointer
-    }
-    for (int i = 0; i < 9; i++)
-    {
-      for (int j = 0; ch[i][j] != '\0'; j++)
-      {
-        uint8 c = ch[i][j] - 32; // convert character to ASCII value
-        for (int k = 0; k < 6; k++) 
-        {
-          for (int l = 0; l < 8; l++)
-          {
-            if (Oled_FontLib_6x8[c][k] & (0x01 << l))
-            {
-              // if the pixel is set, draw it
-              // calculate the x and y coordinates for the character
-              uint8 char_x = 43 + i * 6 + j * 6 + k; // 6 pixels per character
-              uint8 char_y = l + n * 8;
-              // create a new coordinate node for the character pixel
-              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
-              charNode->x = char_x;
-              charNode->y = char_y;
-              charNode->next = NULL;
-              // link the character node to the list
-              if (head == NULL) {
-                  head = charNode; // if head is NULL, set head to the character node
-                  current = head; // move current to the character node
-              } else {
-                  current->next = charNode; // link the character node to the list
-                  current = charNode; // move current to the character node
-              }
-            }
-          }
-        }
-      }
-    }
-    p = p->next;
-    n++;
-  }
-  // if cursor is large than list length, show arrow at the end
-  if (cursor >= n)
-  {
-    char ch[2][2] = {"", ""};
-    snprintf(ch[0], sizeof(ch[0]), "%s", "<"); // pointer
-    snprintf(ch[1], sizeof(ch[1]), "%s", "-"); // pointer
-    for (int i = 0; i < 2; i++)
-    {
-      for (int j = 0; ch[i][j] != '\0'; j++)
-      {
-        uint8 c = ch[i][j] - 32; // convert character to ASCII value
-        for (int k = 0; k < 6; k++) 
-        {
-          for (int l = 0; l < 8; l++)
-          {
-            if (Oled_FontLib_6x8[c][k] & (0x01 << l))
-            {
-              // if the pixel is set, draw it
-              // calculate the x and y coordinates for the character
-              uint8 char_x = 85 + i * 6 + j * 6 + k; // 6 pixels per character
-              uint8 char_y = l + n * 8;
-              // create a new coordinate node for the character pixel
-              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
-              charNode->x = char_x;
-              charNode->y = char_y;
-              charNode->next = NULL;
-              // link the character node to the list
-              if (head == NULL) {
-                  head = charNode; // if head is NULL, set head to the character node
-                  current = head; // move current to the character node
-              } else {
-                  current->next = charNode; // link the character node to the list
-                  current = charNode; // move current to the character node
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  // render the clock numbers
-  for (current = head; current != NULL; current = current->next) 
-  {
-    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
-  }
-  // free the linked list
-  while (head != NULL) 
-  {
-    CoordNode* temp = head;
-    head = head->next;
-    free(temp);
-  }
-  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
-}
-
-/*
- *  @brief      Render_Alarm_Clock_Edit
- *  @since      v1.0
- *  Sample usage:       Render_Alarm_Clock_Edit(10,15,90);
-*/
-void Render_Alarm_Clock_Edit(int hour, int minute, int cursor, int number)
-{
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
-  CoordNode* head = NULL;
-  CoordNode* current = NULL;
-  // render alarm clock edit interface
-  char ch[5][2] = {"", ""}; // initialize with "00"
-  // render alarm clock edit title
-  snprintf(ch[0], sizeof(ch[0]), "%d", number + 1); // tens place of hour
-  snprintf(ch[1], sizeof(ch[1]), "%s", "#");
-  for (int i = 0; i < 2; i++)
-  {
-    for (int j = 0; ch[i][j] != '\0'; j++)
-    {
-      uint8 c = ch[i][j] - 32; // convert character to ASCII value
-      for (int k = 0; k < 12; k++) 
-      {
-        for (int l = 0; l < 8; l++)
-        {
-          for (int m = 0; m < 3; m++)
-          {
-            if ((Oled_FontLib_12x24[c * 36 + m * 12 + k]) & (0x01 << l))
-            {
-              // if the pixel is set, draw it
-              // calculate the x and y coordinates for the character
-              uint8 char_x = 52 + i * 12 + j * 12 + k; // 12 pixels per character
-              uint8 char_y = l + m * 8 + 8; // 8 pixels per line, 20 pixels offset for the first line
-              // create a new coordinate node for the character pixel
-              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
-              charNode->x = char_x;
-              charNode->y = char_y;
-              charNode->next = NULL;
-              // link the character node to the list
-              if (head == NULL) {
-                  head = charNode; // if head is NULL, set head to the character node
-                  current = head; // move current to the character node
-              } else {
-                  current->next = charNode; // link the character node to the list
-                  current = charNode; // move current to the character node
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  // render alarm clock edit text
-  snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
-  snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
-  snprintf(ch[2], sizeof(ch[2]), "%s", ":"); // separator
-  snprintf(ch[3], sizeof(ch[3]), "%d", minute/10); // tens place of minute
-  snprintf(ch[4], sizeof(ch[4]), "%d", minute%10);
-  for (int i = 0; i < 5; i++)
-  {
-    for (int j = 0; ch[i][j] != '\0'; j++)
-    {
-      uint8 c = ch[i][j] - 32; // convert character to ASCII value
-      for (int k = 0; k < 12; k++) 
-      {
-        for (int l = 0; l < 8; l++)
-        {
-          for (int m = 0; m < 3; m++)
-          {
-            if ((((i < 2 && i == cursor) || (i > 2 && i == cursor + 1))?(Oled_FontLib_12x24[c * 36 + m * 12 + k]|Oled_FontLib_12x24[63 * 36 + m * 12 + k]):Oled_FontLib_12x24[c * 36 + m * 12 + k]) & (0x01 << l))
-            {
-              // if the pixel is set, draw it
-              // calculate the x and y coordinates for the character
-              uint8 char_x = 34 + i * 12 + j * 12 + k; // 12 pixels per character
-              uint8 char_y = l + m * 8 + 32; // 8 pixels per line, 20 pixels offset for the first line
-              // create a new coordinate node for the character pixel
-              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
-              charNode->x = char_x;
-              charNode->y = char_y;
-              charNode->next = NULL;
-              // link the character node to the list
-              if (head == NULL) {
-                  head = charNode; // if head is NULL, set head to the character node
-                  current = head; // move current to the character node
-              } else {
-                  current->next = charNode; // link the character node to the list
-                  current = charNode; // move current to the character node
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  // render the clock numbers
-  for (current = head; current != NULL; current = current->next) 
-  {
-    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
-  }
-  // free the linked list
-  while (head != NULL) 
-  {
-    CoordNode* temp = head;
-    head = head->next;
-    free(temp);
-  }
-  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
-}
-
-/*
- *  @brief      Render_World_Clock_Time
- *  @since      v1.0
- *  Sample usage:       Render_World_Clock_Time(10,15,90);
-*/
-void Render_World_Clock_Time(const Coord *city, const int cityLen, Coord** buff, int* buffSize, MAPS_WorldClock_Time time, int hour, int minute)
+void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -1500,37 +1159,216 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, Coord** buff,
   {
     clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
-  // clen the buff if buff is not NULL
-  if (buff != NULL)
+  // free the linked list
+  while (head != NULL) 
   {
-    if (*buff != NULL)
-    {
-      free(*buff);
-      *buff = NULL;
-    }
-    // calculate the length of the linked list
     CoordNode* temp = head;
-    int len = 0;
-    for (temp = head; temp != NULL; temp = temp->next) 
+    head = head->next;
+    free(temp);
+  }
+  // return the clock array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
     {
-      len++;
+      *array++ = clock[i][j];
     }
-     // allocate buffer
-    *buffSize = cityLen + len;
-    *buff = (Coord*)malloc(*buffSize * sizeof(Coord));
-    // copy the coordinates to the buffer
-    for (int i = 0; i < cityLen; i++) 
+  }
+}
+
+/*
+ *  @brief      Render_Clock_Current_Time_Dial
+ *  @param      const Coord *dial   IN    Pointer to the dial coordinate array
+ *  @param      const int dialLen   IN    Length of the dial coordinate array
+ *  @param      int hour            IN    Current hour
+ *  @param      int minute          IN    Current minute
+ *  @param      int second          IN    Current second
+ *  @return     void
+ *  @since      v1.0
+ *  Sample usage:       Render_Clock_Current_Time_Dial(LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, 10, 30, 45);
+*/
+void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour, int minute, int second)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  // calculate the clock dial array
+  Calc_Clock_Current_Time_Dial((uint8*)clock, dial, dialLen, hour, minute, second);
+  // render the clock dial picture
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ * @brief      Render_Clock_Current_Time_Digit
+ * @param      const Coord *digit  IN    Pointer to the digit coordinate array
+ * @param      const int digitLen  IN    Length of the digit coordinate array
+ * @param      int hour            IN    Current hour
+ * @param      int minute          IN    Current minute
+ * @return     void
+ * @since      v1.0
+ * Sample usage:       Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
+*/
+void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  // calculate the clock digit array
+  Calc_Clock_Current_Time_Digit((uint8*)clock, digit, digitLen, hour, minute);
+  // render the clock digit picture
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ *  @brief      Render_Stop_Watch_Current_Time_Dial
+ *  @param      const Coord *dial   IN    Pointer to the dial coordinate array
+ *  @param      const int dialLen   IN    Length of the dial coordinate array
+ *  @param      int minute          IN    Current minute
+ *  @param      int second          IN    Current second
+ *  @param      int centisecond     IN    Current centisecond
+ *  @return     void
+ *  @since      v1.0
+ *  Sample usage:       Render_Stop_Watch_Current_Time_Dial(LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, 10, 30, 45);
+*/
+void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  // calculate the stopwatch dial array
+  Calc_Stop_Watch_Current_Time_Dial((uint8*)clock, dial, dialLen, minute, second, centisecond);
+  // render the stopwatch dial picture
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ *  @brief      Render_Stop_Watch_Current_Time_Digit
+ *  @param      const Coord *digit  IN    Pointer to the digit coordinate array
+ *  @param      const int digitLen  IN    Length of the digit coordinate array
+ *  @param      int minute          IN    Current minute
+ *  @param      int second          IN    Current second
+ *  @param      int centisecond     IN    Current centisecond
+ *  @return     void
+ *  @since      v1.0
+ *  Sample usage:       Render_Stop_Watch_Current_Time_Digit(LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, 10, 30, 45);
+*/
+void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  // calculate the stopwatch digit array
+  Calc_Stop_Watch_Current_Time_Digit((uint8*)clock, digit, digitLen, minute, second, centisecond);
+  // render the stopwatch digit picture
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ *  @brief      Render_Alarm_Clock_List
+ *  @since      v1.0
+ *  Sample usage:       Render_Alarm_Clock_List(10,15,90);
+*/
+void Render_Alarm_Clock_List(int cursor)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  CoordNode* head = NULL;
+  CoordNode* current = NULL;
+  // render alarm clock list
+  Alarm_Clock_Time* p = Alarm_Clock_List;
+  int n = 0;
+  while (p != NULL && n < Alarm_Clock_Max_Len)
+  {
+    // convert hour and minute to digits
+    char ch[9][2] = {"", ""}; // initialize with "00"
+    snprintf(ch[0], sizeof(ch[0]), "%d", n + 1);
+    snprintf(ch[1], sizeof(ch[1]), "%s", "#");
+    snprintf(ch[2], sizeof(ch[2]), "%d", p->hour/10); // tens place of hour
+    snprintf(ch[3], sizeof(ch[3]), "%d", p->hour%10);
+    snprintf(ch[4], sizeof(ch[4]), "%s", ":"); // separator
+    snprintf(ch[5], sizeof(ch[5]), "%d", p->minute/10); // tens place of minute
+    snprintf(ch[6], sizeof(ch[6]), "%d", p->minute%10);
+    if (cursor == n) // highlight the current cursor
     {
-      (*buff)[i].x = city[i].x;
-      (*buff)[i].y = city[i].y;
+      snprintf(ch[7], sizeof(ch[7]), "%s", "<"); // pointer
+      snprintf(ch[8], sizeof(ch[8]), "%s", "-"); // pointer
     }
-    temp = head;
-    for (int i = 0; i < len; i++) 
+    else
     {
-      (*buff)[cityLen + i].x = temp->x;
-      (*buff)[cityLen + i].y = temp->y;
-      temp = temp->next;
+      snprintf(ch[7], sizeof(ch[7]), "%s", ""); // no pointer
+      snprintf(ch[8], sizeof(ch[8]), "%s", ""); // no pointer
     }
+    for (int i = 0; i < 9; i++)
+    {
+      for (int j = 0; ch[i][j] != '\0'; j++)
+      {
+        uint8 c = ch[i][j] - 32; // convert character to ASCII value
+        for (int k = 0; k < 6; k++) 
+        {
+          for (int l = 0; l < 8; l++)
+          {
+            if (Oled_FontLib_6x8[c][k] & (0x01 << l))
+            {
+              // if the pixel is set, draw it
+              // calculate the x and y coordinates for the character
+              uint8 char_x = 43 + i * 6 + j * 6 + k; // 6 pixels per character
+              uint8 char_y = l + n * 8;
+              // create a new coordinate node for the character pixel
+              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+              charNode->x = char_x;
+              charNode->y = char_y;
+              charNode->next = NULL;
+              // link the character node to the list
+              if (head == NULL) {
+                  head = charNode; // if head is NULL, set head to the character node
+                  current = head; // move current to the character node
+              } else {
+                  current->next = charNode; // link the character node to the list
+                  current = charNode; // move current to the character node
+              }
+            }
+          }
+        }
+      }
+    }
+    p = p->next;
+    n++;
+  }
+  // if cursor is large than list length, show arrow at the end
+  if (cursor >= n)
+  {
+    char ch[2][2] = {"", ""};
+    snprintf(ch[0], sizeof(ch[0]), "%s", "<"); // pointer
+    snprintf(ch[1], sizeof(ch[1]), "%s", "-"); // pointer
+    for (int i = 0; i < 2; i++)
+    {
+      for (int j = 0; ch[i][j] != '\0'; j++)
+      {
+        uint8 c = ch[i][j] - 32; // convert character to ASCII value
+        for (int k = 0; k < 6; k++) 
+        {
+          for (int l = 0; l < 8; l++)
+          {
+            if (Oled_FontLib_6x8[c][k] & (0x01 << l))
+            {
+              // if the pixel is set, draw it
+              // calculate the x and y coordinates for the character
+              uint8 char_x = 85 + i * 6 + j * 6 + k; // 6 pixels per character
+              uint8 char_y = l + n * 8;
+              // create a new coordinate node for the character pixel
+              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+              charNode->x = char_x;
+              charNode->y = char_y;
+              charNode->next = NULL;
+              // link the character node to the list
+              if (head == NULL) {
+                  head = charNode; // if head is NULL, set head to the character node
+                  current = head; // move current to the character node
+              } else {
+                  current->next = charNode; // link the character node to the list
+                  current = charNode; // move current to the character node
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  // render the clock numbers
+  for (current = head; current != NULL; current = current->next) 
+  {
+    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
   }
   // free the linked list
   while (head != NULL) 
@@ -1539,6 +1377,134 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, Coord** buff,
     head = head->next;
     free(temp);
   }
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ *  @brief      Render_Alarm_Clock_Edit
+ *  @since      v1.0
+ *  Sample usage:       Render_Alarm_Clock_Edit(10,15,90);
+*/
+void Render_Alarm_Clock_Edit(int hour, int minute, int cursor, int number)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  CoordNode* head = NULL;
+  CoordNode* current = NULL;
+  // render alarm clock edit interface
+  char ch[5][2] = {"", ""}; // initialize with "00"
+  // render alarm clock edit title
+  snprintf(ch[0], sizeof(ch[0]), "%d", number + 1); // tens place of hour
+  snprintf(ch[1], sizeof(ch[1]), "%s", "#");
+  for (int i = 0; i < 2; i++)
+  {
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 12; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          for (int m = 0; m < 3; m++)
+          {
+            if ((Oled_FontLib_12x24[c * 36 + m * 12 + k]) & (0x01 << l))
+            {
+              // if the pixel is set, draw it
+              // calculate the x and y coordinates for the character
+              uint8 char_x = 52 + i * 12 + j * 12 + k; // 12 pixels per character
+              uint8 char_y = l + m * 8 + 8; // 8 pixels per line, 20 pixels offset for the first line
+              // create a new coordinate node for the character pixel
+              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+              charNode->x = char_x;
+              charNode->y = char_y;
+              charNode->next = NULL;
+              // link the character node to the list
+              if (head == NULL) {
+                  head = charNode; // if head is NULL, set head to the character node
+                  current = head; // move current to the character node
+              } else {
+                  current->next = charNode; // link the character node to the list
+                  current = charNode; // move current to the character node
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  // render alarm clock edit text
+  snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
+  snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
+  snprintf(ch[2], sizeof(ch[2]), "%s", ":"); // separator
+  snprintf(ch[3], sizeof(ch[3]), "%d", minute/10); // tens place of minute
+  snprintf(ch[4], sizeof(ch[4]), "%d", minute%10);
+  for (int i = 0; i < 5; i++)
+  {
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 12; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          for (int m = 0; m < 3; m++)
+          {
+            if ((((i < 2 && i == cursor) || (i > 2 && i == cursor + 1))?(Oled_FontLib_12x24[c * 36 + m * 12 + k]|Oled_FontLib_12x24[63 * 36 + m * 12 + k]):Oled_FontLib_12x24[c * 36 + m * 12 + k]) & (0x01 << l))
+            {
+              // if the pixel is set, draw it
+              // calculate the x and y coordinates for the character
+              uint8 char_x = 34 + i * 12 + j * 12 + k; // 12 pixels per character
+              uint8 char_y = l + m * 8 + 32; // 8 pixels per line, 20 pixels offset for the first line
+              // create a new coordinate node for the character pixel
+              CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+              charNode->x = char_x;
+              charNode->y = char_y;
+              charNode->next = NULL;
+              // link the character node to the list
+              if (head == NULL) {
+                  head = charNode; // if head is NULL, set head to the character node
+                  current = head; // move current to the character node
+              } else {
+                  current->next = charNode; // link the character node to the list
+                  current = charNode; // move current to the character node
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  // render the clock numbers
+  for (current = head; current != NULL; current = current->next) 
+  {
+    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
+  }
+  // free the linked list
+  while (head != NULL) 
+  {
+    CoordNode* temp = head;
+    head = head->next;
+    free(temp);
+  }
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ * @brief      Render_World_Clock_Time
+ * @param      const Coord *city          IN    Pointer to the city coordinate array
+ * @param      const int cityLen          IN    Length of the city coordinate array
+ * @param      MAPS_WorldClock_Time time  IN    World clock time structure
+ * @param      int hour                   IN    Current hour
+ * @param      int minute                 IN    Current minute
+ * @return     void
+ * @since      v1.0
+ * Sample usage:       Render_World_Clock_Time(LCM_WorldClock_City_coordinate, LCM_WorldClock_City_coordinate_length, time, 10, 30);
+*/
+void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  // calculate the world clock time array
+  Calc_World_Clock_Time((uint8*)clock, city, cityLen, time, hour, minute);
+  // render the world clock time picture
   Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }
 
@@ -1752,175 +1718,5 @@ void Read_Alarm_Clock_E2PROM_To_List()
           }
           current->next = newAlarm;
       }
-  }
-}
-
-/*
- *  @brief      Clean_Dynamic_Cache_Array
- *  @param      int             menu       menu page index integer parameter
- *  @param      int             app        app page index integer parameter
- *  @since      v1.0
- *  Sample usage:       Clean_Dynamic_Cache_Array(10,15,90);
-*/
-void Clean_Dynamic_Cache_Array(int menu, int app)
-{
-  // clean unused dynamic cache array for free heap memory
-  switch (menu)
-  {
-  case MAPS_Menu_Clock:
-    // clean stop watch cache array
-    Free_Cache_Array(&LCM_StopWatch_Dial_Buf, &LCM_StopWatch_Dial_Buf_Size);
-    Free_Cache_Array(&LCM_StopWatch_Digit_Buf, &LCM_StopWatch_Digit_Buf_Size);
-    // clean world clock cache array
-    Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-    break;
-  case MAPS_Menu_StopWatch:
-    // clean clock cache array
-    Free_Cache_Array(&LCM_Clock_Dial_Buf, &LCM_Clock_Dial_Buf_Size);
-    Free_Cache_Array(&LCM_Clock_Digit_Buf, &LCM_Clock_Digit_Buf_Size);
-    // clean world clock cache array
-    Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-    Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-    break;
-  case MAPS_Menu_WorldClock:
-    // clean clock cache array
-    Free_Cache_Array(&LCM_Clock_Dial_Buf, &LCM_Clock_Dial_Buf_Size);
-    Free_Cache_Array(&LCM_Clock_Digit_Buf, &LCM_Clock_Digit_Buf_Size);
-    // clean stop watch cache array
-    Free_Cache_Array(&LCM_StopWatch_Dial_Buf, &LCM_StopWatch_Dial_Buf_Size);
-    Free_Cache_Array(&LCM_StopWatch_Digit_Buf, &LCM_StopWatch_Digit_Buf_Size);
-    switch (app)
-    {
-      case MAPS_WorldClock_Timezone_Beijing:
-        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_Shanghai:
-        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_Hongkong:
-        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_Taipei:
-        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_Singapore:
-        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_Seoul:
-        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_Tokyo:
-        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sanfrancisco_Buf, &LCM_WorldClock_sanfrancisco_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_Sydney:
-        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_newyork_Buf, &LCM_WorldClock_newyork_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_SanFrancisco:
-        Free_Cache_Array(&LCM_WorldClock_beijing_Buf, &LCM_WorldClock_beijing_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-        break;
-      case MAPS_WorldClock_Timezone_NewYork:
-        Free_Cache_Array(&LCM_WorldClock_shanghai_Buf, &LCM_WorldClock_shanghai_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_hongkong_Buf, &LCM_WorldClock_hongkong_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_taipei_Buf, &LCM_WorldClock_taipei_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_singapore_Buf, &LCM_WorldClock_singapore_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_seoul_Buf, &LCM_WorldClock_seoul_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_tokyo_Buf, &LCM_WorldClock_tokyo_Buf_Size);
-        Free_Cache_Array(&LCM_WorldClock_sydney_Buf, &LCM_WorldClock_sydney_Buf_Size);
-        break;
-      default:
-        break;
-    }
-    break;
-  default:
-    break;
-  }
-}
-
-/*
- *  @brief      Free_Cache_Array
- *  @param      Coord**          buff            buffer pointer parameter
- *  @param      int             buffSize        buffer size integer parameter
- *  @since      v1.0
- *  Sample usage:       Free_Cache_Array(10,15,90);
-*/
-void Free_Cache_Array(Coord** buff, int* buffSize)
-{
-  // free cache array for free heap memory
-  if (buff != NULL && *buff != NULL)
-  {
-    free(*buff);
-    *buff = NULL;
-    *buffSize = 0;
   }
 }

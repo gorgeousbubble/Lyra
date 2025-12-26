@@ -31,6 +31,13 @@ struct Coord {
 };
 typedef struct Coord Coord;
 
+struct CoordCache {
+    uint8 index;
+    Coord* coord;
+    int length;
+    struct CoordCache* next;
+};
+
 /*
 **variate declaration
 */
