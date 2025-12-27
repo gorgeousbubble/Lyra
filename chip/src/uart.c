@@ -32,7 +32,7 @@ UART_MemMapPtr UARTN[UART_UART_MAX]=
 /*
  *  @brief      Initialize serial UART and set baud rate
  *  @param      UART_UARTn      UART_UARTx      module number(UART0~UART4)
- *  @param      uint32          UART_Baud       baud rate, such as 9600¡¢19200¡¢56000¡¢115200...
+ *  @param      uint32          UART_Baud       baud rate, such as 9600ï¿½ï¿½19200ï¿½ï¿½56000ï¿½ï¿½115200...
  *  @since      v1.0
  *  Sample usage:       UART_Init(UART3,115200);        //Initialize the serial port with a baud rate of 115200
  */

@@ -178,7 +178,123 @@ const int LCM_Configure_Adjust_icon_coordinate_length = ARRAY_LENGTH(LCM_Configu
     }
  }
 
- /*
+/*
+ *  @brief      Animation Screen Switch Vertical Scroll
+ *  @since      v1.0
+ *  Sample usage:       Animation_Screen_Switch_Vertical_Scroll();
+ */
+void Animation_Screen_Switch_Vertical_Scroll(const uint8 *src, const uint8 *dst, uint8 direction, uint8 speed, uint8 acc)
+{
+    CoordNode* srcList = NULL;
+    CoordNode* dstList = NULL;
+    
+    // Convert the source and destination arrays to linked lists
+    // This assumes that Animation_Covert_Array_To_LinkedList is defined to convert arrays to linked lists
+    Animation_Covert_Array_To_LinkedList(src, &srcList);
+    Animation_Covert_Array_To_LinkedList(dst, &dstList);
+
+    // Implementation for vertical scroll animation
+    // Similar to horizontal scroll but adjusting y-coordinates instead of x-coordinates
+    // This function is left as a placeholder for future implementation
+    uint8 animation[64][16] = {0x00}; // 64 rows, 128 columns
+
+    if (direction == 0) { // Bottom to top
+        // Implement bottom to top scroll logic
+        // Placeholder for implementation
+        uint8 y_offset = 0; // Starting offset for the scroll
+        while (y_offset < 64)
+        {
+            // Clear the animation array
+            memset(animation, 0x00, sizeof(animation));
+            // Draw the source image at the current offset
+            CoordNode* current = srcList;
+            while (current != NULL) {
+                int x = current->x;
+                int y = current->y + y_offset;
+                if (x >= 0 && x < 128 && y >= 0 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+                current = current->next;
+            }
+            // Draw the destination image at the current offset
+            current = dstList;
+            while (current != NULL) {
+                int x = current->x; // Adjust for the offset
+                int y = current->y + y_offset - 64;
+                if (x >= 0 && x < 128 && y >= 0 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+                current = current->next;
+            }
+            // Display the animation frame (this function should be defined to handle the display logic)
+            Oled_I2C_Draw_Picture_128x64((const uint8*)animation);
+            // Update the offset for the next frame
+            y_offset += speed; // Increment the offset by the speed
+            // Add acceleration logic if needed
+            if (acc > 0) {
+                speed += acc; // Increase speed by acceleration factor
+            }
+            // Delay for a short period to control the frame rate
+            DWT_Delay_ms(100); // Adjust delay based on speed
+        }
+    }
+    else if (direction == 1) { // Top to bottom
+        // Implement top to bottom scroll logic
+        // Placeholder for implementation
+        uint8 y_offset = 64; // Starting offset for the scroll
+        while (y_offset > 0) {
+            // Clear the animation array
+            memset(animation, 0x00, sizeof(animation));
+            // Draw the source image at the current offset
+            CoordNode* current = srcList;
+            while (current != NULL) {
+                int x = current->x; // Adjust for the offset
+                int y = current->y + y_offset - 64;
+                if (x >= 0 && x < 128 && y >= 0 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+                current = current->next;
+            }
+            // Draw the destination image at the current offset
+            current = dstList;
+            while (current != NULL) {
+                int x = current->x;
+                int y = current->y + y_offset;
+                if (x >= 0 && x < 128 && y >= 0 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+                current = current->next;
+            }
+            // Display the animation frame (this function should be defined to handle the display logic)
+            Oled_I2C_Draw_Picture_128x64((const uint8*)animation);
+            // Update the offset for the next frame
+            y_offset -= speed; // Decrement the offset by the speed
+            // Add acceleration logic if needed
+            if (acc > 0) {
+                speed += acc; // Increase speed by acceleration factor
+            }
+            // Delay for a short period to control the frame rate
+            DWT_Delay_ms(100); // Adjust delay based on speed
+        }
+    }
+
+    // Free the source and destination linked lists after use
+    CoordNode* current = NULL;
+    current = srcList;
+    while (current != NULL) {
+        CoordNode* temp = current;
+        current = current->next;
+        free(temp);
+    }
+    current = dstList;
+    while (current != NULL) {
+        CoordNode* temp = current;
+        current = current->next;
+        free(temp);
+    }
+}
+
+/*
  *  @brief      Animation Screen Switch Horizontal Scroll
  *  @since      v1.0
  *  Sample usage:       Animation_Screen_Switch_Horizontal_Scroll();
@@ -272,6 +388,111 @@ void Animation_Screen_Switch_Horizontal_Scroll_Array(const Coord *src, const int
                 x_offset = 0; // Reset offset if it goes below zero
             } else {
                 x_offset -= speed; // Decrement the offset by the speed
+            }
+            // Add acceleration logic if needed
+            if (acc > 0) {
+                speed += acc; // Increase speed by acceleration factor
+            }
+            // Delay for a short period to control the frame rate
+            //DWT_Delay_ms(10); // Adjust delay based on speed
+        }
+    }
+}
+
+/*
+ *  @brief      Animation Screen Switch Vertical Scroll
+ *  @since      v1.0
+ *  Sample usage:       Animation_Screen_Switch_Vertical_Scroll();
+ */
+void Animation_Screen_Switch_Vertical_Scroll_Array(const Coord *src, const int srcLen, const Coord *dst, const int dstLen, uint8 direction, uint8 speed, uint8 acc)
+{
+    // This function is a wrapper for Animation_Screen_Switch_Vertical_Scroll
+    uint8 animation_flag = 0; // Animation flag to indicate if the animation is running
+    uint8 animation[64][16] = {0x00}; // 64 rows, 128 columns
+
+    if (direction == 0) { // Left to right
+        // Implement left to right scroll logic
+        uint8 y_offset = 0; // Starting offset for the scroll
+        while (animation_flag == 0) {
+            // Clear the animation array
+            memset(animation, 0x00, sizeof(animation));
+            // Check current offset against the source and destination lengths
+            if (y_offset >= 64) {
+                y_offset = 64; // Reset offset if it exceeds bounds
+                animation_flag = 1;
+            }
+            // Draw the source image at the current offset
+            for (int i = 0; i < srcLen; i++) {
+                uint8 x = src[i].x;
+                uint8 y = src[i].y + y_offset;
+                if (x < 128 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+            }
+            // Draw the destination image at the current offset
+            for (int i = 0; i < dstLen; i++) {
+                uint8 x = dst[i].x;
+                uint8 y = dst[i].y + y_offset;
+                if (y < 64) {
+                    continue; // Skip if x is out of bounds
+                } else {
+                    y -= 64; // Adjust for the offset
+                }
+                if (x < 128 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+            }
+            // Display the animation frame (this function should be defined to handle the display logic)
+            Oled_I2C_Draw_Picture_128x64((const uint8*)animation);
+            // Update the offset for the next frame
+            y_offset += speed; // Increment the offset by the speed
+            // Add acceleration logic if needed
+            if (acc > 0) {
+                speed += acc; // Increase speed by acceleration factor
+            }
+            // Delay for a short period to control the frame rate
+            //DWT_Delay_ms(10); // Adjust delay based on speed
+        }
+    }
+    else if (direction == 1) { // Right to left
+        // Implement right to left scroll logic
+        uint8 y_offset = 64; // Starting offset for the scroll
+        while (animation_flag == 0) {
+            // Clear the animation array
+            memset(animation, 0x00, sizeof(animation));
+            // Check current offset against the source and destination lengths
+            if (y_offset <= 0) {
+                y_offset = 0; // Reset offset if it goes below zero
+                animation_flag = 1;
+            }
+            // Draw the source image at the current offset
+            for (int i = 0; i < srcLen; i++) {
+                uint8 x = src[i].x;
+                uint8 y = src[i].y + y_offset;
+                if (y < 64) {
+                    continue; // Skip if x is out of bounds
+                } else {
+                    y -= 64; // Adjust for the offset
+                }
+                if (x < 128 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+            }
+            // Draw the destination image at the current offset
+            for (int i = 0; i < dstLen; i++) {
+                uint8 x = dst[i].x;
+                uint8 y = dst[i].y + y_offset;
+                if (x < 128 && y < 64) { // Ensure within bounds
+                    animation[y][x >> 3] |= (0x01 << (7 - (x & 0x07))); // Set the pixel in the animation array
+                }
+            }
+            // Display the animation frame (this function should be defined to handle the display logic)
+            Oled_I2C_Draw_Picture_128x64((const uint8*)animation);
+            // Update the offset for the next frame
+            if(y_offset < speed) {
+                y_offset = 0; // Reset offset if it goes below zero
+            } else {
+                y_offset -= speed; // Decrement the offset by the speed
             }
             // Add acceleration logic if needed
             if (acc > 0) {
