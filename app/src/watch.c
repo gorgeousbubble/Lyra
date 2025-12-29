@@ -773,6 +773,110 @@ void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const 
 }
 
 /*
+ *  @brief      Calc_Alarm_Clock_List_Mode_Time_Digit
+ *  @param      uint8* array        OUT   Pointer to the array to store the clock dial coordinates
+ *  @param      const Coord *dial   IN    Pointer to the dial coordinate array
+ *  @param      const int dialLen   IN    Length of the dial coordinate array
+ *  @param      int hour            IN    Current hour
+ *  @param      int minute          IN    Current minute
+ *  @return     void
+ *  @since      v1.0
+ *  Sample usage:       Calc_Alarm_Clock_List_Mode_Time_Digit(&array, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
+*/
+void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  CoordNode* head = NULL;
+  CoordNode* current = NULL;
+  // convert hour and minute to digits
+  char ch[4][2] = {"", ""}; // initialize with "00"
+  snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
+  snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
+  snprintf(ch[2], sizeof(ch[2]), "%d", minute/10); // tens place of minute
+  snprintf(ch[3], sizeof(ch[3]), "%d", minute%10);
+  for (int i = 0; i < 4; i++)
+  {
+    for (int j = 0; ch[i][j] != '\0'; j++)
+    {
+      uint8 c = ch[i][j] - 32; // convert character to ASCII value
+      for (int k = 0; k < 6; k++) 
+      {
+        for (int l = 0; l < 8; l++)
+        {
+          if (Oled_FontLib_6x8[c][k] & (0x01 << l))
+          {
+            // if the pixel is set, draw it
+            // calculate the x and y coordinates for the character
+            uint8 char_x = j * 6 + k; // 6 pixels per character
+            uint8 char_y = l;
+            if (i == 0) // hour tens place
+            {
+              char_x += 45; // offset for hour tens place
+              char_y += 28; // offset for hour tens place
+            }
+            else if (i == 1) // hour ones place
+            {
+              char_x += 53; // offset for hour ones place
+              char_y += 28; // offset for hour ones place
+            }
+            else if (i == 2) // minute tens place
+            {
+              char_x += 68; // offset for minute tens place
+              char_y += 28; // offset for minute tens place
+            }
+            else if (i == 3) // minute ones place
+            {
+              char_x += 76; // offset for minute ones place
+              char_y += 28; // offset for minute ones place
+            }
+            // create a new coordinate node for the character pixel
+            CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
+            charNode->x = char_x;
+            charNode->y = char_y;
+            charNode->next = NULL;
+            // link the character node to the list
+            if (head == NULL) {
+                head = charNode; // if head is NULL, set head to the character node
+                current = head; // move current to the character node
+            } else {
+                current->next = charNode; // link the character node to the list
+                current = charNode; // move current to the character node
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // draw clock digit
+  for (int i = 0; i < digitLen; i++) 
+  {
+    const Coord *coord = &digit[i];
+    clock[coord->y][coord->x >> 3] |= (0x01 << (7 - (coord->x & 0x07)));
+  }
+  // render the clock numbers
+  for (current = head; current != NULL; current = current->next) 
+  {
+    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
+  }
+  // free the linked list
+  while (head != NULL) 
+  {
+    CoordNode* temp = head;
+    head = head->next;
+    free(temp);
+  }
+  // return the clock array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
+    {
+      *array++ = clock[i][j];
+    }
+  }
+}
+
+/*
  * @brief      Calc_World_Clock_Time
  * @param      uint8* array        OUT   Pointer to the array to store the world clock time coordinates
  * @param      const Coord *city   IN    Pointer to the city coordinate array
@@ -1252,6 +1356,25 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
   // calculate the stopwatch digit array
   Calc_Stop_Watch_Current_Time_Digit((uint8*)clock, digit, digitLen, minute, second, centisecond);
   // render the stopwatch digit picture
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ * @brief      Render_Alarm_Clock_List_Mode_Time_Digit
+ * @param      const Coord *digit  IN    Pointer to the digit coordinate array
+ * @param      const int digitLen  IN    Length of the digit coordinate array
+ * @param      int hour            IN    Current hour
+ * @param      int minute          IN    Current minute
+ * @return     void
+ * @since      v1.0
+ * Sample usage:       Render_Alarm_Clock_List_Mode_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
+*/
+void Render_Alarm_Clock_List_Mode_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  // calculate the clock digit array
+  Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)clock, digit, digitLen, hour, minute);
+  // render the clock digit picture
   Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }
 

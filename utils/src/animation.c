@@ -305,6 +305,11 @@ void Animation_Screen_Switch_Horizontal_Scroll_Array(const Coord *src, const int
     uint8 animation_flag = 0; // Animation flag to indicate if the animation is running
     uint8 animation[64][16] = {0x00}; // 64 rows, 128 columns
 
+    // src and dst should not be NULL
+    if (src == NULL || dst == NULL) {
+        return; // Invalid input, exit the function
+    }
+
     if (direction == 0) { // Left to right
         // Implement left to right scroll logic
         uint8 x_offset = 0; // Starting offset for the scroll
@@ -409,6 +414,11 @@ void Animation_Screen_Switch_Vertical_Scroll_Array(const Coord *src, const int s
     // This function is a wrapper for Animation_Screen_Switch_Vertical_Scroll
     uint8 animation_flag = 0; // Animation flag to indicate if the animation is running
     uint8 animation[64][16] = {0x00}; // 64 rows, 128 columns
+
+    // src and dst should not be NULL
+    if (src == NULL || dst == NULL) {
+        return; // Invalid input, exit the function
+    }
 
     if (direction == 0) { // Left to right
         // Implement left to right scroll logic

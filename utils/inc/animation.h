@@ -60,6 +60,6 @@ extern const int LCM_Configure_Adjust_icon_coordinate_length;
 extern void Animation_Screen_Switch_Horizontal_Scroll(const uint8 *src, const uint8 *dst, uint8 direction, uint8 speed, uint8 acc);
 extern void Animation_Screen_Switch_Vertical_Scroll(const uint8 *src, const uint8 *dst, uint8 direction, uint8 speed, uint8 acc);
 extern void Animation_Screen_Switch_Horizontal_Scroll_Array(const Coord *src, const int srcLen, const Coord *dst, const int dstLen, uint8 direction, uint8 speed, uint8 acc);
-extern void Animation_Screen_Switch_Vertical_Scroll(const uint8 *src, const uint8 *dst, uint8 direction, uint8 speed, uint8 acc);
+extern void Animation_Screen_Switch_Vertical_Scroll_Array(const Coord *src, const int srcLen, const Coord *dst, const int dstLen, uint8 direction, uint8 speed, uint8 acc);
 
 #endif

@@ -32,6 +32,8 @@ int Lyra_Clock_Style = 0;                 // Clock style
 int Lyra_StopWatch_Style = 0;             // Stop Watch style
 int Lyra_AlarmClock_Mode = 0;             // Alarm Clock mode
 int Lyra_AlarmClock_List_Cursor = 0;      // Alarm Clock list cursor
+int Lyra_AlarmClock_List_Time_Hour = 0;   // Alarm Clock list time hour
+int Lyra_AlarmClock_List_Time_Minute = 0; // Alarm Clock list time minute
 int Lyra_AlarmClock_Edit_Cursor = 0;      // Alarm Clock edit cursor
 int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
 int Lyra_WorldClock_Time_Cursor = 0;  // World Clock time cursor
@@ -479,15 +481,21 @@ void MAPS_Dock_KEY_Incident(void)
       {
         if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
         {
-          Lyra_AlarmClock_List_Cursor++; // Move alarm clock list cursor down
-          if (Lyra_AlarmClock_List_Cursor >= Get_Alarm_Clock_List_Len())
+          int index[2] = {MAPS_AlarmClock_Timer_0, MAPS_AlarmClock_Timer_1};
+          Lyra_AlarmClock_List_Cursor--; // Move alarm clock list cursor up
+          if (Lyra_AlarmClock_List_Cursor < 0)
           {
-            Lyra_AlarmClock_List_Cursor = Get_Alarm_Clock_List_Len(); // Reset to minimum alarm clock list cursor position
+            Lyra_AlarmClock_List_Cursor = 0; // Reset to minimum alarm clock list cursor position
+            index[0] = Lyra_AlarmClock_List_Cursor;
+            index[1] = Lyra_AlarmClock_List_Cursor;
           }
-          if (Lyra_AlarmClock_List_Cursor >= Alarm_Clock_Max_Len)
+          else
           {
-            Lyra_AlarmClock_List_Cursor = Alarm_Clock_Max_Len - 1; // Reset to maximum alarm clock list cursor position
+            index[0] = Lyra_AlarmClock_List_Cursor + 1;
+            index[1] = Lyra_AlarmClock_List_Cursor;
           }
+          Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+          Animation_Screen_Switch_Vertical_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 0, 0, 5);
         }
         else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
         {
@@ -652,11 +660,28 @@ void MAPS_Dock_KEY_Incident(void)
       {
         if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
         {
-          Lyra_AlarmClock_List_Cursor--; // Move alarm clock list cursor up
-          if (Lyra_AlarmClock_List_Cursor < 0)
+          int index[2] = {MAPS_AlarmClock_Timer_0, MAPS_AlarmClock_Timer_1};
+          Lyra_AlarmClock_List_Cursor++; // Move alarm clock list cursor down
+          if (Lyra_AlarmClock_List_Cursor > Get_Alarm_Clock_List_Len())
           {
-            Lyra_AlarmClock_List_Cursor = 0; // Reset to minimum alarm clock list cursor position
+            Lyra_AlarmClock_List_Cursor = Get_Alarm_Clock_List_Len(); // Reset to minimum alarm clock list cursor position
+            index[0] = Lyra_AlarmClock_List_Cursor;
+            index[1] = Lyra_AlarmClock_List_Cursor;
           }
+          else
+          {
+            index[0] = Lyra_AlarmClock_List_Cursor;
+            index[1] = Lyra_AlarmClock_List_Cursor + 1;
+          }
+          // if cursor exceeds maximum length
+          if (Lyra_AlarmClock_List_Cursor >= Alarm_Clock_Max_Len)
+          {
+            Lyra_AlarmClock_List_Cursor = Alarm_Clock_Max_Len - 1; // Reset to maximum alarm clock list cursor position
+            index[0] = Lyra_AlarmClock_List_Cursor;
+            index[1] = Lyra_AlarmClock_List_Cursor;
+          }
+          Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+          Animation_Screen_Switch_Vertical_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
         }
         else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
         {
@@ -757,7 +782,8 @@ void MAPS_Dock_KEY_Incident(void)
     case MAPS_Menu_AlarmClock:
       if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
       {
-        Render_Alarm_Clock_List(Lyra_AlarmClock_List_Cursor);
+        Get_Alarm_Clock_Time_From_List(Lyra_AlarmClock_List_Cursor, &Lyra_AlarmClock_List_Time_Hour, &Lyra_AlarmClock_List_Time_Minute);
+        Render_Alarm_Clock_List_Mode_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, Lyra_AlarmClock_List_Time_Hour, Lyra_AlarmClock_List_Time_Minute);
       }
       else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
       {
@@ -914,6 +940,11 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
   uint8 cache[64][16] = {0x00}; // 64 rows, 128 columns
   // release dynamic animation cache
   Release_Dynamic_Animation_Cache(array, len);
+  // index cannot have the same value
+  if (index[0] == index[1])
+  {
+    return;
+  }
   // load dynamic animation cache according to menu and source and destination index
   switch (menu)
   {
@@ -951,6 +982,16 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
         default:
           break;
       } 
+    }
+    break;
+  case MAPS_Menu_AlarmClock:
+    for (int i = 0; i < len; i++)
+    {
+      int hour = 0;
+      int minute = 0;
+      Get_Alarm_Clock_Time_From_List(index[i], &hour, &minute);
+      Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, hour, minute);
+      Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
     }
     break;
   case MAPS_Menu_WorldClock:

@@ -69,6 +69,19 @@ typedef enum
 
 typedef enum
 {
+  MAPS_AlarmClock_Timer_0 = 0,     // Alarm Clock Timer 0
+  MAPS_AlarmClock_Timer_1 = 1,     // Alarm Clock Timer 1
+  MAPS_AlarmClock_Timer_2 = 2,     // Alarm Clock Timer 2
+  MAPS_AlarmClock_Timer_3 = 3,     // Alarm Clock Timer 3
+  MAPS_AlarmClock_Timer_4 = 4,     // Alarm Clock timer 4
+  MAPS_AlarmClock_Timer_5 = 5,     // Alarm Clock Timer 5
+  MAPS_AlarmClock_Timer_6 = 6,     // Alarm Clock Timer 6
+  MAPS_AlarmClock_Timer_7 = 7,     // Alarm Clock timer 7
+  MAPS_AlarmClock_Timer_Max = 8, // Maximum Alarm Clock timer
+} MAPS_AlarmClock_Timer;
+
+typedef enum
+{
   MAPS_WorldClock_Timezone_Beijing = 0, // Beijing Timezone (+8)
   MAPS_WorldClock_Timezone_Shanghai = 1, // Shanghai Timezone (+8)
   MAPS_WorldClock_Timezone_Hongkong = 2, // Hong Kong Timezone (+8)
