@@ -482,16 +482,13 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
         {
           int index[2] = {MAPS_AlarmClock_Timer_0, MAPS_AlarmClock_Timer_1};
+          index[0] = Lyra_AlarmClock_List_Cursor;
+          index[1] = Lyra_AlarmClock_List_Cursor - 1;
           Lyra_AlarmClock_List_Cursor--; // Move alarm clock list cursor up
           if (Lyra_AlarmClock_List_Cursor < 0)
           {
             Lyra_AlarmClock_List_Cursor = 0; // Reset to minimum alarm clock list cursor position
             index[0] = Lyra_AlarmClock_List_Cursor;
-            index[1] = Lyra_AlarmClock_List_Cursor;
-          }
-          else
-          {
-            index[0] = Lyra_AlarmClock_List_Cursor + 1;
             index[1] = Lyra_AlarmClock_List_Cursor;
           }
           Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
@@ -661,17 +658,14 @@ void MAPS_Dock_KEY_Incident(void)
         if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
         {
           int index[2] = {MAPS_AlarmClock_Timer_0, MAPS_AlarmClock_Timer_1};
+          index[0] = Lyra_AlarmClock_List_Cursor;
+          index[1] = Lyra_AlarmClock_List_Cursor + 1;
           Lyra_AlarmClock_List_Cursor++; // Move alarm clock list cursor down
-          if (Lyra_AlarmClock_List_Cursor > Get_Alarm_Clock_List_Len())
+          if (Lyra_AlarmClock_List_Cursor >= Get_Alarm_Clock_List_Len())
           {
-            Lyra_AlarmClock_List_Cursor = Get_Alarm_Clock_List_Len(); // Reset to minimum alarm clock list cursor position
+            Lyra_AlarmClock_List_Cursor = Get_Alarm_Clock_List_Len() - 1; // Reset to minimum alarm clock list cursor position
             index[0] = Lyra_AlarmClock_List_Cursor;
             index[1] = Lyra_AlarmClock_List_Cursor;
-          }
-          else
-          {
-            index[0] = Lyra_AlarmClock_List_Cursor;
-            index[1] = Lyra_AlarmClock_List_Cursor + 1;
           }
           // if cursor exceeds maximum length
           if (Lyra_AlarmClock_List_Cursor >= Alarm_Clock_Max_Len)
