@@ -781,7 +781,7 @@ void MAPS_Dock_KEY_Incident(void)
       }
       else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
       {
-        Render_Alarm_Clock_Edit(Lyra_AlarmClock_Edit_Number[0] * 10 + Lyra_AlarmClock_Edit_Number[1], Lyra_AlarmClock_Edit_Number[2] * 10 + Lyra_AlarmClock_Edit_Number[3], Lyra_AlarmClock_Edit_Cursor, Lyra_AlarmClock_List_Cursor);
+        Render_Alarm_Clock_Edit_Mode_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, Lyra_AlarmClock_Edit_Number[0] * 10 + Lyra_AlarmClock_Edit_Number[1], Lyra_AlarmClock_Edit_Number[2] * 10 + Lyra_AlarmClock_Edit_Number[3], Lyra_AlarmClock_List_Cursor + 1, Lyra_AlarmClock_Edit_Cursor);
       }
       break;
     case MAPS_Menu_WorldClock:
