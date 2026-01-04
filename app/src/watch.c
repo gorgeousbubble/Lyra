@@ -779,22 +779,26 @@ void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const 
  *  @param      const int dialLen   IN    Length of the dial coordinate array
  *  @param      int hour            IN    Current hour
  *  @param      int minute          IN    Current minute
+ *  @param      int cursor          IN    Cursor position
  *  @return     void
  *  @since      v1.0
  *  Sample usage:       Calc_Alarm_Clock_List_Mode_Time_Digit(&array, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
 */
-void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute)
+void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int cursor)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
   CoordNode* current = NULL;
   // convert hour and minute to digits
-  char ch[4][2] = {"", ""}; // initialize with "00"
+  char ch[7][2] = {"", ""}; // initialize with "00"
   snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
   snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
   snprintf(ch[2], sizeof(ch[2]), "%d", minute/10); // tens place of minute
   snprintf(ch[3], sizeof(ch[3]), "%d", minute%10);
-  for (int i = 0; i < 4; i++)
+  snprintf(ch[4], sizeof(ch[4]), "%s", "#");
+  snprintf(ch[5], sizeof(ch[5]), "%d", cursor);
+  snprintf(ch[6], sizeof(ch[6]), "%s", "#");
+  for (int i = 0; i < 7; i++)
   {
     for (int j = 0; ch[i][j] != '\0'; j++)
     {
@@ -828,6 +832,21 @@ void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, con
             {
               char_x += 76; // offset for minute ones place
               char_y += 28; // offset for minute ones place
+            }
+            else if (i == 4) // minute ones place
+            {
+              char_x += 55; // offset for minute ones place
+              char_y += 56; // offset for minute ones place
+            }
+            else if (i == 5) // minute ones place
+            {
+              char_x += 61; // offset for minute ones place
+              char_y += 56; // offset for minute ones place
+            }
+            else if (i == 6) // minute ones place
+            {
+              char_x += 67; // offset for minute ones place
+              char_y += 56; // offset for minute ones place
             }
             // create a new coordinate node for the character pixel
             CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
@@ -1365,15 +1384,16 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
  * @param      const int digitLen  IN    Length of the digit coordinate array
  * @param      int hour            IN    Current hour
  * @param      int minute          IN    Current minute
+ * @param      int cursor          IN    Current cursor position
  * @return     void
  * @since      v1.0
  * Sample usage:       Render_Alarm_Clock_List_Mode_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
 */
-void Render_Alarm_Clock_List_Mode_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute)
+void Render_Alarm_Clock_List_Mode_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int cursor)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   // calculate the clock digit array
-  Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)clock, digit, digitLen, hour, minute);
+  Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, cursor);
   // render the clock digit picture
   Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }

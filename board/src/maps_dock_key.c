@@ -661,9 +661,9 @@ void MAPS_Dock_KEY_Incident(void)
           index[0] = Lyra_AlarmClock_List_Cursor;
           index[1] = Lyra_AlarmClock_List_Cursor + 1;
           Lyra_AlarmClock_List_Cursor++; // Move alarm clock list cursor down
-          if (Lyra_AlarmClock_List_Cursor >= Get_Alarm_Clock_List_Len())
+          if (Lyra_AlarmClock_List_Cursor > Get_Alarm_Clock_List_Len())
           {
-            Lyra_AlarmClock_List_Cursor = Get_Alarm_Clock_List_Len() - 1; // Reset to minimum alarm clock list cursor position
+            Lyra_AlarmClock_List_Cursor = Get_Alarm_Clock_List_Len(); // Reset to minimum alarm clock list cursor position
             index[0] = Lyra_AlarmClock_List_Cursor;
             index[1] = Lyra_AlarmClock_List_Cursor;
           }
@@ -777,7 +777,7 @@ void MAPS_Dock_KEY_Incident(void)
       if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_List)
       {
         Get_Alarm_Clock_Time_From_List(Lyra_AlarmClock_List_Cursor, &Lyra_AlarmClock_List_Time_Hour, &Lyra_AlarmClock_List_Time_Minute);
-        Render_Alarm_Clock_List_Mode_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, Lyra_AlarmClock_List_Time_Hour, Lyra_AlarmClock_List_Time_Minute);
+        Render_Alarm_Clock_List_Mode_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, Lyra_AlarmClock_List_Time_Hour, Lyra_AlarmClock_List_Time_Minute, Lyra_AlarmClock_List_Cursor + 1);
       }
       else if (Lyra_AlarmClock_Mode == MAPS_AlarmClock_Edit)
       {
@@ -984,7 +984,7 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
       int hour = 0;
       int minute = 0;
       Get_Alarm_Clock_Time_From_List(index[i], &hour, &minute);
-      Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, hour, minute);
+      Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, hour, minute, index[i] + 1);
       Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
     }
     break;
