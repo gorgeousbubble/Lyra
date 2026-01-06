@@ -10,6 +10,7 @@
  * @date       2025-06-24
  */
 
+#include "func.h"
 #include "init.h"
 #include "main.h"
 #include "maps_dock_lcd.h"
@@ -104,5 +105,6 @@ void main(void)
   {
     MAPS_Dock_KEY_Incident();           // Independent button serial port transmission
     MAPS_Dock_Rocker_Key_LCM_Control(); // LCM display
+    UART_Send_Parameters();
   }
 }

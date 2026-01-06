@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <fileVersion>5</fileVersion>
-    <fileChecksum>2368967333</fileChecksum>
+    <fileChecksum>2825450171</fileChecksum>
     <configuration>
         <name>MK64FN1M0(RAM Debug)</name>
         <outputs>
@@ -601,6 +601,9 @@
             <file>$PROJ_DIR$\..\..\startup\src\system_init.c</file>
             <file>$PROJ_DIR$\..\..\startup\src\vectors.c</file>
             <file>$PROJ_DIR$\config files\MK64FN1M0_FLASH.icf</file>
+            <file>$PROJ_DIR$\..\..\app\src\func.c</file>
+            <file>$PROJ_DIR$\MK64FN1M0(ROM Debug)\Obj\app\func.o</file>
+            <file>$PROJ_DIR$\..\..\app\inc\func.h</file>
         </outputs>
         <file>
             <name>$PROJ_DIR$\..\..\chip\src\rtc.c</name>
@@ -748,7 +751,7 @@
             <inputs>
                 <tool>
                     <name>ICCARM</name>
-                    <file> 142 140 197 77 76 104 112 94 57 120 205 55 93 204 53 116 98 99 40 67 61 84 43 188 169 114 108 44 109 145 160 139 164 184 156</file>
+                    <file> 216 140 197 77 76 104 112 94 57 120 205 55 93 204 53 116 98 99 40 67 61 84 43 188 169 114 108 44 109 142 145 160 139 164 184 156</file>
                 </tool>
             </inputs>
         </file>
@@ -1151,7 +1154,7 @@
             <inputs>
                 <tool>
                     <name>ILINK</name>
-                    <file> 213 64 70 96 83 122 103 107 75 54 97 79 91 111 62 88 100 41 66 115 72 89 56 105 121 36 86 101 52 60 85 119 74 95 38 69 65 82 117 118 78 46 49 73 51 59 106 80 71 102 81 42 37 90 45 123 92 63 87 47 50</file>
+                    <file> 213 64 70 96 83 122 103 107 75 54 97 79 91 111 62 88 215 100 41 66 115 72 89 56 105 121 36 86 101 52 60 85 119 74 95 38 69 65 82 117 118 78 46 49 73 51 59 106 80 71 102 81 42 37 90 45 123 92 63 87 47 50</file>
                 </tool>
             </inputs>
         </file>
@@ -1479,6 +1482,25 @@
                 </tool>
             </inputs>
         </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\func.c</name>
+            <outputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 215</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>ICCARM</name>
+                    <file> 216 140 197 77 76 104 112 94 57 120 205 55 93 204 53 116 98 99 40 67 61 84 43 188 169 114 108 44 109 135 143 170 185</file>
+                </tool>
+            </inputs>
+        </file>
+        <forcedrebuild>
+            <name>[MULTI_TOOL]</name>
+            <tool>ILINK</tool>
+        </forcedrebuild>
     </configuration>
     <configuration>
         <name>MK64FN1M0(ROM Release)</name>

@@ -11389,6 +11389,9 @@
             <name>$PROJ_DIR$\..\..\app\src\conf.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\func.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\health.c</name>
         </file>
         <file>

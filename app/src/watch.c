@@ -921,7 +921,7 @@ void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, con
     counter = 0;
   }
   // convert hour and minute to digits
-  char ch[12][2] = {"", ""}; // initialize with "00"
+  char ch[8][2] = {"", ""}; // initialize with "00"
   snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
   snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
   snprintf(ch[2], sizeof(ch[2]), "%d", minute/10); // tens place of minute
@@ -929,12 +929,8 @@ void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, con
   snprintf(ch[4], sizeof(ch[4]), "%s", "#");
   snprintf(ch[5], sizeof(ch[5]), "%d", cursor);
   snprintf(ch[6], sizeof(ch[6]), "%s", "#");
-  snprintf(ch[7], sizeof(ch[7]), "%s", "O");
-  snprintf(ch[8], sizeof(ch[8]), "%s", "K");
-  snprintf(ch[9], sizeof(ch[9]), "%s", "D");
-  snprintf(ch[10], sizeof(ch[10]), "%s", "E");
-  snprintf(ch[11], sizeof(ch[11]), "%s", "L");
-  for (int i = 0; i < 12; i++)
+  snprintf(ch[7], sizeof(ch[7]), "%s", "_");
+  for (int i = 0; i < 8; i++)
   {
     for (int j = 0; ch[i][j] != '\0'; j++)
     {
@@ -943,7 +939,7 @@ void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, con
       {
         for (int l = 0; l < 8; l++)
         {
-          if (((i < 4 && i == number && counter % 2 == 0)?(Oled_FontLib_6x8[c][k] | Oled_FontLib_6x8[63][k]):Oled_FontLib_6x8[c][k]) & (0x01 << l))
+          if (Oled_FontLib_6x8[c][k] & (0x01 << l))
           {
             // if the pixel is set, draw it
             // calculate the x and y coordinates for the character
@@ -986,28 +982,30 @@ void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, con
             }
             else if (i == 7) // minute ones place
             {
-              char_x += 0; // offset for minute ones place
-              char_y += 56; // offset for minute ones place
-            }
-            else if (i == 8) // minute ones place
-            {
-              char_x += 6; // offset for minute ones place
-              char_y += 56; // offset for minute ones place
-            }
-            else if (i == 9) // minute ones place
-            {
-              char_x += 110; // offset for minute ones place
-              char_y += 56; // offset for minute ones place
-            }
-            else if (i == 10) // minute ones place
-            {
-              char_x += 116; // offset for minute ones place
-              char_y += 56; // offset for minute ones place
-            }
-            else if (i == 11) // minute ones place
-            {
-              char_x += 122; // offset for minute ones place
-              char_y += 56; // offset for minute ones place
+              if (counter % 2 != 0) // blink the dash
+              {
+                continue; // skip drawing the dash
+              }
+              if (number == 0) // if editing the dash, do not draw
+              {
+                char_x += 45; // offset for hour tens place
+                char_y += 32; // offset for hour tens place
+              }
+              else if (number == 1)
+              {
+                char_x += 53; // offset for hour ones place
+                char_y += 32; // offset for hour ones place
+              }
+              else if (number == 2)
+              {
+                char_x += 68; // offset for minute tens place
+                char_y += 32; // offset for minute tens place
+              }
+              else if (number == 3)
+              {
+                char_x += 76; // offset for minute ones place
+                char_y += 32; // offset for minute ones place
+              }
             }
             // create a new coordinate node for the character pixel
             CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
