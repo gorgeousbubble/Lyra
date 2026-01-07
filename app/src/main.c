@@ -87,6 +87,13 @@ MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max
 };
 
 /*
+** MAPS Configure Adjust Mode
+*/
+MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max] = {
+        MAPS_ConfigureAdjust_Clock,
+};
+
+/*
  *  @brief              main
  *  @note               main function
  *  @since              v1.0

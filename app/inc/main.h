@@ -102,6 +102,11 @@ typedef struct MAPS_WorldClock_Time
   int minute_offset;               // Minute offset from UTC
 } MAPS_WorldClock_Time;
 
+typedef enum
+{
+  MAPS_ConfigureAdjust_Clock = 0, // Configure Adjust RTC Clock
+  MAPS_ConfigureAdjust_Max = 1,       // Maximum Configure Adjust mode
+} MAPS_ConfigureAdjust_Mode;
 
 /*
 **variate declaration
@@ -113,6 +118,7 @@ extern MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max];
 extern MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max];
 extern MAPS_WorldClock_Timezone MAPS_WorldClock_TimezoneN[MAPS_WorldClock_Timezone_Max];
 extern MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max];
+extern MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max];
 
 /*
 **function declaration

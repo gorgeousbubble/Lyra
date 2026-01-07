@@ -37,6 +37,7 @@ int Lyra_AlarmClock_List_Time_Minute = 0; // Alarm Clock list time minute
 int Lyra_AlarmClock_Edit_Cursor = 0;      // Alarm Clock edit cursor
 int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
 int Lyra_WorldClock_Time_Cursor = 0;  // World Clock time cursor
+int Lyra_ConfigureAdjust_Mode = 0; // Configure Adjust mode
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -824,6 +825,12 @@ void MAPS_Dock_KEY_Incident(void)
       else if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_NewYork)
       {
         Render_World_Clock_Time(LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, MAPS_WorldClock_Timezone_Array[9], RTC_Time_Now.Hour - 13, RTC_Time_Now.Minute);
+      }
+      break;
+    case MAPS_Menu_Configure_Adjust:
+      if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
+      {
+        //Render_Configure_Adjust_Clock(LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length, MAPS_WorldClock_Timezone_Array[0], RTC_Time_Now.Hour, RTC_Time_Now.Minute);
       }
       break;
     default:
