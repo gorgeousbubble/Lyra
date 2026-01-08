@@ -104,8 +104,10 @@ typedef struct MAPS_WorldClock_Time
 
 typedef enum
 {
-  MAPS_ConfigureAdjust_Clock = 0, // Configure Adjust RTC Clock
-  MAPS_ConfigureAdjust_Max = 1,       // Maximum Configure Adjust mode
+  MAPS_ConfigureAdjust_List = 0,  // Configure Adjust List
+  MAPS_ConfigureAdjust_Clock = 1, // Configure Adjust RTC Clock
+  MAPS_ConfigureAdjust_Date = 2,  // Configure Adjust RTC Date
+  MAPS_ConfigureAdjust_Max = 3,   // Maximum Configure Adjust mode
 } MAPS_ConfigureAdjust_Mode;
 
 /*

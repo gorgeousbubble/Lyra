@@ -58,16 +58,16 @@ MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max] = {
 ** MAPS World Clock Timezone
 */
 MAPS_WorldClock_Timezone MAPS_WorldClock_TimezoneN[MAPS_WorldClock_Timezone_Max] = {
-  MAPS_WorldClock_Timezone_Beijing,
-  MAPS_WorldClock_Timezone_Shanghai,
-  MAPS_WorldClock_Timezone_Hongkong,
-  MAPS_WorldClock_Timezone_Taipei,
-  MAPS_WorldClock_Timezone_Singapore,
-  MAPS_WorldClock_Timezone_Seoul,
-  MAPS_WorldClock_Timezone_Tokyo,
-  MAPS_WorldClock_Timezone_Sydney,
-  MAPS_WorldClock_Timezone_SanFrancisco,
-  MAPS_WorldClock_Timezone_NewYork,
+        MAPS_WorldClock_Timezone_Beijing,
+        MAPS_WorldClock_Timezone_Shanghai,
+        MAPS_WorldClock_Timezone_Hongkong,
+        MAPS_WorldClock_Timezone_Taipei,
+        MAPS_WorldClock_Timezone_Singapore,
+        MAPS_WorldClock_Timezone_Seoul,
+        MAPS_WorldClock_Timezone_Tokyo,
+        MAPS_WorldClock_Timezone_Sydney,
+        MAPS_WorldClock_Timezone_SanFrancisco,
+        MAPS_WorldClock_Timezone_NewYork,
 };
 
 /*
@@ -90,7 +90,9 @@ MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max
 ** MAPS Configure Adjust Mode
 */
 MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max] = {
+        MAPS_ConfigureAdjust_List,
         MAPS_ConfigureAdjust_Clock,
+        MAPS_ConfigureAdjust_Date,
 };
 
 /*
