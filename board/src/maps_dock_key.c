@@ -38,7 +38,7 @@ int Lyra_AlarmClock_Edit_Cursor = 0;      // Alarm Clock edit cursor
 int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
 int Lyra_WorldClock_Time_Cursor = 0;      // World Clock time cursor
 int Lyra_ConfigureAdjust_Mode = 0;        // Configure Adjust mode
-int Lyra_ConfigureAdjust_List_Cursor = 0; // Configure Adjust list cursor
+int Lyra_ConfigureAdjust_List_Cursor = 1; // Configure Adjust list cursor
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -620,9 +620,9 @@ void MAPS_Dock_KEY_Incident(void)
           index[0] = Lyra_ConfigureAdjust_List_Cursor;
           index[1] = Lyra_ConfigureAdjust_List_Cursor - 1;
           Lyra_ConfigureAdjust_List_Cursor--; // Move configure adjust list cursor up
-          if (Lyra_ConfigureAdjust_List_Cursor < 0)
+          if (Lyra_ConfigureAdjust_List_Cursor < 1)
           {
-            Lyra_ConfigureAdjust_List_Cursor = 0; // Reset to minimum configure adjust list cursor position
+            Lyra_ConfigureAdjust_List_Cursor = 1; // Reset to minimum configure adjust list cursor position
             index[0] = Lyra_ConfigureAdjust_List_Cursor;
             index[1] = Lyra_ConfigureAdjust_List_Cursor;
           }
@@ -777,6 +777,32 @@ void MAPS_Dock_KEY_Incident(void)
         Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
         Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
       }
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Configure_Adjust)
+      {
+        if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_List)
+        {
+          int index[2] = {MAPS_ConfigureAdjust_Clock, MAPS_ConfigureAdjust_Date};
+          index[0] = Lyra_ConfigureAdjust_List_Cursor;
+          index[1] = Lyra_ConfigureAdjust_List_Cursor + 1;
+          Lyra_ConfigureAdjust_List_Cursor++; // Move configure adjust list cursor down
+          if (Lyra_ConfigureAdjust_List_Cursor > MAPS_ConfigureAdjust_Max - 1)
+          {
+            Lyra_ConfigureAdjust_List_Cursor = MAPS_ConfigureAdjust_Max - 1; // Reset to maximum configure adjust list cursor position
+            index[0] = Lyra_ConfigureAdjust_List_Cursor;
+            index[1] = Lyra_ConfigureAdjust_List_Cursor;
+          }
+          Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
+          Animation_Screen_Switch_Vertical_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
+        {
+
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
+        {
+
+        }
+      }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
     // Display the current menu selection
@@ -856,9 +882,24 @@ void MAPS_Dock_KEY_Incident(void)
       }
       break;
     case MAPS_Menu_Configure_Adjust:
-      if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
+      if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_List)
       {
-        //Render_Configure_Adjust_Clock(LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length, MAPS_WorldClock_Timezone_Array[0], RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+        if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_Clock)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length);
+        }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_Date)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Date_icon_coordinate, LCM_ConfigureAdjust_Date_icon_coordinate_length);
+        }
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
+      {
+
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
+      {
+
       }
       break;
     default:
@@ -1079,12 +1120,12 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
       switch(index[i])
       {
         case MAPS_ConfigureAdjust_Clock:
-          //Calc_Configure_Adjust_Clock((uint8*)cache, LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length, MAPS_WorldClock_Timezone_Array[9], RTC_Time_Now.Hour - 13, RTC_Time_Now.Minute);
-          //Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
           break;
         case MAPS_ConfigureAdjust_Date:
-          //Calc_Configure_Adjust_Clock((uint8*)cache, LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length, MAPS_WorldClock_Timezone_Array[9], RTC_Time_Now.Hour - 13, RTC_Time_Now.Minute);
-          //Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Date_icon_coordinate, LCM_ConfigureAdjust_Date_icon_coordinate_length);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
           break;
         default:
           break;

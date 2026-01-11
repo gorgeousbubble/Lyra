@@ -1467,6 +1467,49 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
 }
 
 /*
+ *  @brief      Calc_Configure_Adjust_List_Mode_Item
+ *  @param      uint8* array        OUT   Pointer to the array to store the clock digit coordinates
+ *  @param      const Coord *item   IN    Pointer to the item coordinate array
+ *  @param      const int itemLen   IN    Length of the item coordinate array
+ *  @return     void
+ *  @since      v1.0
+ * Sample usage:       Calc_Configure_Adjust_List_Mode_Item(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+*/
+void Calc_Configure_Adjust_List_Mode_Item(uint8* array, const Coord *item, const int itemLen)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  CoordNode* head = NULL;
+  CoordNode* current = NULL;
+
+  // draw clock digit
+  for (int i = 0; i < itemLen; i++) 
+  {
+    const Coord *coord = &item[i];
+    clock[coord->y][coord->x >> 3] |= (0x01 << (7 - (coord->x & 0x07)));
+  }
+  // render the clock numbers
+  for (current = head; current != NULL; current = current->next) 
+  {
+    clock[current->y][current->x >> 3] |= (0x01 << (7 - (current->x & 0x07)));
+  }
+  // free the linked list
+  while (head != NULL) 
+  {
+    CoordNode* temp = head;
+    head = head->next;
+    free(temp);
+  }
+  // return the clock array
+  for (int i = 0; i < 64; i++)
+  {
+    for (int j = 0; j < 16; j++)
+    {
+      *array++ = clock[i][j];
+    }
+  }
+}
+
+/*
  *  @brief      Render_Clock_Current_Time_Dial
  *  @param      const Coord *dial   IN    Pointer to the dial coordinate array
  *  @param      const int dialLen   IN    Length of the dial coordinate array
@@ -1603,6 +1646,24 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClo
   // calculate the world clock time array
   Calc_World_Clock_Time((uint8*)clock, city, cityLen, time, hour, minute);
   // render the world clock time picture
+  Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
+}
+
+/*
+ *  @brief      Render_Configure_Adjust_List_Mode_Item
+ *  @param      uint8* array        OUT   Pointer to the array to store the clock digit coordinates
+ *  @param      const Coord *item   IN    Pointer to the item coordinate array
+ *  @param      const int itemLen   IN    Length of the item coordinate array
+ *  @return     void
+ *  @since      v1.0
+ * Sample usage:       Render_Configure_Adjust_List_Mode_Item(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+*/
+void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen)
+{
+  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  // calculate the clock digit array
+  Calc_Configure_Adjust_List_Mode_Item((uint8*)clock, item, itemLen);
+  // render the clock digit picture
   Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }
 
