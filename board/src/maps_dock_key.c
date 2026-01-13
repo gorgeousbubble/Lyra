@@ -18,8 +18,10 @@
 #include "main.h"
 #include "maps_dock_key.h"
 #include "oled_i2c.h"
+#include "rtc.h"
 #include "uart.h"
 #include "watch.h"
+#include <time.h>
 
 /*
 **Independent button port
@@ -39,6 +41,10 @@ int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
 int Lyra_WorldClock_Time_Cursor = 0;      // World Clock time cursor
 int Lyra_ConfigureAdjust_Mode = 0;        // Configure Adjust mode
 int Lyra_ConfigureAdjust_List_Cursor = 1; // Configure Adjust list cursor
+int Lyra_ConfigureAdjust_Clock_Cursor = 0;      // Configure Adjust clock cursor
+int Lyra_ConfigureAdjust_Clock_Number[6] = {0}; // Configure Adjust clock number (hh:mm:ss)
+int Lyra_ConfigureAdjust_Date_Cursor = 0;       // Configure Adjust date cursor
+int Lyra_ConfigureAdjust_Date_Number[8] = {0};  // Configure Adjust date number (yyyy:mm:dd)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -393,6 +399,49 @@ void MAPS_Dock_KEY_Incident(void)
           }
         }
       }
+      // Check current menu selection is configure adjust
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Configure_Adjust)
+      {
+        if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_List)
+        {
+          struct tm time = RTC_Get_Time_Format();
+          switch (Lyra_ConfigureAdjust_List_Cursor)
+          {
+          case MAPS_ConfigureAdjust_Clock:
+            Lyra_ConfigureAdjust_Clock_Number[0] = time.tm_hour / 10;      // Hour tens
+            Lyra_ConfigureAdjust_Clock_Number[1] = time.tm_hour % 10;      // Hour units
+            Lyra_ConfigureAdjust_Clock_Number[2] = time.tm_min / 10;       // Minute tens
+            Lyra_ConfigureAdjust_Clock_Number[3] = time.tm_min % 10;       // Minute units
+            Lyra_ConfigureAdjust_Clock_Number[4] = time.tm_sec / 10;       // Second tens
+            Lyra_ConfigureAdjust_Clock_Number[5] = time.tm_sec % 10;       // Second units
+            Lyra_ConfigureAdjust_Clock_Cursor = 0;
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Clock;
+            break;
+          case MAPS_ConfigureAdjust_Date:
+            Lyra_ConfigureAdjust_Date_Number[0] = (time.tm_year + 1900) / 1000;        // Year thousands
+            Lyra_ConfigureAdjust_Date_Number[1] = ((time.tm_year + 1900) / 100) % 10;  // Year hundreds
+            Lyra_ConfigureAdjust_Date_Number[2] = ((time.tm_year + 1900) / 10) % 10;   // Year tens
+            Lyra_ConfigureAdjust_Date_Number[3] = (time.tm_year + 1900) % 10;          // Year units
+            Lyra_ConfigureAdjust_Date_Number[4] = (time.tm_mon + 1) / 10;             // Month tens
+            Lyra_ConfigureAdjust_Date_Number[5] = (time.tm_mon + 1) % 10;             // Month units
+            Lyra_ConfigureAdjust_Date_Number[6] = time.tm_mday / 10;                // Day tens
+            Lyra_ConfigureAdjust_Date_Number[7] = time.tm_mday % 10;                // Day units
+            Lyra_ConfigureAdjust_Date_Cursor = 0;
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Date;
+            break;
+          default:
+            break;
+          } 
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
+        {
+          
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
+        {
+          
+        }
+      }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
     // Press KEY1
@@ -631,11 +680,261 @@ void MAPS_Dock_KEY_Incident(void)
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
         {
-
+          Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor]++; // Increase configure adjust clock edit number
+          if (Lyra_ConfigureAdjust_Clock_Cursor == 0)
+          {
+            if (Lyra_ConfigureAdjust_Clock_Number[1] >= 5) // If hour units is 5 or more
+            {
+              if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 2)
+              {
+                Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+              }
+            }
+            else // If hour units is less than 5
+            {
+              if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 3)
+              {
+                Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+              }
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Clock_Cursor == 1) // Hour units
+          {
+            if (Lyra_ConfigureAdjust_Clock_Number[0] == 2) // If hour tens is 2
+            {
+              if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 4)
+              {
+                Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+              }
+            }
+            else // If hour tens is 0 or 1
+            {
+              if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 10)
+              {
+                Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+              }
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Clock_Cursor == 2) // Minute tens
+          {
+            if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 6)
+            {
+              Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Clock_Cursor == 3) // Minute units
+          {
+            if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 10)
+            {
+              Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Clock_Cursor == 4) // Second tens
+          {
+            if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 6)
+            {
+              Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Clock_Cursor == 5) // Second units
+          {
+            if (Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] >= 10)
+            {
+              Lyra_ConfigureAdjust_Clock_Number[Lyra_ConfigureAdjust_Clock_Cursor] = 0; // Reset to 0
+            }
+          }
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
         {
-
+          Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor]++; // Increase configure adjust date edit number
+          // Validate the date number based on the cursor position (date format: YYYYMMDD range: 19000101 to 20991231)
+          if (Lyra_ConfigureAdjust_Date_Cursor == 0) // Year thousands
+          {
+            if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 3)
+            {
+              Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 1; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Date_Cursor == 1) // Year hundreds
+          {
+            if (Lyra_ConfigureAdjust_Date_Number[0] == 1) // If year thousands is 1
+            {
+              if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+              {
+                Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 9; // Reset to 9
+              }
+            }
+            else // If year thousands is 2
+            {
+              if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 1)
+              {
+                Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+              }
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Date_Cursor == 2) // Year tens
+          {
+            if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+            {
+              Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Date_Cursor == 3) // Year units
+          {
+            if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+            {
+              Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Date_Cursor == 4) // Month tens
+          {
+            if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 2)
+            {
+              Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Date_Cursor == 5) // Month units
+          {
+            if (Lyra_ConfigureAdjust_Date_Number[4] == 1) // If month tens is 1
+            {
+              if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 3)
+              {
+                Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+              }
+            }
+            else // If month tens is 0
+            {
+              if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+              {
+                Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+              }
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Date_Cursor == 6) // Day tens
+          {
+            // check month to determine maximum day tens
+            int month = Lyra_ConfigureAdjust_Date_Number[4] * 10 + Lyra_ConfigureAdjust_Date_Number[5];
+            if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) // Months with 31 days
+            {
+              if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 4)
+              {
+                Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+              }
+            }
+            else if (month == 4 || month == 6 || month == 9 || month == 11) // Months with 30 days
+            {
+              if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 3)
+              {
+                Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+              }
+            }
+            else if (month == 2) // February
+            {
+              int year = Lyra_ConfigureAdjust_Date_Number[0] * 1000 + Lyra_ConfigureAdjust_Date_Number[1] * 100 + Lyra_ConfigureAdjust_Date_Number[2] * 10 + Lyra_ConfigureAdjust_Date_Number[3];
+              // Check for leap year
+              if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+              {
+                if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 3) // Leap year has 29 days
+                {
+                  Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                }
+              }
+              else
+              {
+                if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 2) // Non-leap year has 28 days
+                {
+                  Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                }
+              }
+            }
+            else // Invalid month, reset day tens
+            {
+              Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+            }
+          }
+          else if (Lyra_ConfigureAdjust_Date_Cursor == 7) // Day units
+          {
+            // check month and day tens to determine maximum day units
+            int month = Lyra_ConfigureAdjust_Date_Number[4] * 10 + Lyra_ConfigureAdjust_Date_Number[5];
+            int day_tens = Lyra_ConfigureAdjust_Date_Number[6];
+            if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) // Months with 31 days
+            {
+              if (day_tens == 3) // Day tens is 3
+              {
+                if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 2)
+                {
+                  Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                }
+              }
+              else // Day tens is 0, 1, or 2
+              {
+                if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+                {
+                  Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                }
+              }
+            }
+            else if (month == 4 || month == 6 || month == 9 || month == 11) // Months with 30 days
+            {
+              if (day_tens == 3) // Day tens is 3
+              {
+                if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 1)
+                {
+                  Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                }
+              }
+              else // Day tens is 0, 1, or 2
+              {
+                if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+                {
+                  Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                }
+              }
+            }
+            else if (month == 2) // February
+            {
+              int year = Lyra_ConfigureAdjust_Date_Number[0] * 1000 + Lyra_ConfigureAdjust_Date_Number[1] * 100 + Lyra_ConfigureAdjust_Date_Number[2] * 10 + Lyra_ConfigureAdjust_Date_Number[3];
+              // Check for leap year
+              if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+              {
+                if (day_tens == 2) // Day tens is 2
+                {
+                  if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 9)
+                  {
+                    Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                  }
+                }
+                else // Day tens is 0 or 1
+                {
+                  if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+                  {
+                    Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                  }
+                }
+              }
+              else
+              {
+                if (day_tens == 2) // Day tens is 2
+                {
+                  if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 8)
+                  {
+                    Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                  }
+                }
+                else // Day tens is 0 or 1
+                {
+                  if (Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] >= 10)
+                  {
+                    Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+                  }
+                }
+              }
+            }
+            else // Invalid month, reset day units
+            {
+              Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
+            }
+          }  
         }
       }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
@@ -796,11 +1095,19 @@ void MAPS_Dock_KEY_Incident(void)
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
         {
-
+          Lyra_ConfigureAdjust_Clock_Cursor++;
+          if (Lyra_ConfigureAdjust_Clock_Cursor >= 6)
+          {
+            Lyra_ConfigureAdjust_Clock_Cursor = 0; // Reset to maximum configure adjust clock edit cursor position
+          }
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
         {
-
+          Lyra_ConfigureAdjust_Date_Cursor++;
+          if (Lyra_ConfigureAdjust_Date_Cursor >= 8)
+          {
+            Lyra_ConfigureAdjust_Date_Cursor = 0; // Reset to maximum configure adjust date edit cursor position
+          }
         }
       }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
@@ -895,11 +1202,11 @@ void MAPS_Dock_KEY_Incident(void)
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
-
+        Render_Configure_Adjust_Clock_Digit(LCM_ConfigureAdjust_Clock_Digit_coordinate, LCM_ConfigureAdjust_Clock_Digit_coordinate_length, Lyra_ConfigureAdjust_Clock_Number[0] * 10 + Lyra_ConfigureAdjust_Clock_Number[1], Lyra_ConfigureAdjust_Clock_Number[2] * 10 + Lyra_ConfigureAdjust_Clock_Number[3], Lyra_ConfigureAdjust_Clock_Number[4] * 10 + Lyra_ConfigureAdjust_Clock_Number[5], Lyra_ConfigureAdjust_Clock_Cursor);
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
       {
-
+        Render_Configure_Adjust_Date_Digit(LCM_ConfigureAdjust_Clock_Digit_coordinate, LCM_ConfigureAdjust_Clock_Digit_coordinate_length, Lyra_ConfigureAdjust_Date_Number[0] * 1000 + Lyra_ConfigureAdjust_Date_Number[1] * 100 + Lyra_ConfigureAdjust_Date_Number[2] * 10 + Lyra_ConfigureAdjust_Date_Number[3], Lyra_ConfigureAdjust_Date_Number[4] * 10 + Lyra_ConfigureAdjust_Date_Number[5], Lyra_ConfigureAdjust_Date_Number[6] * 10 + Lyra_ConfigureAdjust_Date_Number[7], Lyra_ConfigureAdjust_Date_Cursor);
       }
       break;
     default:
