@@ -435,11 +435,37 @@ void MAPS_Dock_KEY_Incident(void)
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
         {
-          
+          // save clock time to rtc clock
+          int hour = Lyra_ConfigureAdjust_Clock_Number[0] * 10 + Lyra_ConfigureAdjust_Clock_Number[1];
+          int minute = Lyra_ConfigureAdjust_Clock_Number[2] * 10 + Lyra_ConfigureAdjust_Clock_Number[3];
+          int second = Lyra_ConfigureAdjust_Clock_Number[4] * 10 + Lyra_ConfigureAdjust_Clock_Number[5];
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // get rtc clock
+          struct tm time = RTC_Get_Time_Format();
+          // update clock time
+          time.tm_hour = hour;
+          time.tm_min = minute;
+          time.tm_sec = second;
+          RTC_Set_Time_Format(&time);//Set RTC time format*/
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
         {
-          
+          // save date time to rtc clock
+          int year = Lyra_ConfigureAdjust_Date_Number[0] * 1000 + Lyra_ConfigureAdjust_Date_Number[1] * 100 + Lyra_ConfigureAdjust_Date_Number[2] * 10 + Lyra_ConfigureAdjust_Date_Number[3];
+          int month = Lyra_ConfigureAdjust_Date_Number[4] * 10 + Lyra_ConfigureAdjust_Date_Number[5];
+          int day = Lyra_ConfigureAdjust_Date_Number[6] * 10 + Lyra_ConfigureAdjust_Date_Number[7];
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // get rtc clock
+          struct tm time = RTC_Get_Time_Format();
+          // update clock time
+          time.tm_year = year - 1900;
+          time.tm_mon = month - 1;
+          time.tm_mday = day;
+          RTC_Set_Time_Format(&time);//Set RTC time format*/
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
       }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
@@ -478,7 +504,18 @@ void MAPS_Dock_KEY_Incident(void)
           }
         }
       }
-
+      // Check current menu selection is configure adjust
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Configure_Adjust)
+      {
+        if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+      }
       Lyra_Status--; // Switch to screen saver
       if (Lyra_Status < MAPS_Screen_Saver)
       {
@@ -1076,6 +1113,7 @@ void MAPS_Dock_KEY_Incident(void)
         Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
         Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
       }
+      // Check current menu selection is configure adjust
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Configure_Adjust)
       {
         if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_List)

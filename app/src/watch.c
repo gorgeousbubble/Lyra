@@ -1618,30 +1618,20 @@ void Calc_Configure_Adjust_Clock_Digit(uint8* array, const Coord *digit, const i
               }
               else if (number == 2)
               {
-                char_x += 57; // offset for minute tens place
-                char_y += 32; // offset for minute tens place
-              }
-              else if (number == 3)
-              {
                 char_x += 63; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
               }
-              else if (number == 4)
+              else if (number == 3)
               {
                 char_x += 69; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
               }
-              else if (number == 5)
-              {
-                char_x += 75; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
-              }
-              else if (number == 6)
+              else if (number == 4)
               {
                 char_x += 81; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
               }
-              else if (number == 7)
+              else if (number == 5)
               {
                 char_x += 87; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
@@ -1825,30 +1815,20 @@ void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const in
               }
               else if (number == 4)
               {
-                char_x += 69; // offset for minute ones place
+                char_x += 75; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
               }
               else if (number == 5)
               {
-                char_x += 75; // offset for minute ones place
+                char_x += 81; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
               }
               else if (number == 6)
               {
-                char_x += 81; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
-              }
-              else if (number == 7)
-              {
-                char_x += 87; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
-              }
-              else if (number == 8)
-              {
                 char_x += 93; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
               }
-              else if (number == 9)
+              else if (number == 7)
               {
                 char_x += 99; // offset for minute ones place
                 char_y += 32; // offset for minute ones place
@@ -2066,7 +2046,7 @@ void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen
  *  @param      const int itemLen   IN    Length of the item coordinate array
  *  @return     void
  *  @since      v1.0
- * Sample usage:       Render_Configure_Adjust_List_Mode_Item(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+ * Sample usage:       Render_Configure_Adjust_Clock_Digit(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
 */
 void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen, int hour, int minute, int second, int number)
 {
@@ -2078,13 +2058,13 @@ void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen,
 }
 
 /*
- *  @brief      Render_Configure_Adjust_Clock_Digit
+ *  @brief      Render_Configure_Adjust_Date_Digit
  *  @param      uint8* array        OUT   Pointer to the array to store the clock digit coordinates
  *  @param      const Coord *item   IN    Pointer to the item coordinate array
  *  @param      const int itemLen   IN    Length of the item coordinate array
  *  @return     void
  *  @since      v1.0
- * Sample usage:       Render_Configure_Adjust_List_Mode_Item(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+ * Sample usage:       Render_Configure_Adjust_Date_Digit(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
 */
 void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, int year, int month, int day, int number)
 {
