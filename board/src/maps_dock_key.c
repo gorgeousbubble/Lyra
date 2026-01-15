@@ -1244,7 +1244,7 @@ void MAPS_Dock_KEY_Incident(void)
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
       {
-        Render_Configure_Adjust_Date_Digit(LCM_ConfigureAdjust_Clock_Digit_coordinate, LCM_ConfigureAdjust_Clock_Digit_coordinate_length, Lyra_ConfigureAdjust_Date_Number[0] * 1000 + Lyra_ConfigureAdjust_Date_Number[1] * 100 + Lyra_ConfigureAdjust_Date_Number[2] * 10 + Lyra_ConfigureAdjust_Date_Number[3], Lyra_ConfigureAdjust_Date_Number[4] * 10 + Lyra_ConfigureAdjust_Date_Number[5], Lyra_ConfigureAdjust_Date_Number[6] * 10 + Lyra_ConfigureAdjust_Date_Number[7], Lyra_ConfigureAdjust_Date_Cursor);
+        Render_Configure_Adjust_Date_Digit(LCM_ConfigureAdjust_Date_Digit_coordinate, LCM_ConfigureAdjust_Date_Digit_coordinate_length, Lyra_ConfigureAdjust_Date_Number[0] * 1000 + Lyra_ConfigureAdjust_Date_Number[1] * 100 + Lyra_ConfigureAdjust_Date_Number[2] * 10 + Lyra_ConfigureAdjust_Date_Number[3], Lyra_ConfigureAdjust_Date_Number[4] * 10 + Lyra_ConfigureAdjust_Date_Number[5], Lyra_ConfigureAdjust_Date_Number[6] * 10 + Lyra_ConfigureAdjust_Date_Number[7], Lyra_ConfigureAdjust_Date_Cursor);
       }
       break;
     default:
