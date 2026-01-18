@@ -1712,19 +1712,18 @@ void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const in
     counter = 0;
   }
   // convert hour and minute to digits
-  char ch[11][2] = {"", ""}; // initialize with "00"
+  char ch[10][2] = {"", ""}; // initialize with "00"
   snprintf(ch[0], sizeof(ch[0]), "%d", year/1000); // tens place of year
   snprintf(ch[1], sizeof(ch[1]), "%d", (year/100)%10);
   snprintf(ch[2], sizeof(ch[2]), "%d", (year/10)%10);
   snprintf(ch[3], sizeof(ch[3]), "%d", year%10);
-  snprintf(ch[4], sizeof(ch[4]), "%s", "-");
-  snprintf(ch[5], sizeof(ch[5]), "%d", month/10); // tens place of month
-  snprintf(ch[6], sizeof(ch[6]), "%d", month%10);
-  snprintf(ch[7], sizeof(ch[7]), "%s", "-");
-  snprintf(ch[8], sizeof(ch[8]), "%d", day/10); // tens place of day
-  snprintf(ch[9], sizeof(ch[9]), "%d", day%10);
-  snprintf(ch[10], sizeof(ch[10]), "%s", "_");
-  for (int i = 0; i < 11; i++)
+  snprintf(ch[4], sizeof(ch[5]), "%d", month/10); // tens place of month
+  snprintf(ch[5], sizeof(ch[5]), "%d", month%10);
+  snprintf(ch[6], sizeof(ch[6]), "%s", "-");
+  snprintf(ch[7], sizeof(ch[7]), "%d", day/10); // tens place of day
+  snprintf(ch[8], sizeof(ch[8]), "%d", day%10);
+  snprintf(ch[9], sizeof(ch[9]), "%s", "_");
+  for (int i = 0; i < 10; i++)
   {
     for (int j = 0; ch[i][j] != '\0'; j++)
     {
@@ -1741,55 +1740,50 @@ void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const in
             uint8 char_y = l;
             if (i == 0) // hour tens place
             {
-              char_x += 45; // offset for hour tens place
-              char_y += 28; // offset for hour tens place
+              char_x += 52; // offset for hour tens place
+              char_y += 20; // offset for hour tens place
             }
             else if (i == 1) // hour ones place
             {
-              char_x += 51; // offset for hour ones place
-              char_y += 28; // offset for hour ones place
+              char_x += 58; // offset for hour ones place
+              char_y += 20; // offset for hour ones place
             }
             else if (i == 2) // minute tens place
             {
-              char_x += 57; // offset for minute tens place
-              char_y += 28; // offset for minute tens place
+              char_x += 64; // offset for minute tens place
+              char_y += 20; // offset for minute tens place
             }
             else if (i == 3) // minute ones place
             {
-              char_x += 63; // offset for minute ones place
-              char_y += 28; // offset for minute ones place
+              char_x += 70; // offset for minute ones place
+              char_y += 20; // offset for minute ones place
             }
             else if (i == 4) // minute ones place
             {
-              char_x += 69; // offset for minute ones place
-              char_y += 28; // offset for minute ones place
+              char_x += 49; // offset for minute ones place
+              char_y += 32; // offset for minute ones place
             }
             else if (i == 5) // minute ones place
             {
-              char_x += 75; // offset for minute ones place
-              char_y += 28; // offset for minute ones place
+              char_x += 55; // offset for minute ones place
+              char_y += 32; // offset for minute ones place
             }
             else if (i == 6) // minute ones place
             {
-              char_x += 81; // offset for minute ones place
-              char_y += 28; // offset for minute ones place
+              char_x += 61; // offset for minute ones place
+              char_y += 32; // offset for minute ones place
             }
             else if (i == 7) // minute ones place
             {
-              char_x += 87; // offset for minute ones place
-              char_y += 28; // offset for minute ones place
+              char_x += 67; // offset for minute ones place
+              char_y += 32; // offset for minute ones place
             }
             else if (i == 8) // minute ones place
             {
-              char_x += 93; // offset for minute ones place
-              char_y += 28; // offset for minute ones place
+              char_x += 73; // offset for minute ones place
+              char_y += 32; // offset for minute ones place
             }
             else if (i == 9) // minute ones place
-            {
-              char_x += 99; // offset for minute ones place
-              char_y += 28; // offset for minute ones place
-            }
-            else if (i == 10) // minute ones place
             {
               if (counter % 2 != 0) // blink the dash
               {
@@ -1797,43 +1791,43 @@ void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const in
               }
               if (number == 0) // if editing the dash, do not draw
               {
-                char_x += 45; // offset for hour tens place
-                char_y += 32; // offset for hour tens place
+                char_x += 52; // offset for hour tens place
+                char_y += 22; // offset for hour tens place
               }
               else if (number == 1)
               {
-                char_x += 51; // offset for hour ones place
-                char_y += 32; // offset for hour ones place
+                char_x += 58; // offset for hour ones place
+                char_y += 22; // offset for hour ones place
               }
               else if (number == 2)
               {
-                char_x += 57; // offset for minute tens place
-                char_y += 32; // offset for minute tens place
+                char_x += 64; // offset for minute tens place
+                char_y += 22; // offset for minute tens place
               }
               else if (number == 3)
               {
-                char_x += 63; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
+                char_x += 70; // offset for minute ones place
+                char_y += 22; // offset for minute ones place
               }
               else if (number == 4)
               {
-                char_x += 75; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
+                char_x += 49; // offset for minute ones place
+                char_y += 34; // offset for minute ones place
               }
               else if (number == 5)
               {
-                char_x += 81; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
+                char_x += 55; // offset for minute ones place
+                char_y += 34; // offset for minute ones place
               }
               else if (number == 6)
               {
-                char_x += 93; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
+                char_x += 67; // offset for minute ones place
+                char_y += 34; // offset for minute ones place
               }
               else if (number == 7)
               {
-                char_x += 99; // offset for minute ones place
-                char_y += 32; // offset for minute ones place
+                char_x += 73; // offset for minute ones place
+                char_y += 34; // offset for minute ones place
               }
             }
             // create a new coordinate node for the character pixel
