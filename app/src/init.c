@@ -98,7 +98,7 @@ void AllInit(void)
   Oled_I2C_Init(); // Oled initialization
   MAX30102_Init(); // MAX30102 initialization
   RTC_Init();      // RTC initialization
-  // Beep_Init();//Beep initialization
+  Beep_Init();      //Beep initialization
 
   // set current time
   /*struct tm timeinfo = {
@@ -125,9 +125,9 @@ void AllInit(void)
   /*
   **Kalman Filter
   */
-  Kalman_Init(&KF_X); // Kalman filter initialization
-  Kalman_Init(&KF_Y); // Kalman filter initialization
-  Kalman_Init(&KF_Z); // Kalman filter initialization
+  //Kalman_Init(&KF_X); // Kalman filter initialization
+  //Kalman_Init(&KF_Y); // Kalman filter initialization
+  //Kalman_Init(&KF_Z); // Kalman filter initialization
 
   /*
   **Interrupts

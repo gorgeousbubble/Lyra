@@ -19,7 +19,7 @@ void Kalman_Init(KalmanFilter *kf)
     kf->P[0][1] = 0.0f;
     kf->P[1][0] = 0.0f;
     kf->P[1][1] = 1.0f;
-    kf->dt = 0.001f;      // Default sampling period of 1ms
+    kf->dt = 0.1f;      // Default sampling period of 1ms
     kf->Q_angle = 0.001f; // Process noise parameters (angle)
     kf->Q_gyro = 0.003f;  // Process noise parameters (gyroscope)
     kf->R_angle = 0.5f;   // Measure noise parameters

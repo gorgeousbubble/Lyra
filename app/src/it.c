@@ -50,7 +50,7 @@ MPU6050_Sensor MPU6050 = {
 */
 KalmanFilter KF_X = {
     .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.001f,      // Default sampling period of 1ms
+    .dt = 0.1f,      // Default sampling period of 1ms
     .Q_angle = 0.001f, // Process noise parameters (angle)
     .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
     .R_angle = 0.5f,   // Measure noise parameters
@@ -60,7 +60,7 @@ KalmanFilter KF_X = {
 
 KalmanFilter KF_Y = {
     .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.001f,      // Default sampling period of 1ms
+    .dt = 0.1f,      // Default sampling period of 1ms
     .Q_angle = 0.001f, // Process noise parameters (angle)
     .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
     .R_angle = 0.5f,   // Measure noise parameters
@@ -70,7 +70,7 @@ KalmanFilter KF_Y = {
 
 KalmanFilter KF_Z = {
     .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.001f,      // Default sampling period of 1ms
+    .dt = 0.1f,      // Default sampling period of 1ms
     .Q_angle = 0.001f, // Process noise parameters (angle)
     .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
     .R_angle = 0.5f,   // Measure noise parameters
