@@ -50,6 +50,9 @@ extern const Coord LCM_ConfigureAdjust_Clock_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_Clock_Digit_coordinate[];
 extern const Coord LCM_ConfigureAdjust_Date_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_Date_Digit_coordinate[];
+extern const Coord LCM_ConfigureAdjust_Tense_icon_coordinate[];
+extern const Coord LCM_ConfigureAdjust_Tense_24_icon_coordinate[];
+extern const Coord LCM_ConfigureAdjust_Tense_12_icon_coordinate[];
 
 extern const int LCM_Clock_Dial_coordinate_length;
 extern const int LCM_Clock_Digit_coordinate_length;
@@ -70,6 +73,9 @@ extern const int LCM_ConfigureAdjust_Clock_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_Clock_Digit_coordinate_length;
 extern const int LCM_ConfigureAdjust_Date_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_Date_Digit_coordinate_length;
+extern const int LCM_ConfigureAdjust_Tense_icon_coordinate_length;
+extern const int LCM_ConfigureAdjust_Tense_24_icon_coordinate_length;
+extern const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time* Alarm_Clock_List;
