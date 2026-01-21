@@ -45,6 +45,7 @@ int Lyra_ConfigureAdjust_Clock_Cursor = 0;      // Configure Adjust clock cursor
 int Lyra_ConfigureAdjust_Clock_Number[6] = {0}; // Configure Adjust clock number (hh:mm:ss)
 int Lyra_ConfigureAdjust_Date_Cursor = 0;       // Configure Adjust date cursor
 int Lyra_ConfigureAdjust_Date_Number[8] = {0};  // Configure Adjust date number (yyyy:mm:dd)
+int Lyra_ConfigureAdjust_Tense_Format = 0;      // Configure Adjust tense format (0: 24-hour/1: 12-hour)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -429,6 +430,10 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_Date_Cursor = 0;
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Date;
             break;
+          case MAPS_ConfigureAdjust_Tense:
+            // should get current tense formart from memory
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Tense;
+            break;
           default:
             break;
           } 
@@ -465,6 +470,11 @@ void MAPS_Dock_KEY_Incident(void)
           time.tm_mon = month - 1;
           time.tm_mday = day;
           RTC_Set_Time_Format(&time);//Set RTC time format*/
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
+        {
+          // should save tense format to memory
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
       }
@@ -512,6 +522,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
         {
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
@@ -973,6 +987,14 @@ void MAPS_Dock_KEY_Incident(void)
             }
           }  
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
+        {
+          Lyra_ConfigureAdjust_Tense_Format--; // Switch tense format
+          if (Lyra_ConfigureAdjust_Tense_Format < 0)
+          {
+            Lyra_ConfigureAdjust_Tense_Format = 0; // Reset to 0
+          }
+        }
       }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
@@ -1147,6 +1169,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_Date_Cursor = 0; // Reset to maximum configure adjust date edit cursor position
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
+        {
+          Lyra_ConfigureAdjust_Tense_Format++; // Switch tense format
+          if (Lyra_ConfigureAdjust_Tense_Format > 1)
+          {
+            Lyra_ConfigureAdjust_Tense_Format = 1; // Reset to maximum tense format
+          }
+        }
       }
       MAPS_Dock_KEY_Delay(100); // Button delay 500ms
     }
@@ -1237,6 +1267,10 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Date_icon_coordinate, LCM_ConfigureAdjust_Date_icon_coordinate_length);
         }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_Tense)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Tense_icon_coordinate, LCM_ConfigureAdjust_Tense_icon_coordinate_length);
+        }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
@@ -1245,6 +1279,17 @@ void MAPS_Dock_KEY_Incident(void)
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
       {
         Render_Configure_Adjust_Date_Digit(LCM_ConfigureAdjust_Date_Digit_coordinate, LCM_ConfigureAdjust_Date_Digit_coordinate_length, Lyra_ConfigureAdjust_Date_Number[0] * 1000 + Lyra_ConfigureAdjust_Date_Number[1] * 100 + Lyra_ConfigureAdjust_Date_Number[2] * 10 + Lyra_ConfigureAdjust_Date_Number[3], Lyra_ConfigureAdjust_Date_Number[4] * 10 + Lyra_ConfigureAdjust_Date_Number[5], Lyra_ConfigureAdjust_Date_Number[6] * 10 + Lyra_ConfigureAdjust_Date_Number[7], Lyra_ConfigureAdjust_Date_Cursor);
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
+      {
+        if (Lyra_ConfigureAdjust_Tense_Format == 0)
+        {
+          Render_Configure_Adjust_Tense_Digit(LCM_ConfigureAdjust_Tense_24_icon_coordinate, LCM_ConfigureAdjust_Tense_24_icon_coordinate_length);
+        }
+        else
+        {
+          Render_Configure_Adjust_Tense_Digit(LCM_ConfigureAdjust_Tense_12_icon_coordinate, LCM_ConfigureAdjust_Tense_12_icon_coordinate_length);
+        }
       }
       break;
     default:
@@ -1470,6 +1515,10 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
           break;
         case MAPS_ConfigureAdjust_Date:
           Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Date_icon_coordinate, LCM_ConfigureAdjust_Date_icon_coordinate_length);
+          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+          break;
+        case MAPS_ConfigureAdjust_Tense:
+          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Tense_icon_coordinate, LCM_ConfigureAdjust_Tense_icon_coordinate_length);
           Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
           break;
         default:

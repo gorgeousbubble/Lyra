@@ -93,6 +93,7 @@ MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max] =
         MAPS_ConfigureAdjust_List,
         MAPS_ConfigureAdjust_Clock,
         MAPS_ConfigureAdjust_Date,
+        MAPS_ConfigureAdjust_Tense,
 };
 
 /*

@@ -94,6 +94,7 @@ extern void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cit
 extern void Calc_Configure_Adjust_List_Mode_Item(uint8* array, const Coord *item, const int itemLen);
 extern void Calc_Configure_Adjust_Clock_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int second, int number);
 extern void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const int digitLen, int year, int month, int day, int number);
+extern void Calc_Configure_Adjust_Tense_Digit(uint8* array, const Coord *item, const int itemLen);
 extern void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour, int minute, int second);
 extern void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute);
 extern void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond);
@@ -104,6 +105,7 @@ extern void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_W
 extern void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen);
 extern void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen, int hour, int minute, int second, int number);
 extern void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, int year, int month, int day, int number);
+extern void Render_Configure_Adjust_Tense_Digit(const Coord *item, const int itemLen);
 
 extern void Add_Alarm_Clock_Time_To_List(int hour, int minute);
 extern void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute);

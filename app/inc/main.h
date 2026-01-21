@@ -107,7 +107,8 @@ typedef enum
   MAPS_ConfigureAdjust_List = 0,  // Configure Adjust List
   MAPS_ConfigureAdjust_Clock = 1, // Configure Adjust RTC Clock
   MAPS_ConfigureAdjust_Date = 2,  // Configure Adjust RTC Date
-  MAPS_ConfigureAdjust_Max = 3,   // Maximum Configure Adjust mode
+  MAPS_ConfigureAdjust_Tense = 3, // Configure Adjust Time Tense
+  MAPS_ConfigureAdjust_Max = 4,   // Maximum Configure Adjust mode
 } MAPS_ConfigureAdjust_Mode;
 
 /*
