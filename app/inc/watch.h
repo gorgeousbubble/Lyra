@@ -80,6 +80,7 @@ extern const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length;
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time* Alarm_Clock_List;
 extern int Alarm_Clock_Max_Len;
+extern uint8 Configure_Adjust_Tense;
 
 /*
 **function declaration
@@ -115,5 +116,7 @@ extern int Get_Alarm_Clock_List_Len();
 extern void Clean_Alarm_Clock_List();
 extern void Write_Alarm_Clock_List_To_E2PROM();
 extern void Read_Alarm_Clock_E2PROM_To_List();
+extern void Write_Configure_Adjust_Tense_Value_To_E2PROM();
+extern void Read_Configure_Adjust_Tense_E2PROM_To_Value();
 
 #endif

@@ -111,6 +111,12 @@ typedef enum
   MAPS_ConfigureAdjust_Max = 4,   // Maximum Configure Adjust mode
 } MAPS_ConfigureAdjust_Mode;
 
+typedef enum
+{
+  MAPS_ConfigureAdjust_Tense_24H = 64, // 24-Hour Format
+  MAPS_ConfigureAdjust_Tense_12H = 65, // 12-Hour Format
+} MAPS_ConfigureAdjust_Tense_Format;
+
 /*
 **variate declaration
 */

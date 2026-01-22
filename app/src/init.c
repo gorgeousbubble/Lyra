@@ -148,4 +148,5 @@ void ReadConf(void)
   */
   //MAPS_Dock_W25Q80_Erase_Chip(); // Erase W25Q80 chip
   Read_Alarm_Clock_E2PROM_To_List(); // Read MAPS Dock configuration from W25Q80
+  Read_Configure_Adjust_Tense_E2PROM_To_Value(); // Read MAPS Dock configuration from W25Q80
 }

@@ -97,6 +97,14 @@ MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max] =
 };
 
 /*
+** MAPS Configure Adjust Tense Format
+*/
+MAPS_ConfigureAdjust_Tense_Format MAPS_ConfigureAdjust_Tense_FormatN[2] = {
+        MAPS_ConfigureAdjust_Tense_24H,
+        MAPS_ConfigureAdjust_Tense_12H,
+};
+
+/*
  *  @brief              main
  *  @note               main function
  *  @since              v1.0

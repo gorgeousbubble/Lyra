@@ -66,9 +66,14 @@ const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length = ARRAY_LENGTH(LCM
 /*
 **Alarm Clock timer
 */
-uint8 Alarm_Clock_Array[16] = {0};// Alarm clock time array
+uint8 Alarm_Clock_Array[16] = {0};// Alarm clock time array (page: 0, offset: 0-15)
 Alarm_Clock_Time* Alarm_Clock_List = NULL;// Pointer to the head of the alarm clock linked list
 int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
+
+/*
+**Configure Adjust tense
+*/
+uint8 Configure_Adjust_Tense = 0; // 0: 12-hour format, 1: 24-hour format (page: 0, offset: 16)
 
 /*
  *  @brief      Calc_Clock_Current_Time_Dial
@@ -2323,7 +2328,7 @@ void Write_Alarm_Clock_List_To_E2PROM()
  *  @param      int             hour            hour integer parameter
  *  @param      int             minute          minute integer parameter
  *  @since      v1.0
- *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+ *  Sample usage:       Read_Alarm_Clock_E2PROM_To_List(10,15,90);
 */
 void Read_Alarm_Clock_E2PROM_To_List()
 {
@@ -2349,4 +2354,27 @@ void Read_Alarm_Clock_E2PROM_To_List()
           current->next = newAlarm;
       }
   }
+}
+
+/*
+ *  @brief      Write_Configure_Adjust_Tense_Value_To_E2PROM
+ *  @since      v1.0
+ *  Sample usage:       Write_Configure_Adjust_Tense_Value_To_E2PROM(10,15,90);
+*/
+void Write_Configure_Adjust_Tense_Value_To_E2PROM()
+{
+  // write tense value array to e2prom
+  MAPS_Dock_W25Q80_Erase_Block(ERASE_SECTOR_SIZE, ERASE_SECTOR_SIZE); // erase first block
+  MAPS_Dock_W25Q80_Write_Page(1, 0, &Configure_Adjust_Tense, 1);
+}
+
+/*
+ *  @brief      Read_Configure_Adjust_Tense_E2PROM_To_Value
+ *  @since      v1.0
+ *  Sample usage:       Read_Configure_Adjust_Tense_E2PROM_To_Value();
+*/
+void Read_Configure_Adjust_Tense_E2PROM_To_Value()
+{
+  // read tense value from e2prom
+  MAPS_Dock_W25Q80_Read_Page(1, 0, &Configure_Adjust_Tense, 1);
 }
