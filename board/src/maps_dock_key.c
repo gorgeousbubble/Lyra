@@ -1234,7 +1234,7 @@ void MAPS_Dock_KEY_Incident(void)
       }
       else if (Lyra_Clock_Style == MAPS_Clock_Digit)
       {
-        Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+        Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
       }
       break;
     case MAPS_Menu_StopWatch:
@@ -1462,7 +1462,7 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
           Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
           break;
         case MAPS_Clock_Digit:
-          Calc_Clock_Current_Time_Digit((uint8*)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute);
+          Calc_Clock_Current_Time_Digit((uint8*)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
           Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
           break;
         default:

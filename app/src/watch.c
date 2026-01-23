@@ -375,19 +375,20 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
  *  @param      const int dialLen   IN    Length of the dial coordinate array
  *  @param      int hour            IN    Current hour
  *  @param      int minute          IN    Current minute
+ *  @param      int formart         IN    Time format (12-hour or 24-hour)
  *  @return     void
  *  @since      v1.0
  *  Sample usage:       Calc_Clock_Current_Time_Digit(&array, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
 */
-void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute)
+void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int formart)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
   CoordNode* current = NULL;
   // convert hour and minute to digits
   char ch[4][2] = {"", ""}; // initialize with "00"
-  snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
-  snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
+  snprintf(ch[0], sizeof(ch[0]), "%d", ((formart==MAPS_ConfigureAdjust_Tense_24H)?hour:hour%12)/10); // tens place of hour
+  snprintf(ch[1], sizeof(ch[1]), "%d", ((formart==MAPS_ConfigureAdjust_Tense_24H)?hour:hour%12)%10);
   snprintf(ch[2], sizeof(ch[2]), "%d", minute/10); // tens place of minute
   snprintf(ch[3], sizeof(ch[3]), "%d", minute%10);
   for (int i = 0; i < 4; i++)
@@ -1957,15 +1958,16 @@ void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int ho
  * @param      const int digitLen  IN    Length of the digit coordinate array
  * @param      int hour            IN    Current hour
  * @param      int minute          IN    Current minute
+ * @param      int formart         IN    Time format (12-hour or 24-hour)
  * @return     void
  * @since      v1.0
  * Sample usage:       Render_Clock_Current_Time_Digit(LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, 10, 30);
 */
-void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute)
+void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int formart)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   // calculate the clock digit array
-  Calc_Clock_Current_Time_Digit((uint8*)clock, digit, digitLen, hour, minute);
+  Calc_Clock_Current_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, formart);
   // render the clock digit picture
   Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }
