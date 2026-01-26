@@ -1084,11 +1084,12 @@ void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, con
  * @param      MAPS_WorldClock_Time time IN    World clock time structure
  * @param      int hour            IN    Local hour
  * @param      int minute          IN    Local minute
+ * @param      int formart         IN    Time format (12 or 24 hours)
  * @return     void
  * @since      v1.0
  * Sample usage:       Calc_World_Clock_Time(&array, LCM_WorldClock_City_coordinate, LCM_WorldClock_City_coordinate_length, time, 10, 30);
 */
-void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute)
+void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute, int formart)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   CoordNode* head = NULL;
@@ -1154,8 +1155,8 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
   {
     hour -= 24;
   }
-  snprintf(ch[0], sizeof(ch[0]), "%d", hour/10); // tens place of hour
-  snprintf(ch[1], sizeof(ch[1]), "%d", hour%10);
+  snprintf(ch[0], sizeof(ch[0]), "%d", ((formart==MAPS_ConfigureAdjust_Tense_24H)?hour:hour%12)/10); // tens place of hour
+  snprintf(ch[1], sizeof(ch[1]), "%d", ((formart==MAPS_ConfigureAdjust_Tense_24H)?hour:hour%12)%10);
   snprintf(ch[2], sizeof(ch[2]), "%s", ":"); // separator
   snprintf(ch[3], sizeof(ch[3]), "%d", minute/10); // tens place of minute
   snprintf(ch[4], sizeof(ch[4]), "%d", minute%10);
@@ -2060,15 +2061,16 @@ void Render_Alarm_Clock_Edit_Mode_Time_Digit(const Coord *digit, const int digit
  * @param      MAPS_WorldClock_Time time  IN    World clock time structure
  * @param      int hour                   IN    Current hour
  * @param      int minute                 IN    Current minute
+ * @param      int formart                 IN    Time format (12-hour or 24-hour)
  * @return     void
  * @since      v1.0
  * Sample usage:       Render_World_Clock_Time(LCM_WorldClock_City_coordinate, LCM_WorldClock_City_coordinate_length, time, 10, 30);
 */
-void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute)
+void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute, int formart)
 {
   uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
   // calculate the world clock time array
-  Calc_World_Clock_Time((uint8*)clock, city, cityLen, time, hour, minute);
+  Calc_World_Clock_Time((uint8*)clock, city, cityLen, time, hour, minute, formart);
   // render the world clock time picture
   Oled_I2C_Draw_Picture_128x64((const uint8*)clock);
 }
