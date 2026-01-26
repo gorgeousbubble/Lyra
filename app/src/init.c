@@ -18,7 +18,7 @@
 #include "i2c.h"
 #include "init.h"
 #include "it.h"
-#include "kalman_filter.h"
+#include "filter.h"
 #include "max30102.h"
 #include "maps_dock_key.h"
 #include "maps_dock_lcd.h"

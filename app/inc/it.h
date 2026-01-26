@@ -14,7 +14,7 @@
 #define __IT_H__
 
 #include "common.h"
-#include "kalman_filter.h"
+#include "filter.h"
 #include "vectors.h"
 
 #undef VECTOR_077

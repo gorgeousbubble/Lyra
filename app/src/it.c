@@ -14,7 +14,7 @@
 #include "ftm.h"
 #include "health.h"
 #include "it.h"
-#include "kalman_filter.h"
+#include "filter.h"
 #include "max30102.h"
 #include "maps_dock_led.h"
 #include "misc.h"

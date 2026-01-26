@@ -3,15 +3,15 @@
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       kalman_filter.h
+ * @file       filter.h
  * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
  */
 
-#ifndef __KALMAN_FILTER_H__
-#define __KALMAN_FILTER_H__
+#ifndef __FILTER_H__
+#define __FILTER_H__
 
 #include "common.h"
 

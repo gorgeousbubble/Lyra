@@ -3,14 +3,14 @@
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       kalman_filter.c
+ * @file       filter.c
  * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
  */
 
-#include "kalman_filter.h"
+#include "filter.h"
 
 // Initialize Kalman filter
 void Kalman_Init(KalmanFilter *kf)
