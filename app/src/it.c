@@ -276,6 +276,7 @@ void PIT1_IRQHandler(void)
  */
 void RTC_IRQHandler(void)
 {
+  disable_irq(RTC_IRQn);
   if (RTC_SR & RTC_SR_TIF_MASK) // Invalid settings
   {
     RTC_SR = 0;
@@ -298,4 +299,5 @@ void RTC_IRQHandler(void)
 
     // Put Your Code...
   }
+  enable_irq(RTC_IRQn);
 }
