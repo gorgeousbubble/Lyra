@@ -30,6 +30,18 @@ typedef struct
     float R_angle; // Measurement noise covariance
 } KalmanFilter;
 
+// Fusion filter structure
+typedef struct
+{
+    float accAngle;     // Angle calculated from accelerometer
+    float gyroRate;     // Angular velocity from gyroscope
+    float fusedAngle;   // Fused angle
+    float accMax;       // Maximum angle from accelerometer
+    float accMin;       // Minimum angle from accelerometer
+    float alpha;        // Fusion coefficient
+    float beta;         // Fusion coefficient
+} FusionFilter;
+
 /*
 **variate declaration
 */

@@ -58,3 +58,21 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
 
     return kf->angle_f;
 }
+
+// Initialize Fusion filter
+void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float alpha, float beta)
+{
+    ff->accAngle = 0.0f;
+    ff->gyroRate = 0.0f;
+    ff->fusedAngle = 0.0f;
+    ff->accMax = accMax; // Maximum angle from accelerometer
+    ff->accMin = accMin; // Minimum angle from accelerometer
+    ff->alpha = alpha; // Fusion coefficient
+    ff->beta = beta; // Fusion coefficient
+}
+
+// Fusion filter calculation
+void Fusion_Filter(FusionFilter *ff)
+{
+
+}
