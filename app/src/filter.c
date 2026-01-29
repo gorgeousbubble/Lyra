@@ -13,16 +13,16 @@
 #include "filter.h"
 
 // Initialize Kalman filter
-void Kalman_Init(KalmanFilter *kf)
+void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle)
 {
-    kf->P[0][0] = 1.0f;
-    kf->P[0][1] = 0.0f;
-    kf->P[1][0] = 0.0f;
-    kf->P[1][1] = 1.0f;
-    kf->dt = 0.1f;      // Default sampling period of 1ms
-    kf->Q_angle = 0.001f; // Process noise parameters (angle)
-    kf->Q_gyro = 0.003f;  // Process noise parameters (gyroscope)
-    kf->R_angle = 0.5f;   // Measure noise parameters
+    kf->P[0][0] = p[0][0];
+    kf->P[0][1] = p[0][1];
+    kf->P[1][0] = p[1][0];
+    kf->P[1][1] = p[1][1];
+    kf->dt = dt;      // Default sampling period of 1ms
+    kf->Q_angle = q_angle; // Process noise parameters (angle)
+    kf->Q_gyro = q_gyro;  // Process noise parameters (gyroscope)
+    kf->R_angle = r_angle;   // Measure noise parameters
     kf->q_bias = 0.0f;    // Initial value of gyroscope offset
     kf->angle_f = 0.0f;   // Initial Angle
 }
@@ -60,7 +60,7 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
 }
 
 // Initialize Fusion filter
-void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float alpha, float beta)
+void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float alpha, float beta, float dt)
 {
     ff->accAngle = 0.0f;
     ff->gyroRate = 0.0f;
@@ -69,10 +69,17 @@ void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float alpha, floa
     ff->accMin = accMin; // Minimum angle from accelerometer
     ff->alpha = alpha; // Fusion coefficient
     ff->beta = beta; // Fusion coefficient
+    ff->dt = dt; // Sample time
 }
 
 // Fusion filter calculation
-void Fusion_Filter(FusionFilter *ff)
+float Fusion_Filter(FusionFilter *ff, float angle_m, float gyro_m)
 {
+    // Calculate accelerometer angle
+    ff->accAngle = (angle_m - ff->accMin) / (ff->accMax - ff->accMin) * 180.0f - 90.0f;
+    ff->gyroRate = gyro_m * ff->alpha;
 
+    // Fuse accelerometer and gyroscope data
+    ff->fusedAngle += (ff->beta * (ff->accAngle - ff->fusedAngle) + ff->gyroRate) * ff->dt;
+    return ff->fusedAngle;
 }
