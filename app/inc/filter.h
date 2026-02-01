@@ -38,6 +38,8 @@ typedef struct
     float fusedAngle;   // Fused angle
     float accMax;       // Maximum angle from accelerometer
     float accMin;       // Minimum angle from accelerometer
+    float gyroMax;      // Maximum angular velocity from gyroscope
+    float gyroMin;      // Minimum angular velocity from gyroscope
     float alpha;        // Fusion coefficient
     float beta;         // Fusion coefficient
     float dt;           // Sample time

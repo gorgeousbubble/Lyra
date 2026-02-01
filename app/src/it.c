@@ -78,6 +78,48 @@ KalmanFilter KF_Z = {
     .angle_f = 0.0f    // Initial Angle
 };
 
+/*
+**Fusion Filter
+*/
+FusionFilter FF_X = {
+    .accAngle = 0.0f,
+    .gyroRate = 0.0f,
+    .fusedAngle = 0.0f,
+    .accMax = 32767.0f, // Maximum angle from accelerometer
+    .accMin = -32768.0f, // Minimum angle from accelerometer
+    .gyroMax = 32767.0f, // Maximum angular velocity from gyroscope
+    .gyroMin = -32768.0f, // Minimum angular velocity from gyroscope
+    .alpha = 0.2f, // Fusion coefficient
+    .beta = 0.8f, // Fusion coefficient
+    .dt = 0.001f // Sample time
+};
+
+FusionFilter FF_Y = {
+    .accAngle = 0.0f,
+    .gyroRate = 0.0f,
+    .fusedAngle = 0.0f,
+    .accMax = 32767.0f, // Maximum angle from accelerometer
+    .accMin = -32768.0f, // Minimum angle from accelerometer
+    .gyroMax = 32767.0f, // Maximum angular velocity from gyroscope
+    .gyroMin = -32768.0f, // Minimum angular velocity from gyroscope
+    .alpha = 0.2f, // Fusion coefficient
+    .beta = 0.8f, // Fusion coefficient
+    .dt = 0.001f // Sample time
+};
+
+FusionFilter FF_Z = {
+    .accAngle = 0.0f,
+    .gyroRate = 0.0f,
+    .fusedAngle = 0.0f,
+    .accMax = 32767.0f, // Maximum angle from accelerometer
+    .accMin = -32768.0f, // Minimum angle from accelerometer
+    .gyroMax = 32767.0f, // Maximum angular velocity from gyroscope
+    .gyroMin = -32768.0f, // Minimum angular velocity from gyroscope
+    .alpha = 0.2f, // Fusion coefficient
+    .beta = 0.8f, // Fusion coefficient
+    .dt = 0.001f // Sample time
+};
+
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X
     .Angle_Y = 0.0f, // Angle Y
@@ -258,9 +300,12 @@ void PIT1_IRQHandler(void)
     MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
 
     // Kalman filter processing
-    MPU6050_Angle.Angle_X = Kalman_Filter(&KF_X, MPU6050.Gyro.X, MPU6050.Acc.X);
-    MPU6050_Angle.Angle_Y = Kalman_Filter(&KF_Y, MPU6050.Gyro.Y, MPU6050.Acc.Y);
-    MPU6050_Angle.Angle_Z = Kalman_Filter(&KF_Z, MPU6050.Gyro.Z, MPU6050.Acc.Z);
+    //MPU6050_Angle.Angle_X = Kalman_Filter(&KF_X, MPU6050.Acc.X, MPU6050.Gyro.X);
+    //MPU6050_Angle.Angle_Y = Kalman_Filter(&KF_Y, MPU6050.Acc.Y, MPU6050.Gyro.Y);
+    //MPU6050_Angle.Angle_Z = Kalman_Filter(&KF_Z, MPU6050.Acc.Z, MPU6050.Gyro.Z);
+    MPU6050_Angle.Angle_X = Fusion_Filter(&FF_X, MPU6050.Acc.X, MPU6050.Gyro.X);
+    MPU6050_Angle.Angle_Y = Fusion_Filter(&FF_Y, MPU6050.Acc.Y, MPU6050.Gyro.Y);
+    MPU6050_Angle.Angle_Z = Fusion_Filter(&FF_Z, MPU6050.Acc.Z, MPU6050.Gyro.Z);
 
     // MAX30102 sensor data read
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);

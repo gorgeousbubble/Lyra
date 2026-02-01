@@ -77,9 +77,9 @@ float Fusion_Filter(FusionFilter *ff, float angle_m, float gyro_m)
 {
     // Calculate accelerometer angle
     ff->accAngle = (angle_m - ff->accMin) / (ff->accMax - ff->accMin) * 180.0f - 90.0f;
-    ff->gyroRate = gyro_m * ff->alpha;
+    ff->gyroRate = (gyro_m - ff->gyroMin) / (ff->gyroMax - ff->gyroMin) * 2000.0f - 1000.0f;
 
     // Fuse accelerometer and gyroscope data
-    ff->fusedAngle += (ff->beta * (ff->accAngle - ff->fusedAngle) + ff->gyroRate) * ff->dt;
+    ff->fusedAngle += (ff->beta * (ff->accAngle - ff->fusedAngle) + ff->gyroRate * ff->alpha) * ff->dt;
     return ff->fusedAngle;
 }

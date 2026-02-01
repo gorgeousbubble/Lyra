@@ -123,11 +123,8 @@ void AllInit(void)
   RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
 
   /*
-  **Kalman Filter
+  **Kalman Filter (Fusion Filter)
   */
-  //Kalman_Init(&KF_X); // Kalman filter initialization
-  //Kalman_Init(&KF_Y); // Kalman filter initialization
-  //Kalman_Init(&KF_Z); // Kalman filter initialization
 
   /*
   **Interrupts
