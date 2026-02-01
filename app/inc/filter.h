@@ -54,7 +54,7 @@ typedef struct
 */
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
-extern void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float alpha, float beta, float dt);
+extern void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float gyroMax, float gyroMin, float alpha, float beta, float dt);
 extern float Fusion_Filter(FusionFilter *ff, float angle_m, float gyro_m);
 
 #endif
