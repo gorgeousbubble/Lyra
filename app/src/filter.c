@@ -11,6 +11,7 @@
  */
 
 #include "filter.h"
+#include <math.h>
 
 // Initialize Kalman filter
 void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle)
@@ -59,29 +60,21 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
     return kf->angle_f;
 }
 
-// Initialize Fusion filter
-void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float gyroMax, float gyroMin, float alpha, float beta, float dt)
-{
-    ff->accAngle = 0.0f;
-    ff->gyroRate = 0.0f;
-    ff->fusedAngle = 0.0f;
-    ff->accMax = accMax; // Maximum angle from accelerometer
-    ff->accMin = accMin; // Minimum angle from accelerometer
-    ff->gyroMax = gyroMax; // Maximum angular velocity from gyroscope
-    ff->gyroMin = gyroMin; // Minimum angular velocity from gyroscope
-    ff->alpha = alpha; // Fusion coefficient
-    ff->beta = beta; // Fusion coefficient
-    ff->dt = dt; // Sample time
-}
-
 // Fusion filter calculation
-float Fusion_Filter(FusionFilter *ff, float angle_m, float gyro_m)
+void Fusion_Filter(FusionFilter *ff, float angle_roll, float angle_pitch, float angle_yaw, float gyro_roll, float gyro_pitch, float gyro_yaw)
 {
-    // Calculate accelerometer angle
-    ff->accAngle = (angle_m - ff->accMin) / (ff->accMax - ff->accMin) * 180.0f - 90.0f;
-    ff->gyroRate = (gyro_m - ff->gyroMin) / (ff->gyroMax - ff->gyroMin) * 2000.0f - 1000.0f;
+    // Accelerometer angle
+    ff->accAngleRoll = atan2f(angle_pitch, angle_yaw) * (180.0f / 3.14159265358979323846f);
+    ff->accAnglePitch = atan2f(-angle_roll, sqrtf(angle_pitch * angle_pitch + angle_yaw * angle_yaw)) * (180.0f / 3.14159265358979323846f);
+    ff->accAngleYaw = atan2f(angle_roll, angle_pitch) * (180.0f / 3.14159265358979323846f);
 
-    // Fuse accelerometer and gyroscope data
-    ff->fusedAngle += (ff->beta * (ff->accAngle - ff->fusedAngle) + ff->gyroRate * ff->alpha) * ff->dt;
-    return ff->fusedAngle;
+    // Gyroscope angular velocity
+    ff->gyroRateRoll = gyro_roll / 16.4f;   // Assuming sensitivity is set to ±2000°/s
+    ff->gyroRatePitch = gyro_pitch / 16.4f; // Assuming sensitivity is set to ±2000°/s
+    ff->gyroRateYaw = gyro_yaw / 16.4f;     // Assuming sensitivity is set to ±2000°/s
+
+    // Calculate fused angles
+    ff->fusedAngleRoll = ff->alpha * (ff->fusedAngleRoll + ff->gyroRateRoll * ff->dt) + (1.0f - ff->alpha) * ff->accAngleRoll;
+    ff->fusedAnglePitch = ff->alpha * (ff->fusedAnglePitch + ff->gyroRatePitch * ff->dt) + (1.0f - ff->alpha) * ff->accAnglePitch;
+    ff->fusedAngleYaw = ff->alpha * (ff->fusedAngleYaw + ff->gyroRateYaw * ff->dt) + (1.0f - ff->alpha) * ff->accAngleYaw;
 }

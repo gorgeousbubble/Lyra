@@ -33,15 +33,16 @@ typedef struct
 // Fusion filter structure
 typedef struct
 {
-    float accAngle;     // Angle calculated from accelerometer
-    float gyroRate;     // Angular velocity from gyroscope
-    float fusedAngle;   // Fused angle
-    float accMax;       // Maximum angle from accelerometer
-    float accMin;       // Minimum angle from accelerometer
-    float gyroMax;      // Maximum angular velocity from gyroscope
-    float gyroMin;      // Minimum angular velocity from gyroscope
+    float accAngleRoll;     // Angle roll(X) calculated from accelerometer
+    float accAnglePitch;    // Angle pitch(Y) calculated from accelerometer
+    float accAngleYaw;      // Angle yaw(Z) calculated from accelerometer
+    float gyroRateRoll;    // Angular velocity roll(X) from gyroscope
+    float gyroRatePitch;   // Angular velocity pitch(Y) from gyroscope
+    float gyroRateYaw;     // Angular velocity yaw(Z) from gyroscope
+    float fusedAngleRoll;   // Fused angle roll(X)
+    float fusedAnglePitch;  // Fused angle pitch(Y)
+    float fusedAngleYaw;    // Fused angle yaw(Z)
     float alpha;        // Fusion coefficient
-    float beta;         // Fusion coefficient
     float dt;           // Sample time
 } FusionFilter;
 
@@ -54,7 +55,6 @@ typedef struct
 */
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
-extern void Fusion_Init(FusionFilter *ff, float accMax, float accMin, float gyroMax, float gyroMin, float alpha, float beta, float dt);
-extern float Fusion_Filter(FusionFilter *ff, float angle_m, float gyro_m);
+extern void Fusion_Filter(FusionFilter *ff, float angle_roll, float angle_pitch, float angle_yaw, float gyro_roll, float gyro_pitch, float gyro_yaw);
 
 #endif
