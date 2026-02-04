@@ -81,6 +81,19 @@ KalmanFilter KF_Z = {
 /*
 **Fusion Filter
 */
+FusionFilter FF = {
+    .accAngleRoll = 0.0f,     // Angle roll(X) calculated from accelerometer
+    .accAnglePitch = 0.0f,    // Angle pitch(Y) calculated from accelerometer
+    .accAngleYaw = 0.0f,      // Angle yaw(Z) calculated from accelerometer
+    .gyroRateRoll = 0.0f,    // Angular velocity roll(X) from gyroscope
+    .gyroRatePitch = 0.0f,   // Angular velocity pitch(Y) from gyroscope
+    .gyroRateYaw = 0.0f,     // Angular velocity yaw(Z) from gyroscope
+    .fusedAngleRoll = 0.0f,   // Fused angle roll(X)
+    .fusedAnglePitch = 0.0f,  // Fused angle pitch(Y)
+    .fusedAngleYaw = 0.0f,    // Fused angle yaw(Z)
+    .alpha = 0.85f,        // Fusion coefficient
+    .dt = 0.001f            // Sample time
+};
 
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X
@@ -262,6 +275,8 @@ void PIT1_IRQHandler(void)
     MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
 
     // Kalman filter processing
+    Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z,
+                   MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
 
     // MAX30102 sensor data read
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);
