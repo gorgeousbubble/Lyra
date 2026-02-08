@@ -79,20 +79,18 @@ KalmanFilter KF_Z = {
 };
 
 /*
-**Fusion Filter
+**Complementary Filter
 */
-FusionFilter FF = {
-    .accAngleRoll = 0.0f,     // Angle roll(X) calculated from accelerometer
-    .accAnglePitch = 0.0f,    // Angle pitch(Y) calculated from accelerometer
-    .accAngleYaw = 0.0f,      // Angle yaw(Z) calculated from accelerometer
-    .gyroRateRoll = 0.0f,    // Angular velocity roll(X) from gyroscope
-    .gyroRatePitch = 0.0f,   // Angular velocity pitch(Y) from gyroscope
-    .gyroRateYaw = 0.0f,     // Angular velocity yaw(Z) from gyroscope
-    .fusedAngleRoll = 0.0f,   // Fused angle roll(X)
-    .fusedAnglePitch = 0.0f,  // Fused angle pitch(Y)
-    .fusedAngleYaw = 0.0f,    // Fused angle yaw(Z)
-    .alpha = 0.85f,        // Fusion coefficient
-    .dt = 0.001f            // Sample time
+ComplementaryFilter CF = {
+    .angle = {0.0f, 0.0f, 0.0f},
+    .quat = {1.0f, 0.0f, 0.0f, 0.0f},
+    .kp = 2.0f,
+    .ki = 0.005f,
+    .dt = 0.01f,
+    .exInt = 0.0f,
+    .eyInt = 0.0f,
+    .ezInt = 0.0f,
+    .initialized = 0
 };
 
 Angle MPU6050_Angle = {
@@ -247,6 +245,36 @@ void PIT1_IRQHandler(void)
   disable_irq(PIT1_IRQn);
 
   // Put Your Code...
+  // MPU6050 sensor data read
+  MPU6050.Acc.X = MPU_Get_Acc_X();
+  MPU6050.Acc.Y = MPU_Get_Acc_Y();
+  MPU6050.Acc.Z = MPU_Get_Acc_Z();
+  MPU6050.Gyro.X = MPU_Get_Gyro_X();
+  MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
+  MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
+
+  // Kalman filter processing
+  int accel_raw[3] = {0};
+  int gyro_raw[3] = {0};
+  float accel[3] = {0.0f};
+  float gyro[3] = {0.0f};
+  float roll, pitch, yaw;
+  float q0, q1, q2, q3;
+
+  accel_raw[0] = MPU6050.Acc.X;
+  accel_raw[1] = MPU6050.Acc.Y;
+  accel_raw[2] = MPU6050.Acc.Z;
+  gyro_raw[0] = MPU6050.Gyro.X;
+  gyro_raw[1] = MPU6050.Gyro.Y;
+  gyro_raw[2] = MPU6050.Gyro.Z;
+
+  Convert_Sensor_Data(accel, gyro, accel_raw, gyro_raw, 2.0f, 2000.0f);
+  Complementary_Filter_Update(&CF, accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2]);
+  Get_Attitude_Angles(&CF, &roll, &pitch, &yaw);
+  Get_Quaternion(&CF, &q0, &q1, &q2, &q3);
+  MPU6050_Angle.Angle_X = roll;
+  MPU6050_Angle.Angle_Y = pitch;
+  MPU6050_Angle.Angle_Z = yaw;
 
   PIT1_Count++;
 
@@ -265,18 +293,6 @@ void PIT1_IRQHandler(void)
     {
       PIT1_Flag = 0;
     }
-
-    // MPU6050 sensor data read
-    MPU6050.Acc.X = MPU_Get_Acc_X();
-    MPU6050.Acc.Y = MPU_Get_Acc_Y();
-    MPU6050.Acc.Z = MPU_Get_Acc_Z();
-    MPU6050.Gyro.X = MPU_Get_Gyro_X();
-    MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
-    MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
-
-    // Kalman filter processing
-    Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z,
-                   MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
 
     // MAX30102 sensor data read
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);

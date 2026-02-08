@@ -43,6 +43,20 @@
 #define	GYRO_ZOUT_L	0x48    //Gyroscope Z-axis low-level output
 #define	WHO_AM_I        0x75	//I2C address register (default value 0x68, read-only)
 
+//MPU6050 senser range definition
+#define RAD_TO_DEG 57.2957795130823208768f
+#define DEG_TO_RAD 0.01745329251994329577f
+
+#define ACCEL_RANGE_2G   16384.0f     // LSB/g
+#define ACCEL_RANGE_4G   8192.0f
+#define ACCEL_RANGE_8G   4096.0f
+#define ACCEL_RANGE_16G  2048.0f
+
+#define GYRO_RANGE_250   131.0f       // LSB/°/s
+#define GYRO_RANGE_500   65.5f
+#define GYRO_RANGE_1000  32.8f
+#define GYRO_RANGE_2000  16.4f
+
 //I2C Port Macro
 //I2C SCL port initialization
 #ifndef I2C_PORT_INIT_SCL

@@ -30,21 +30,30 @@ typedef struct
     float R_angle; // Measurement noise covariance
 } KalmanFilter;
 
-// Fusion filter structure
-typedef struct
-{
-    float accAngleRoll;     // Angle roll(X) calculated from accelerometer
-    float accAnglePitch;    // Angle pitch(Y) calculated from accelerometer
-    float accAngleYaw;      // Angle yaw(Z) calculated from accelerometer
-    float gyroRateRoll;    // Angular velocity roll(X) from gyroscope
-    float gyroRatePitch;   // Angular velocity pitch(Y) from gyroscope
-    float gyroRateYaw;     // Angular velocity yaw(Z) from gyroscope
-    float fusedAngleRoll;   // Fused angle roll(X)
-    float fusedAnglePitch;  // Fused angle pitch(Y)
-    float fusedAngleYaw;    // Fused angle yaw(Z)
-    float alpha;        // Fusion coefficient
-    float dt;           // Sample time
-} FusionFilter;
+// Complementary filter structure
+// Attitude structure
+typedef struct {
+    float roll;      // X-axis rotation
+    float pitch;     // Y-axis rotation
+    float yaw;       // Z-axis rotation
+} Attitude_t;
+
+typedef struct {
+    float q0, q1, q2, q3;  // Quaternion [w, x, y, z]
+} Quaternion_t;
+
+// Complementary filter structure
+typedef struct {
+    Attitude_t angle;
+    Quaternion_t quat;
+    float kp;
+    float ki;
+    float dt;
+    float exInt;
+    float eyInt;
+    float ezInt;
+    uint8_t initialized;
+} ComplementaryFilter;
 
 /*
 **variate declaration
@@ -55,6 +64,12 @@ typedef struct
 */
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
-extern void Fusion_Filter(FusionFilter *ff, float angle_roll, float angle_pitch, float angle_yaw, float gyro_roll, float gyro_pitch, float gyro_yaw);
+extern void Complementary_Filter_Init(ComplementaryFilter* filter, float kp, float ki, float dt);
+extern void Complementary_Filter_Update(ComplementaryFilter* filter, float ax, float ay, float az, float gx, float gy, float gz);
+extern void Convert_Sensor_Data(float* accel, float* gyro, const int acc_raw[3], const int gyro_raw[3], float acc_range, float gyro_range);
+extern void Calculate_Euler_Angles(ComplementaryFilter* filter);
+extern float Normalize_Angle(float angle);
+extern void Get_Attitude_Angles(ComplementaryFilter* filter, float *roll, float *pitch, float *yaw);
+extern void Get_Quaternion(ComplementaryFilter* filter, float *q0, float *q1, float *q2, float *q3);
 
 #endif
