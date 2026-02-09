@@ -45,6 +45,10 @@ MPU6050_Sensor MPU6050 = {
     .Acc = {0, 0, 0},
     .Gyro = {0, 0, 0}};
 
+MPU6050_Sensor_Norm MPU6050_Norm = {
+    .Acc = {0, 0, 0},
+    .Gyro = {0, 0, 0}};
+
 /*
 **Kalman Filter
 */
@@ -245,36 +249,6 @@ void PIT1_IRQHandler(void)
   disable_irq(PIT1_IRQn);
 
   // Put Your Code...
-  // MPU6050 sensor data read
-  MPU6050.Acc.X = MPU_Get_Acc_X();
-  MPU6050.Acc.Y = MPU_Get_Acc_Y();
-  MPU6050.Acc.Z = MPU_Get_Acc_Z();
-  MPU6050.Gyro.X = MPU_Get_Gyro_X();
-  MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
-  MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
-
-  // Kalman filter processing
-  int accel_raw[3] = {0};
-  int gyro_raw[3] = {0};
-  float accel[3] = {0.0f};
-  float gyro[3] = {0.0f};
-  float roll, pitch, yaw;
-  float q0, q1, q2, q3;
-
-  accel_raw[0] = MPU6050.Acc.X;
-  accel_raw[1] = MPU6050.Acc.Y;
-  accel_raw[2] = MPU6050.Acc.Z;
-  gyro_raw[0] = MPU6050.Gyro.X;
-  gyro_raw[1] = MPU6050.Gyro.Y;
-  gyro_raw[2] = MPU6050.Gyro.Z;
-
-  Convert_Sensor_Data(accel, gyro, accel_raw, gyro_raw, 2.0f, 2000.0f);
-  Complementary_Filter_Update(&CF, accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2]);
-  Get_Attitude_Angles(&CF, &roll, &pitch, &yaw);
-  Get_Quaternion(&CF, &q0, &q1, &q2, &q3);
-  MPU6050_Angle.Angle_X = roll;
-  MPU6050_Angle.Angle_Y = pitch;
-  MPU6050_Angle.Angle_Z = yaw;
 
   PIT1_Count++;
 
@@ -293,6 +267,45 @@ void PIT1_IRQHandler(void)
     {
       PIT1_Flag = 0;
     }
+
+    // MPU6050 sensor data read
+    MPU6050.Acc.X = MPU_Get_Acc_X();
+    MPU6050.Acc.Y = MPU_Get_Acc_Y();
+    MPU6050.Acc.Z = MPU_Get_Acc_Z();
+    MPU6050.Gyro.X = MPU_Get_Gyro_X();
+    MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
+    MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
+
+    // Kalman filter processing
+    int accel_raw[3] = {0};
+    int gyro_raw[3] = {0};
+    float accel[3] = {0.0f};
+    float gyro[3] = {0.0f};
+    float roll, pitch, yaw;
+    float q0, q1, q2, q3;
+
+    accel_raw[0] = MPU6050.Acc.X;
+    accel_raw[1] = MPU6050.Acc.Y;
+    accel_raw[2] = MPU6050.Acc.Z;
+    gyro_raw[0] = MPU6050.Gyro.X;
+    gyro_raw[1] = MPU6050.Gyro.Y;
+    gyro_raw[2] = MPU6050.Gyro.Z;
+
+    Convert_Sensor_Data(accel, gyro, accel_raw, gyro_raw, 2.0f, 2000.0f);
+
+    MPU6050_Norm.Acc.X = accel[0];
+    MPU6050_Norm.Acc.Y = accel[1];
+    MPU6050_Norm.Acc.Z = accel[2];
+    MPU6050_Norm.Gyro.X = gyro[0];
+    MPU6050_Norm.Gyro.Y = gyro[1];
+    MPU6050_Norm.Gyro.Z = gyro[2];
+
+    Complementary_Filter_Update(&CF, accel[0], accel[1], accel[2], gyro[0], gyro[1], gyro[2]);
+    Get_Attitude_Angles(&CF, &roll, &pitch, &yaw);
+    Get_Quaternion(&CF, &q0, &q1, &q2, &q3);
+    MPU6050_Angle.Angle_X = roll;
+    MPU6050_Angle.Angle_Y = pitch;
+    MPU6050_Angle.Angle_Z = yaw;
 
     // MAX30102 sensor data read
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);

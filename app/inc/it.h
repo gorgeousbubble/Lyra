@@ -57,6 +57,26 @@ typedef struct
 
 typedef struct
 {
+  float X;
+  float Y;
+  float Z;
+} ACC_Norm;
+
+typedef struct
+{
+  float X;
+  float Y;
+  float Z;
+} GYRO_Norm;
+
+typedef struct
+{
+  ACC_Norm Acc;
+  GYRO_Norm Gyro;
+} MPU6050_Sensor_Norm;
+
+typedef struct
+{
   float Angle_X; // Angle X
   float Angle_Y; // Angle Y
   float Angle_Z; // Angle Z
@@ -87,6 +107,7 @@ extern int PIT0_Count;               // PIT0 counter
 extern int PIT1_Count;               // PIT1 counter
 extern uint16 ADC_Convert_Result[2]; // ADC sample
 extern MPU6050_Sensor MPU6050;       // MPU6050
+extern MPU6050_Sensor_Norm MPU6050_Norm; // MPU6050 normalized data
 extern Angle MPU6050_Angle;          // MPU6050 angle
 extern KalmanFilter KF_X;            // Kalman Filter X
 extern KalmanFilter KF_Y;            // Kalman Filter Y
