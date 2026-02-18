@@ -23,7 +23,7 @@ struct Alarm_Clock_Time
 {
   int hour;
   int minute;
-  struct Alarm_Clock_Time* next;
+  struct Alarm_Clock_Time *next;
 };
 
 typedef struct Alarm_Clock_Time Alarm_Clock_Time;
@@ -78,24 +78,24 @@ extern const int LCM_ConfigureAdjust_Tense_24_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
-extern Alarm_Clock_Time* Alarm_Clock_List;
+extern Alarm_Clock_Time *Alarm_Clock_List;
 extern int Alarm_Clock_Max_Len;
 extern uint8 Configure_Adjust_Tense;
 
 /*
 **function declaration
 */
-extern void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int hour,int minute,int second);
-extern void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int formart);
-extern void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen,  int minute,int second, int centisecond);
-extern void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen,  int minute,int second, int centisecond);
-extern void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int cursor);
-extern void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int cursor, int number);
-extern void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute, int formart);
-extern void Calc_Configure_Adjust_List_Mode_Item(uint8* array, const Coord *item, const int itemLen);
-extern void Calc_Configure_Adjust_Clock_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int second, int number);
-extern void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const int digitLen, int year, int month, int day, int number);
-extern void Calc_Configure_Adjust_Tense_Digit(uint8* array, const Coord *item, const int itemLen);
+extern void Calc_Clock_Current_Time_Dial(uint8 *array, const Coord *dial, const int dialLen, int hour, int minute, int second);
+extern void Calc_Clock_Current_Time_Digit(uint8 *array, const Coord *digit, const int digitLen, int hour, int minute, int formart);
+extern void Calc_Stop_Watch_Current_Time_Dial(uint8 *array, const Coord *dial, const int dialLen, int minute, int second, int centisecond);
+extern void Calc_Stop_Watch_Current_Time_Digit(uint8 *array, const Coord *digit, const int digitLen, int minute, int second, int centisecond);
+extern void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8 *array, const Coord *digit, const int digitLen, int hour, int minute, int cursor);
+extern void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8 *array, const Coord *digit, const int digitLen, int hour, int minute, int cursor, int number);
+extern void Calc_World_Clock_Time(uint8 *array, const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute, int formart);
+extern void Calc_Configure_Adjust_List_Mode_Item(uint8 *array, const Coord *item, const int itemLen);
+extern void Calc_Configure_Adjust_Clock_Digit(uint8 *array, const Coord *digit, const int digitLen, int hour, int minute, int second, int number);
+extern void Calc_Configure_Adjust_Date_Digit(uint8 *array, const Coord *digit, const int digitLen, int year, int month, int day, int number);
+extern void Calc_Configure_Adjust_Tense_Digit(uint8 *array, const Coord *item, const int itemLen);
 extern void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour, int minute, int second);
 extern void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int formart);
 extern void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond);
@@ -111,7 +111,7 @@ extern void Render_Configure_Adjust_Tense_Digit(const Coord *item, const int ite
 extern void Add_Alarm_Clock_Time_To_List(int hour, int minute);
 extern void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute);
 extern void Del_Alarm_Clock_Time_From_List(int index);
-extern void Get_Alarm_Clock_Time_From_List(int index, int* hour, int* minute);
+extern void Get_Alarm_Clock_Time_From_List(int index, int *hour, int *minute);
 extern int Get_Alarm_Clock_List_Len();
 extern void Clean_Alarm_Clock_List();
 extern void Write_Alarm_Clock_List_To_E2PROM();

@@ -37,13 +37,13 @@ typedef enum
 
 typedef enum
 {
-  MAPS_Menu_Clock = 0,      // Menu Clock
-  MAPS_Menu_StopWatch = 1,  // Menu Stop Watch
-  MAPS_Menu_AlarmClock = 2, // Menu Alarm Clock
-  MAPS_Menu_WorldClock = 3,    //Menu World Clock
-  MAPS_Menu_SpiritLevel = 4,   // Menu Spirit Level
+  MAPS_Menu_Clock = 0,            // Menu Clock
+  MAPS_Menu_StopWatch = 1,        // Menu Stop Watch
+  MAPS_Menu_AlarmClock = 2,       // Menu Alarm Clock
+  MAPS_Menu_WorldClock = 3,       // Menu World Clock
+  MAPS_Menu_SpiritLevel = 4,      // Menu Spirit Level
   MAPS_Menu_Configure_Adjust = 5, // Menu Configure Adjust
-  MAPS_Menu_Selection_Max = 6, // Maximum menu selection
+  MAPS_Menu_Selection_Max = 6,    // Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum
@@ -56,7 +56,7 @@ typedef enum
 typedef enum
 {
   MAPS_StopWatch_Dial = 0,      // Stop Watch Dial
-  MAPS_StopWatch_Digit = 1,   // Stop Watch Digital
+  MAPS_StopWatch_Digit = 1,     // Stop Watch Digital
   MAPS_StopWatch_Style_Max = 2, // Maximum Stop Watch style
 } MAPS_StopWatch_Style;
 
@@ -69,37 +69,37 @@ typedef enum
 
 typedef enum
 {
-  MAPS_AlarmClock_Timer_0 = 0,     // Alarm Clock Timer 0
-  MAPS_AlarmClock_Timer_1 = 1,     // Alarm Clock Timer 1
-  MAPS_AlarmClock_Timer_2 = 2,     // Alarm Clock Timer 2
-  MAPS_AlarmClock_Timer_3 = 3,     // Alarm Clock Timer 3
-  MAPS_AlarmClock_Timer_4 = 4,     // Alarm Clock timer 4
-  MAPS_AlarmClock_Timer_5 = 5,     // Alarm Clock Timer 5
-  MAPS_AlarmClock_Timer_6 = 6,     // Alarm Clock Timer 6
-  MAPS_AlarmClock_Timer_7 = 7,     // Alarm Clock timer 7
+  MAPS_AlarmClock_Timer_0 = 0,   // Alarm Clock Timer 0
+  MAPS_AlarmClock_Timer_1 = 1,   // Alarm Clock Timer 1
+  MAPS_AlarmClock_Timer_2 = 2,   // Alarm Clock Timer 2
+  MAPS_AlarmClock_Timer_3 = 3,   // Alarm Clock Timer 3
+  MAPS_AlarmClock_Timer_4 = 4,   // Alarm Clock timer 4
+  MAPS_AlarmClock_Timer_5 = 5,   // Alarm Clock Timer 5
+  MAPS_AlarmClock_Timer_6 = 6,   // Alarm Clock Timer 6
+  MAPS_AlarmClock_Timer_7 = 7,   // Alarm Clock timer 7
   MAPS_AlarmClock_Timer_Max = 8, // Maximum Alarm Clock timer
 } MAPS_AlarmClock_Timer;
 
 typedef enum
 {
-  MAPS_WorldClock_Timezone_Beijing = 0, // Beijing Timezone (+8)
-  MAPS_WorldClock_Timezone_Shanghai = 1, // Shanghai Timezone (+8)
-  MAPS_WorldClock_Timezone_Hongkong = 2, // Hong Kong Timezone (+8)
-  MAPS_WorldClock_Timezone_Taipei = 3,   // Taipei Timezone (+8)
-  MAPS_WorldClock_Timezone_Singapore = 4, // Singapore Timezone (+8)
-  MAPS_WorldClock_Timezone_Seoul = 5,    // Seoul Timezone (+9)
-  MAPS_WorldClock_Timezone_Tokyo = 6,    // Tokyo Timezone (+9)
-  MAPS_WorldClock_Timezone_Sydney = 7,    // Sydney Timezone (+10)
+  MAPS_WorldClock_Timezone_Beijing = 0,      // Beijing Timezone (+8)
+  MAPS_WorldClock_Timezone_Shanghai = 1,     // Shanghai Timezone (+8)
+  MAPS_WorldClock_Timezone_Hongkong = 2,     // Hong Kong Timezone (+8)
+  MAPS_WorldClock_Timezone_Taipei = 3,       // Taipei Timezone (+8)
+  MAPS_WorldClock_Timezone_Singapore = 4,    // Singapore Timezone (+8)
+  MAPS_WorldClock_Timezone_Seoul = 5,        // Seoul Timezone (+9)
+  MAPS_WorldClock_Timezone_Tokyo = 6,        // Tokyo Timezone (+9)
+  MAPS_WorldClock_Timezone_Sydney = 7,       // Sydney Timezone (+10)
   MAPS_WorldClock_Timezone_SanFrancisco = 8, // San Francisco Timezone (-8)
-  MAPS_WorldClock_Timezone_NewYork = 9,    // New York Timezone (-5)
-  MAPS_WorldClock_Timezone_Max = 10, // Maximum World Clock timezone
+  MAPS_WorldClock_Timezone_NewYork = 9,      // New York Timezone (-5)
+  MAPS_WorldClock_Timezone_Max = 10,         // Maximum World Clock timezone
 } MAPS_WorldClock_Timezone;
 
 typedef struct MAPS_WorldClock_Time
 {
   MAPS_WorldClock_Timezone timezone; // World Clock timezone
-  int hour_offset;                 // Hour offset from UTC
-  int minute_offset;               // Minute offset from UTC
+  int hour_offset;                   // Hour offset from UTC
+  int minute_offset;                 // Minute offset from UTC
 } MAPS_WorldClock_Time;
 
 typedef enum
