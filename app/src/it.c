@@ -54,7 +54,7 @@ MPU6050_Sensor_Norm MPU6050_Norm = {
 */
 KalmanFilter KF_X = {
     .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.1f,      // Default sampling period of 1ms
+    .dt = 0.1f,        // Default sampling period of 1ms
     .Q_angle = 0.001f, // Process noise parameters (angle)
     .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
     .R_angle = 0.5f,   // Measure noise parameters
@@ -64,7 +64,7 @@ KalmanFilter KF_X = {
 
 KalmanFilter KF_Y = {
     .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.1f,      // Default sampling period of 1ms
+    .dt = 0.1f,        // Default sampling period of 1ms
     .Q_angle = 0.001f, // Process noise parameters (angle)
     .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
     .R_angle = 0.5f,   // Measure noise parameters
@@ -74,7 +74,7 @@ KalmanFilter KF_Y = {
 
 KalmanFilter KF_Z = {
     .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.1f,      // Default sampling period of 1ms
+    .dt = 0.1f,        // Default sampling period of 1ms
     .Q_angle = 0.001f, // Process noise parameters (angle)
     .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
     .R_angle = 0.5f,   // Measure noise parameters
@@ -94,8 +94,7 @@ ComplementaryFilter CF = {
     .exInt = 0.0f,
     .eyInt = 0.0f,
     .ezInt = 0.0f,
-    .initialized = 0
-};
+    .initialized = 0};
 
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X

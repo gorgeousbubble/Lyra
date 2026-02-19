@@ -21,87 +21,87 @@
 ** MAPS Screen Status
 */
 MAPS_Screen_Status MAPS_Screen_StatusN[MAPS_Screen_Status_Max] = {
-        MAPS_Screen_Saver,
-        MAPS_Screen_Menu,
-        MAPS_Screen_Normal,
+    MAPS_Screen_Saver,
+    MAPS_Screen_Menu,
+    MAPS_Screen_Normal,
 };
 
 /*
 ** MAPS Menu Selection
 */
 MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
-        MAPS_Menu_Clock,
-        MAPS_Menu_StopWatch,
-        MAPS_Menu_AlarmClock,
-        MAPS_Menu_WorldClock,
-        MAPS_Menu_SpiritLevel,
-        MAPS_Menu_Configure_Adjust,
+    MAPS_Menu_Clock,
+    MAPS_Menu_StopWatch,
+    MAPS_Menu_AlarmClock,
+    MAPS_Menu_WorldClock,
+    MAPS_Menu_SpiritLevel,
+    MAPS_Menu_Configure_Adjust,
 };
 
 /*
 ** MAPS Clock Style
 */
 MAPS_Clock_Style MAPS_Clock_StyleN[MAPS_Clock_Style_Max] = {
-        MAPS_Clock_Dial,
-        MAPS_Clock_Digit,
+    MAPS_Clock_Dial,
+    MAPS_Clock_Digit,
 };
 
 /*
 ** MAPS Alarm Clock Mode
 */
 MAPS_AlarmClock_Mode MAPS_AlarmClock_ModeN[MAPS_AlarmClock_Mode_Max] = {
-        MAPS_AlarmClock_List,
-        MAPS_AlarmClock_Edit,
+    MAPS_AlarmClock_List,
+    MAPS_AlarmClock_Edit,
 };
 
 /*
 ** MAPS World Clock Timezone
 */
 MAPS_WorldClock_Timezone MAPS_WorldClock_TimezoneN[MAPS_WorldClock_Timezone_Max] = {
-        MAPS_WorldClock_Timezone_Beijing,
-        MAPS_WorldClock_Timezone_Shanghai,
-        MAPS_WorldClock_Timezone_Hongkong,
-        MAPS_WorldClock_Timezone_Taipei,
-        MAPS_WorldClock_Timezone_Singapore,
-        MAPS_WorldClock_Timezone_Seoul,
-        MAPS_WorldClock_Timezone_Tokyo,
-        MAPS_WorldClock_Timezone_Sydney,
-        MAPS_WorldClock_Timezone_SanFrancisco,
-        MAPS_WorldClock_Timezone_NewYork,
+    MAPS_WorldClock_Timezone_Beijing,
+    MAPS_WorldClock_Timezone_Shanghai,
+    MAPS_WorldClock_Timezone_Hongkong,
+    MAPS_WorldClock_Timezone_Taipei,
+    MAPS_WorldClock_Timezone_Singapore,
+    MAPS_WorldClock_Timezone_Seoul,
+    MAPS_WorldClock_Timezone_Tokyo,
+    MAPS_WorldClock_Timezone_Sydney,
+    MAPS_WorldClock_Timezone_SanFrancisco,
+    MAPS_WorldClock_Timezone_NewYork,
 };
 
 /*
 ** MAPS World Clock Timezone Array
 */
 MAPS_WorldClock_Time MAPS_WorldClock_Timezone_Array[MAPS_WorldClock_Timezone_Max] = {
-  {MAPS_WorldClock_Timezone_Beijing, 8, 0},
-  {MAPS_WorldClock_Timezone_Shanghai, 8, 0},
-  {MAPS_WorldClock_Timezone_Hongkong, 8, 0},
-  {MAPS_WorldClock_Timezone_Taipei, 8, 0},
-  {MAPS_WorldClock_Timezone_Singapore, 8, 0},
-  {MAPS_WorldClock_Timezone_Seoul, 9, 0},
-  {MAPS_WorldClock_Timezone_Tokyo, 9, 0},
-  {MAPS_WorldClock_Timezone_Sydney, 10, 0},
-  {MAPS_WorldClock_Timezone_SanFrancisco, -8, 0},
-  {MAPS_WorldClock_Timezone_NewYork, -5, 0},
+    {MAPS_WorldClock_Timezone_Beijing, 8, 0},
+    {MAPS_WorldClock_Timezone_Shanghai, 8, 0},
+    {MAPS_WorldClock_Timezone_Hongkong, 8, 0},
+    {MAPS_WorldClock_Timezone_Taipei, 8, 0},
+    {MAPS_WorldClock_Timezone_Singapore, 8, 0},
+    {MAPS_WorldClock_Timezone_Seoul, 9, 0},
+    {MAPS_WorldClock_Timezone_Tokyo, 9, 0},
+    {MAPS_WorldClock_Timezone_Sydney, 10, 0},
+    {MAPS_WorldClock_Timezone_SanFrancisco, -8, 0},
+    {MAPS_WorldClock_Timezone_NewYork, -5, 0},
 };
 
 /*
 ** MAPS Configure Adjust Mode
 */
 MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max] = {
-        MAPS_ConfigureAdjust_List,
-        MAPS_ConfigureAdjust_Clock,
-        MAPS_ConfigureAdjust_Date,
-        MAPS_ConfigureAdjust_Tense,
+    MAPS_ConfigureAdjust_List,
+    MAPS_ConfigureAdjust_Clock,
+    MAPS_ConfigureAdjust_Date,
+    MAPS_ConfigureAdjust_Tense,
 };
 
 /*
 ** MAPS Configure Adjust Tense Format
 */
 MAPS_ConfigureAdjust_Tense_Format MAPS_ConfigureAdjust_Tense_FormatN[2] = {
-        MAPS_ConfigureAdjust_Tense_24H,
-        MAPS_ConfigureAdjust_Tense_12H,
+    MAPS_ConfigureAdjust_Tense_24H,
+    MAPS_ConfigureAdjust_Tense_12H,
 };
 
 /*
@@ -112,17 +112,17 @@ MAPS_ConfigureAdjust_Tense_Format MAPS_ConfigureAdjust_Tense_FormatN[2] = {
  */
 void main(void)
 {
-  Site_t Site = {0, 0};
+        Site_t Site = {0, 0};
 
-  AllInit(); // initialization
-  ReadConf(); // read configuration from e2prom
+        AllInit();  // initialization
+        ReadConf(); // read configuration from e2prom
 
-  MAPS_LCDC_BMP_From_SD("0:/Mitsuha.bmp", Site); // load image
+        MAPS_LCDC_BMP_From_SD("0:/Mitsuha.bmp", Site); // load image
 
-  for (;;)
-  {
-    MAPS_Dock_KEY_Incident();           // Independent button serial port transmission
-    MAPS_Dock_Rocker_Key_LCM_Control(); // LCM display
-    UART_Send_Parameters();
-  }
+        for (;;)
+        {
+                MAPS_Dock_KEY_Incident();           // Independent button serial port transmission
+                MAPS_Dock_Rocker_Key_LCM_Control(); // LCM display
+                UART_Send_Parameters();
+        }
 }
