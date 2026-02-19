@@ -19,17 +19,17 @@
 #include "maps_dock_lcm.h"
 #include "maps_dock_rocker.h"
 
-//Joystick button controls LCM
-int Rocker_Key_Switch_Page=1;           //Current page selection
-int Rocker_Key_Switch_Row=1;            //Current selection row
-int Rocker_Key_Switch_Row_Old=1;        //Last selection row
-int Rocker_Key_Switch_Choice_Stauts=0;  //Parameter selection status
-int Rocker_Key_Switch_Choice_Flag=0;    //Button action symbol
+// Joystick button controls LCM
+int Rocker_Key_Switch_Page = 1;          // Current page selection
+int Rocker_Key_Switch_Row = 1;           // Current selection row
+int Rocker_Key_Switch_Row_Old = 1;       // Last selection row
+int Rocker_Key_Switch_Choice_Stauts = 0; // Parameter selection status
+int Rocker_Key_Switch_Choice_Flag = 0;   // Button action symbol
 
 /*
 **Joystick button port
 */
-PTXn Rocker_Key_PTXn[Rocker_MAX]={PTA27,PTA26,PTA25,PTA24,PTA4};//PTA4(NMI)
+PTXn Rocker_Key_PTXn[Rocker_MAX] = {PTA27, PTA26, PTA25, PTA24, PTA4}; // PTA4(NMI)
 
 /*
  *  @brief      Rocker_Key initialization
@@ -38,11 +38,11 @@ PTXn Rocker_Key_PTXn[Rocker_MAX]={PTA27,PTA26,PTA25,PTA24,PTA4};//PTA4(NMI)
  */
 void MAPS_Dock_Rocker_Key_Init(void)
 {
-  GPIO_Init(Rocker_Key_PTXn[Rocker_Up],GPI,0);//Rocker_Up button initialization
-  GPIO_Init(Rocker_Key_PTXn[Rocker_Donw],GPI,0);//Rocker_Donw button initialization
-  GPIO_Init(Rocker_Key_PTXn[Rocker_Left],GPI,0);//Rocker_Left button initialization
-  GPIO_Init(Rocker_Key_PTXn[Rocker_Right],GPI,0);//Rocker_Right button initialization
-  GPIO_Init(Rocker_Key_PTXn[Rocker_Select],GPI,0);//Rocker_Select button initialization
+  GPIO_Init(Rocker_Key_PTXn[Rocker_Up], GPI, 0);     // Rocker_Up button initialization
+  GPIO_Init(Rocker_Key_PTXn[Rocker_Donw], GPI, 0);   // Rocker_Donw button initialization
+  GPIO_Init(Rocker_Key_PTXn[Rocker_Left], GPI, 0);   // Rocker_Left button initialization
+  GPIO_Init(Rocker_Key_PTXn[Rocker_Right], GPI, 0);  // Rocker_Right button initialization
+  GPIO_Init(Rocker_Key_PTXn[Rocker_Select], GPI, 0); // Rocker_Select button initialization
 }
 
 /*
@@ -52,120 +52,118 @@ void MAPS_Dock_Rocker_Key_Init(void)
  */
 void MAPS_Dock_Rocker_Key_LCM_Control(void)
 {
-  //Enter the interface
-  if(Rocker_Key_Switch_Choice_Stauts == 0)
+  // Enter the interface
+  if (Rocker_Key_Switch_Choice_Stauts == 0)
   {
-    //Only by pressing the Select button can you enter the parameter interface
-    if(GPIO_GET(Rocker_Key_PTXn[Rocker_Select]) == Rocker_Key_On)
+    // Only by pressing the Select button can you enter the parameter interface
+    if (GPIO_GET(Rocker_Key_PTXn[Rocker_Select]) == Rocker_Key_On)
     {
       Rocker_Key_Switch_Choice_Stauts = 1;
-      MAPS_Dock_LCM_CLS();//Clear screen
-      Rocker_Key_Delay(500);//Button delay
+      MAPS_Dock_LCM_CLS();   // Clear screen
+      Rocker_Key_Delay(500); // Button delay
     }
   }
-  //Key page selection interface
-  else if(Rocker_Key_Switch_Choice_Stauts == 1)
+  // Key page selection interface
+  else if (Rocker_Key_Switch_Choice_Stauts == 1)
   {
-    //Press the left joystick button
-    if(GPIO_GET(Rocker_Key_PTXn[Rocker_Left]) == Rocker_Key_On)
+    // Press the left joystick button
+    if (GPIO_GET(Rocker_Key_PTXn[Rocker_Left]) == Rocker_Key_On)
     {
-      Rocker_Key_Switch_Page--;//Reduce the number of pages by one
-      if(Rocker_Key_Switch_Page < 1)//Page count less than 1
+      Rocker_Key_Switch_Page--;       // Reduce the number of pages by one
+      if (Rocker_Key_Switch_Page < 1) // Page count less than 1
       {
-        Rocker_Key_Switch_Page = LCM_PAGES;//The number of pages is equal to the maximum number of pages
+        Rocker_Key_Switch_Page = LCM_PAGES; // The number of pages is equal to the maximum number of pages
       }
       Rocker_Key_Switch_Row = 1;
       Rocker_Key_Switch_Row_Old = 1;
       Rocker_Key_Switch_Choice_Flag = 0;
       Rocker_Key_Switch_Choice_Stauts = 1;
-      MAPS_Dock_LCM_CLS();//Clear screen
-      Rocker_Key_Delay(500);//Button delay
+      MAPS_Dock_LCM_CLS();   // Clear screen
+      Rocker_Key_Delay(500); // Button delay
     }
-    //Press the right button on the joystick
-    else if(GPIO_GET(Rocker_Key_PTXn[Rocker_Right]) == Rocker_Key_On)
+    // Press the right button on the joystick
+    else if (GPIO_GET(Rocker_Key_PTXn[Rocker_Right]) == Rocker_Key_On)
     {
-      Rocker_Key_Switch_Page++;//Page number plus one
-      if(Rocker_Key_Switch_Page > LCM_PAGES)//The number of pages is greater than the maximum number of pages
+      Rocker_Key_Switch_Page++;               // Page number plus one
+      if (Rocker_Key_Switch_Page > LCM_PAGES) // The number of pages is greater than the maximum number of pages
       {
-        Rocker_Key_Switch_Page = 1;//The number of pages is equal to 1
+        Rocker_Key_Switch_Page = 1; // The number of pages is equal to 1
       }
       Rocker_Key_Switch_Row = 1;
       Rocker_Key_Switch_Row_Old = 1;
       Rocker_Key_Switch_Choice_Flag = 0;
       Rocker_Key_Switch_Choice_Stauts = 1;
-      MAPS_Dock_LCM_CLS();//Clear screen
-      Rocker_Key_Delay(500);//Button delay
+      MAPS_Dock_LCM_CLS();   // Clear screen
+      Rocker_Key_Delay(500); // Button delay
     }
-    //Press the up key on the joystick
-    else if(GPIO_GET(Rocker_Key_PTXn[Rocker_Up]) == Rocker_Key_On)
+    // Press the up key on the joystick
+    else if (GPIO_GET(Rocker_Key_PTXn[Rocker_Up]) == Rocker_Key_On)
     {
-      Rocker_Key_Delay(500);//Button delay
+      Rocker_Key_Delay(500); // Button delay
     }
-    //Press the down key on the joystick
-    else if(GPIO_GET(Rocker_Key_PTXn[Rocker_Donw]) == Rocker_Key_On)
+    // Press the down key on the joystick
+    else if (GPIO_GET(Rocker_Key_PTXn[Rocker_Donw]) == Rocker_Key_On)
     {
-      Rocker_Key_Delay(500);//Button delay
+      Rocker_Key_Delay(500); // Button delay
     }
   }
-  
-  
-  //LCM parameter display
-  if(Rocker_Key_Switch_Choice_Stauts == 0)
+
+  // LCM parameter display
+  if (Rocker_Key_Switch_Choice_Stauts == 0)
   {
-    MAPS_Dock_LCM_DrawBMP(&LCM_Freescale_logo[0],LCM_Invert_Color);
+    MAPS_Dock_LCM_DrawBMP(&LCM_Freescale_logo[0], LCM_Invert_Color);
   }
   else
   {
-    switch(Rocker_Key_Switch_Page)
+    switch (Rocker_Key_Switch_Page)
     {
-      case 1:
-              MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Str_6x8(49,1,"List1",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,2,"PIT0_Count:",PIT0_Count,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,3,"ADC0_DP0:",ADC_Convert_Result[0],LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,4,"ADC0_DM0:",ADC_Convert_Result[1],LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,5,"RTC_Count:",RTC_Count,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,6,"Lyra_Status:",Lyra_Status,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,7,"Lyra_Menu_Selection:",Lyra_Menu_Selection,LCM_Pure_Color);
-              break;
-      case 2:
-              MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Str_6x8(49,1,"List2",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,2,"MPU6050.Acc.X:",MPU6050.Acc.X,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,3,"MPU6050.Acc.Y:",MPU6050.Acc.Y,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,4,"MPU6050.Acc.Z:",MPU6050.Acc.Z,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,5,"MPU6050.Gyro.X:",MPU6050.Gyro.X,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,6,"MPU6050.Gyro.Y:",MPU6050.Gyro.Y,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,7,"MPU6050.Gyro.Z:",MPU6050.Gyro.Z,LCM_Pure_Color);
-              break;
-      case 3:
-              MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Str_6x8(49,1,"List3",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,2,"Year:",RTC_Time_Now.Year,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,3,"Mon:",RTC_Time_Now.Month,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,4,"Day:",RTC_Time_Now.Day,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,5,"Hour:",RTC_Time_Now.Hour,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,6,"Min:",RTC_Time_Now.Minute,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,7,"Sec:",RTC_Time_Now.Second,LCM_Pure_Color);
-              break;
-      case 4:
-              MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Str_6x8(49,1,"List4",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,2,"MPU6050.Angle.X:",(int)MPU6050_Angle.Angle_X,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,3,"MPU6050.Angle.Y:",(int)MPU6050_Angle.Angle_Y,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,4,"MPU6050.Angle.Z:",(int)MPU6050_Angle.Angle_Z,LCM_Pure_Color);
-              break;
-      case 5:
-              MAPS_Dock_LCM_Put_Str_6x8(37,0,"MAPS_MK64",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Str_6x8(49,1,"List5",LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,2,"MAX30102.RED:",MAX30102_RED,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,3,"MAX30102.IR:",MAX30102_IR,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,4,"SPO2:",SPO2,LCM_Pure_Color);
-              MAPS_Dock_LCM_Put_Para_6x8(0,5,"Heart_Rate:",Heart_Rate,LCM_Pure_Color);
-              break;
-      default:
-              break;
+    case 1:
+      MAPS_Dock_LCM_Put_Str_6x8(37, 0, "MAPS_MK64", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Str_6x8(49, 1, "List1", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 2, "PIT0_Count:", PIT0_Count, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 3, "ADC0_DP0:", ADC_Convert_Result[0], LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 4, "ADC0_DM0:", ADC_Convert_Result[1], LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 5, "RTC_Count:", RTC_Count, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 6, "Lyra_Status:", Lyra_Status, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 7, "Lyra_Menu_Selection:", Lyra_Menu_Selection, LCM_Pure_Color);
+      break;
+    case 2:
+      MAPS_Dock_LCM_Put_Str_6x8(37, 0, "MAPS_MK64", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Str_6x8(49, 1, "List2", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 2, "MPU6050.Acc.X:", MPU6050.Acc.X, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 3, "MPU6050.Acc.Y:", MPU6050.Acc.Y, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 4, "MPU6050.Acc.Z:", MPU6050.Acc.Z, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 5, "MPU6050.Gyro.X:", MPU6050.Gyro.X, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 6, "MPU6050.Gyro.Y:", MPU6050.Gyro.Y, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 7, "MPU6050.Gyro.Z:", MPU6050.Gyro.Z, LCM_Pure_Color);
+      break;
+    case 3:
+      MAPS_Dock_LCM_Put_Str_6x8(37, 0, "MAPS_MK64", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Str_6x8(49, 1, "List3", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 2, "Year:", RTC_Time_Now.Year, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 3, "Mon:", RTC_Time_Now.Month, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 4, "Day:", RTC_Time_Now.Day, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 5, "Hour:", RTC_Time_Now.Hour, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 6, "Min:", RTC_Time_Now.Minute, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 7, "Sec:", RTC_Time_Now.Second, LCM_Pure_Color);
+      break;
+    case 4:
+      MAPS_Dock_LCM_Put_Str_6x8(37, 0, "MAPS_MK64", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Str_6x8(49, 1, "List4", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 2, "MPU6050.Angle.X:", (int)MPU6050_Angle.Angle_X, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 3, "MPU6050.Angle.Y:", (int)MPU6050_Angle.Angle_Y, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 4, "MPU6050.Angle.Z:", (int)MPU6050_Angle.Angle_Z, LCM_Pure_Color);
+      break;
+    case 5:
+      MAPS_Dock_LCM_Put_Str_6x8(37, 0, "MAPS_MK64", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Str_6x8(49, 1, "List5", LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 2, "MAX30102.RED:", MAX30102_RED, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 3, "MAX30102.IR:", MAX30102_IR, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 4, "SPO2:", SPO2, LCM_Pure_Color);
+      MAPS_Dock_LCM_Put_Para_6x8(0, 5, "Heart_Rate:", Heart_Rate, LCM_Pure_Color);
+      break;
+    default:
+      break;
     }
   }
-  
 }

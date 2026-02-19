@@ -28,24 +28,24 @@
 */
 PTXn MAPS_Dock_KEY_PTXn[MAPS_Dock_KEY_MAX] = {PTB21, PTB22, PTB23, PTB20};
 
-int Lyra_Status = 0;                      // Screen status
-int Lyra_Menu_Selection = 0;              // Menu selection
-int Lyra_Clock_Style = 0;                 // Clock style
-int Lyra_StopWatch_Style = 0;             // Stop Watch style
-int Lyra_AlarmClock_Mode = 0;             // Alarm Clock mode
-int Lyra_AlarmClock_List_Cursor = 0;      // Alarm Clock list cursor
-int Lyra_AlarmClock_List_Time_Hour = 0;   // Alarm Clock list time hour
-int Lyra_AlarmClock_List_Time_Minute = 0; // Alarm Clock list time minute
-int Lyra_AlarmClock_Edit_Cursor = 0;      // Alarm Clock edit cursor
-int Lyra_AlarmClock_Edit_Number[4] = {0}; // Alarm Clock edit number (hh:mm)
-int Lyra_WorldClock_Time_Cursor = 0;      // World Clock time cursor
-int Lyra_ConfigureAdjust_Mode = 0;        // Configure Adjust mode
-int Lyra_ConfigureAdjust_List_Cursor = 1; // Configure Adjust list cursor
-int Lyra_ConfigureAdjust_Clock_Cursor = 0;      // Configure Adjust clock cursor
-int Lyra_ConfigureAdjust_Clock_Number[6] = {0}; // Configure Adjust clock number (hh:mm:ss)
-int Lyra_ConfigureAdjust_Date_Cursor = 0;       // Configure Adjust date cursor
-int Lyra_ConfigureAdjust_Date_Number[8] = {0};  // Configure Adjust date number (yyyy:mm:dd)
-int Lyra_ConfigureAdjust_Tense_Format = MAPS_ConfigureAdjust_Tense_24H;      // Configure Adjust tense format (64: 24-hour/65: 12-hour)
+int Lyra_Status = 0;                                                    // Screen status
+int Lyra_Menu_Selection = 0;                                            // Menu selection
+int Lyra_Clock_Style = 0;                                               // Clock style
+int Lyra_StopWatch_Style = 0;                                           // Stop Watch style
+int Lyra_AlarmClock_Mode = 0;                                           // Alarm Clock mode
+int Lyra_AlarmClock_List_Cursor = 0;                                    // Alarm Clock list cursor
+int Lyra_AlarmClock_List_Time_Hour = 0;                                 // Alarm Clock list time hour
+int Lyra_AlarmClock_List_Time_Minute = 0;                               // Alarm Clock list time minute
+int Lyra_AlarmClock_Edit_Cursor = 0;                                    // Alarm Clock edit cursor
+int Lyra_AlarmClock_Edit_Number[4] = {0};                               // Alarm Clock edit number (hh:mm)
+int Lyra_WorldClock_Time_Cursor = 0;                                    // World Clock time cursor
+int Lyra_ConfigureAdjust_Mode = 0;                                      // Configure Adjust mode
+int Lyra_ConfigureAdjust_List_Cursor = 1;                               // Configure Adjust list cursor
+int Lyra_ConfigureAdjust_Clock_Cursor = 0;                              // Configure Adjust clock cursor
+int Lyra_ConfigureAdjust_Clock_Number[6] = {0};                         // Configure Adjust clock number (hh:mm:ss)
+int Lyra_ConfigureAdjust_Date_Cursor = 0;                               // Configure Adjust date cursor
+int Lyra_ConfigureAdjust_Date_Number[8] = {0};                          // Configure Adjust date number (yyyy:mm:dd)
+int Lyra_ConfigureAdjust_Tense_Format = MAPS_ConfigureAdjust_Tense_24H; // Configure Adjust tense format (64: 24-hour/65: 12-hour)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -356,11 +356,11 @@ void MAPS_Dock_KEY_Incident(void)
           // get alarm clock time from list
           Get_Alarm_Clock_Time_From_List(Lyra_AlarmClock_List_Cursor, &hour, &minute);
           // set alarm clock edit number
-          Lyra_AlarmClock_Edit_Number[0] = hour / 10; // Hour tens
-          Lyra_AlarmClock_Edit_Number[1] = hour % 10; // Hour
+          Lyra_AlarmClock_Edit_Number[0] = hour / 10;   // Hour tens
+          Lyra_AlarmClock_Edit_Number[1] = hour % 10;   // Hour
           Lyra_AlarmClock_Edit_Number[2] = minute / 10; // Minute tens
           Lyra_AlarmClock_Edit_Number[3] = minute % 10; // Minute
-          Lyra_AlarmClock_Edit_Cursor = 0; // Reset edit cursor  
+          Lyra_AlarmClock_Edit_Cursor = 0;              // Reset edit cursor
 
           Lyra_AlarmClock_Mode++; // Switch to edit mode
           if (Lyra_AlarmClock_Mode >= MAPS_AlarmClock_Mode_Max)
@@ -409,24 +409,24 @@ void MAPS_Dock_KEY_Incident(void)
           switch (Lyra_ConfigureAdjust_List_Cursor)
           {
           case MAPS_ConfigureAdjust_Clock:
-            Lyra_ConfigureAdjust_Clock_Number[0] = time.tm_hour / 10;      // Hour tens
-            Lyra_ConfigureAdjust_Clock_Number[1] = time.tm_hour % 10;      // Hour units
-            Lyra_ConfigureAdjust_Clock_Number[2] = time.tm_min / 10;       // Minute tens
-            Lyra_ConfigureAdjust_Clock_Number[3] = time.tm_min % 10;       // Minute units
-            Lyra_ConfigureAdjust_Clock_Number[4] = time.tm_sec / 10;       // Second tens
-            Lyra_ConfigureAdjust_Clock_Number[5] = time.tm_sec % 10;       // Second units
+            Lyra_ConfigureAdjust_Clock_Number[0] = time.tm_hour / 10; // Hour tens
+            Lyra_ConfigureAdjust_Clock_Number[1] = time.tm_hour % 10; // Hour units
+            Lyra_ConfigureAdjust_Clock_Number[2] = time.tm_min / 10;  // Minute tens
+            Lyra_ConfigureAdjust_Clock_Number[3] = time.tm_min % 10;  // Minute units
+            Lyra_ConfigureAdjust_Clock_Number[4] = time.tm_sec / 10;  // Second tens
+            Lyra_ConfigureAdjust_Clock_Number[5] = time.tm_sec % 10;  // Second units
             Lyra_ConfigureAdjust_Clock_Cursor = 0;
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Clock;
             break;
           case MAPS_ConfigureAdjust_Date:
-            Lyra_ConfigureAdjust_Date_Number[0] = (time.tm_year + 1900) / 1000;        // Year thousands
-            Lyra_ConfigureAdjust_Date_Number[1] = ((time.tm_year + 1900) / 100) % 10;  // Year hundreds
-            Lyra_ConfigureAdjust_Date_Number[2] = ((time.tm_year + 1900) / 10) % 10;   // Year tens
-            Lyra_ConfigureAdjust_Date_Number[3] = (time.tm_year + 1900) % 10;          // Year units
+            Lyra_ConfigureAdjust_Date_Number[0] = (time.tm_year + 1900) / 1000;       // Year thousands
+            Lyra_ConfigureAdjust_Date_Number[1] = ((time.tm_year + 1900) / 100) % 10; // Year hundreds
+            Lyra_ConfigureAdjust_Date_Number[2] = ((time.tm_year + 1900) / 10) % 10;  // Year tens
+            Lyra_ConfigureAdjust_Date_Number[3] = (time.tm_year + 1900) % 10;         // Year units
             Lyra_ConfigureAdjust_Date_Number[4] = (time.tm_mon + 1) / 10;             // Month tens
             Lyra_ConfigureAdjust_Date_Number[5] = (time.tm_mon + 1) % 10;             // Month units
-            Lyra_ConfigureAdjust_Date_Number[6] = time.tm_mday / 10;                // Day tens
-            Lyra_ConfigureAdjust_Date_Number[7] = time.tm_mday % 10;                // Day units
+            Lyra_ConfigureAdjust_Date_Number[6] = time.tm_mday / 10;                  // Day tens
+            Lyra_ConfigureAdjust_Date_Number[7] = time.tm_mday % 10;                  // Day units
             Lyra_ConfigureAdjust_Date_Cursor = 0;
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Date;
             break;
@@ -449,7 +449,7 @@ void MAPS_Dock_KEY_Incident(void)
             break;
           default:
             break;
-          } 
+          }
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
         {
@@ -465,7 +465,7 @@ void MAPS_Dock_KEY_Incident(void)
           time.tm_hour = hour;
           time.tm_min = minute;
           time.tm_sec = second;
-          RTC_Set_Time_Format(&time);//Set RTC time format*/
+          RTC_Set_Time_Format(&time); // Set RTC time format*/
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Date)
@@ -482,7 +482,7 @@ void MAPS_Dock_KEY_Incident(void)
           time.tm_year = year - 1900;
           time.tm_mon = month - 1;
           time.tm_mday = day;
-          RTC_Set_Time_Format(&time);//Set RTC time format*/
+          RTC_Set_Time_Format(&time); // Set RTC time format*/
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
@@ -580,8 +580,8 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Clock_Style = MAPS_Clock_Style_Max - 1; // Reset to maximum clock style
           index[0] = MAPS_Clock_Dial;
           index[1] = MAPS_Clock_Digit;
-        } 
-        else 
+        }
+        else
         {
           index[0] = MAPS_Clock_Digit;
           index[1] = MAPS_Clock_Dial;
@@ -600,7 +600,7 @@ void MAPS_Dock_KEY_Incident(void)
           index[0] = MAPS_StopWatch_Dial;
           index[1] = MAPS_StopWatch_Digit;
         }
-        else 
+        else
         {
           index[0] = MAPS_StopWatch_Digit;
           index[1] = MAPS_StopWatch_Dial;
@@ -689,10 +689,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_WorldClock_Time_Cursor = MAPS_WorldClock_Timezone_Max - 1; // Reset to minimum world clock time cursor position
           index[0] = MAPS_WorldClock_Timezone_Beijing;
           index[1] = MAPS_WorldClock_Timezone_NewYork;
-        } 
-        else 
+        }
+        else
         {
-          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Beijing) 
+          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Beijing)
           {
             index[0] = MAPS_WorldClock_Timezone_Shanghai;
             index[1] = MAPS_WorldClock_Timezone_Beijing;
@@ -1015,7 +1015,7 @@ void MAPS_Dock_KEY_Incident(void)
             {
               Lyra_ConfigureAdjust_Date_Number[Lyra_ConfigureAdjust_Date_Cursor] = 0; // Reset to 0
             }
-          }  
+          }
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
         {
@@ -1048,8 +1048,8 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Clock_Style = 0; // Reset to clock dial style
           index[0] = MAPS_Clock_Digit;
           index[1] = MAPS_Clock_Dial;
-        } 
-        else 
+        }
+        else
         {
           index[0] = MAPS_Clock_Dial;
           index[1] = MAPS_Clock_Digit;
@@ -1067,8 +1067,8 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_StopWatch_Style = 0; // Reset to stopwatch dial style
           index[0] = MAPS_StopWatch_Digit;
           index[1] = MAPS_StopWatch_Dial;
-        } 
-        else 
+        }
+        else
         {
           index[0] = MAPS_StopWatch_Dial;
           index[1] = MAPS_StopWatch_Digit;
@@ -1120,10 +1120,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_WorldClock_Time_Cursor = 0; // Reset to minimum world clock time cursor position
           index[0] = MAPS_WorldClock_Timezone_NewYork;
           index[1] = MAPS_WorldClock_Timezone_Beijing;
-        } 
-        else 
+        }
+        else
         {
-          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai) 
+          if (Lyra_WorldClock_Time_Cursor == MAPS_WorldClock_Timezone_Shanghai)
           {
             index[0] = MAPS_WorldClock_Timezone_Beijing;
             index[1] = MAPS_WorldClock_Timezone_Shanghai;
@@ -1348,11 +1348,11 @@ void MAPS_Dock_KEY_Incident(void)
  *  @param      int             minute          minute integer parameter
  *  @since      v1.0
  *  Sample usage:       Calc_Dynamic_Animation_Cache_Array(10,15,90);
-*/
-void Calc_Dynamic_Animation_Cache_Array(Coord** buff, int* buffSize, const uint8 array[64][16])
+ */
+void Calc_Dynamic_Animation_Cache_Array(Coord **buff, int *buffSize, const uint8 array[64][16])
 {
-  CoordNode* head = NULL;
-  CoordNode* current = NULL;
+  CoordNode *head = NULL;
+  CoordNode *current = NULL;
   int counter = 0;
   // if buff is not NULL free the memory
   if (*buff != NULL)
@@ -1374,17 +1374,20 @@ void Calc_Dynamic_Animation_Cache_Array(Coord** buff, int* buffSize, const uint8
           uint8 x = j * 8 + k;
           uint8 y = i;
           // create a new coordinate node for the pixel
-          CoordNode* node = (CoordNode*)malloc(sizeof(CoordNode));
+          CoordNode *node = (CoordNode *)malloc(sizeof(CoordNode));
           node->x = x;
           node->y = y;
           node->next = NULL;
           // link the coordinate node to the list
-          if (head == NULL) {
-              head = node; // if head is NULL, set head to the coordinate node
-              current = head; // move current to the coordinate node
-          } else {
-              current->next = node; // link the coordinate node to the list
-              current = node; // move current to the coordinate node
+          if (head == NULL)
+          {
+            head = node;    // if head is NULL, set head to the coordinate node
+            current = head; // move current to the coordinate node
+          }
+          else
+          {
+            current->next = node; // link the coordinate node to the list
+            current = node;       // move current to the coordinate node
           }
           // increment counter
           counter++;
@@ -1394,18 +1397,18 @@ void Calc_Dynamic_Animation_Cache_Array(Coord** buff, int* buffSize, const uint8
   }
   // return the coordinate array
   *buffSize = counter;
-  *buff = (Coord*)malloc(sizeof(Coord) * counter);
+  *buff = (Coord *)malloc(sizeof(Coord) * counter);
   int index = 0;
-  for (current = head; current != NULL; current = current->next) 
+  for (current = head; current != NULL; current = current->next)
   {
     (*buff)[index].x = current->x;
     (*buff)[index].y = current->y;
     index++;
   }
   // free the linked list
-  while (head != NULL) 
+  while (head != NULL)
   {
-    CoordNode* temp = head;
+    CoordNode *temp = head;
     head = head->next;
     free(temp);
   }
@@ -1417,8 +1420,8 @@ void Calc_Dynamic_Animation_Cache_Array(Coord** buff, int* buffSize, const uint8
  *  @param      int             minute          minute integer parameter
  *  @since      v1.0
  *  Sample usage:       Release_Dynamic_Animation_Cache(10,15,90);
-*/
-void Release_Dynamic_Animation_Cache(CoordCache* array, int len)
+ */
+void Release_Dynamic_Animation_Cache(CoordCache *array, int len)
 {
   for (int i = 0; i < len; i++)
   {
@@ -1438,8 +1441,8 @@ void Release_Dynamic_Animation_Cache(CoordCache* array, int len)
  *  @param      int             minute          minute integer parameter
  *  @since      v1.0
  *  Sample usage:       Refresh_Dynamic_Animation_Cache(10,15,90);
-*/
-void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int index[2])
+ */
+void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int index[2])
 {
   uint8 cache[64][16] = {0x00}; // 64 rows, 128 columns
   // release dynamic animation cache
@@ -1457,17 +1460,17 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
     {
       switch (index[i])
       {
-        case MAPS_Clock_Dial:
-          Calc_Clock_Current_Time_Dial((uint8*)cache, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_Clock_Digit:
-          Calc_Clock_Current_Time_Digit((uint8*)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        default:
-          break;
-      } 
+      case MAPS_Clock_Dial:
+        Calc_Clock_Current_Time_Dial((uint8 *)cache, LCM_Clock_Dial_coordinate, LCM_Clock_Dial_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, RTC_Time_Now.Second);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_Clock_Digit:
+        Calc_Clock_Current_Time_Digit((uint8 *)cache, LCM_Clock_Digit_coordinate, LCM_Clock_Digit_coordinate_length, RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      default:
+        break;
+      }
     }
     break;
   case MAPS_Menu_StopWatch:
@@ -1475,17 +1478,17 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
     {
       switch (index[i])
       {
-        case MAPS_StopWatch_Dial:
-          Calc_Stop_Watch_Current_Time_Dial((uint8*)cache, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_StopWatch_Digit:
-          Calc_Stop_Watch_Current_Time_Digit((uint8*)cache, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        default:
-          break;
-      } 
+      case MAPS_StopWatch_Dial:
+        Calc_Stop_Watch_Current_Time_Dial((uint8 *)cache, LCM_StopWatch_Dial_coordinate, LCM_StopWatch_Dial_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_StopWatch_Digit:
+        Calc_Stop_Watch_Current_Time_Digit((uint8 *)cache, LCM_StopWatch_Digit_coordinate, LCM_StopWatch_Digit_coordinate_length, Stop_Watch_Now.Minute, Stop_Watch_Now.Second, Stop_Watch_Now.Centisecond);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      default:
+        break;
+      }
     }
     break;
   case MAPS_Menu_AlarmClock:
@@ -1494,7 +1497,7 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
       int hour = 0;
       int minute = 0;
       Get_Alarm_Clock_Time_From_List(index[i], &hour, &minute);
-      Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)cache, LCM_AlarmClock_Digit_coordinate, LCM_AlarmClock_Digit_coordinate_length, hour, minute, index[i] + 1);
+      Calc_Alarm_Clock_List_Mode_Time_Digit((uint8 *)cache, LCM_AlarmClock_Digit_coordinate, LCM_AlarmClock_Digit_coordinate_length, hour, minute, index[i] + 1);
       Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
     }
     break;
@@ -1503,78 +1506,78 @@ void Refresh_Dynamic_Animation_Cache(CoordCache* array, int len, int menu, int i
     {
       switch (index[i])
       {
-        case MAPS_WorldClock_Timezone_Beijing:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, MAPS_WorldClock_Timezone_Array[0], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_Shanghai:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, MAPS_WorldClock_Timezone_Array[1], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_Hongkong:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, MAPS_WorldClock_Timezone_Array[2], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_Taipei:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, MAPS_WorldClock_Timezone_Array[3], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_Singapore:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_singapore_coordinate, LCM_WorldClock_singapore_coordinate_length, MAPS_WorldClock_Timezone_Array[4], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_Seoul:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_seoul_coordinate, LCM_WorldClock_seoul_coordinate_length, MAPS_WorldClock_Timezone_Array[5], RTC_Time_Now.Hour + 1, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_Tokyo:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_tokyo_coordinate, LCM_WorldClock_tokyo_coordinate_length, MAPS_WorldClock_Timezone_Array[6], RTC_Time_Now.Hour + 1, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_Sydney:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_sydney_coordinate, LCM_WorldClock_sydney_coordinate_length, MAPS_WorldClock_Timezone_Array[7], RTC_Time_Now.Hour + 2, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_SanFrancisco:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_sanfrancisco_coordinate, LCM_WorldClock_sanfrancisco_coordinate_length, MAPS_WorldClock_Timezone_Array[8], RTC_Time_Now.Hour - 16, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_WorldClock_Timezone_NewYork:
-          Calc_World_Clock_Time((uint8*)cache, LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, MAPS_WorldClock_Timezone_Array[9], RTC_Time_Now.Hour - 13, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        default:
-          break;
-      } 
+      case MAPS_WorldClock_Timezone_Beijing:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_beijing_coordinate, LCM_WorldClock_beijing_coordinate_length, MAPS_WorldClock_Timezone_Array[0], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_Shanghai:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_shanghai_coordinate, LCM_WorldClock_shanghai_coordinate_length, MAPS_WorldClock_Timezone_Array[1], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_Hongkong:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_hongkong_coordinate, LCM_WorldClock_hongkong_coordinate_length, MAPS_WorldClock_Timezone_Array[2], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_Taipei:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_taipei_coordinate, LCM_WorldClock_taipei_coordinate_length, MAPS_WorldClock_Timezone_Array[3], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_Singapore:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_singapore_coordinate, LCM_WorldClock_singapore_coordinate_length, MAPS_WorldClock_Timezone_Array[4], RTC_Time_Now.Hour, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_Seoul:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_seoul_coordinate, LCM_WorldClock_seoul_coordinate_length, MAPS_WorldClock_Timezone_Array[5], RTC_Time_Now.Hour + 1, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_Tokyo:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_tokyo_coordinate, LCM_WorldClock_tokyo_coordinate_length, MAPS_WorldClock_Timezone_Array[6], RTC_Time_Now.Hour + 1, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_Sydney:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_sydney_coordinate, LCM_WorldClock_sydney_coordinate_length, MAPS_WorldClock_Timezone_Array[7], RTC_Time_Now.Hour + 2, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_SanFrancisco:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_sanfrancisco_coordinate, LCM_WorldClock_sanfrancisco_coordinate_length, MAPS_WorldClock_Timezone_Array[8], RTC_Time_Now.Hour - 16, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_WorldClock_Timezone_NewYork:
+        Calc_World_Clock_Time((uint8 *)cache, LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, MAPS_WorldClock_Timezone_Array[9], RTC_Time_Now.Hour - 13, RTC_Time_Now.Minute, Lyra_ConfigureAdjust_Tense_Format);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      default:
+        break;
+      }
     }
     break;
   case MAPS_Menu_Configure_Adjust:
     for (int i = 0; i < len; i++)
     {
-      switch(index[i])
+      switch (index[i])
       {
-        case MAPS_ConfigureAdjust_Clock:
-          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_ConfigureAdjust_Date:
-          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Date_icon_coordinate, LCM_ConfigureAdjust_Date_icon_coordinate_length);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_ConfigureAdjust_Tense:
-          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Tense_icon_coordinate, LCM_ConfigureAdjust_Tense_icon_coordinate_length);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_ConfigureAdjust_Tense_24H:
-          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Tense_24_icon_coordinate, LCM_ConfigureAdjust_Tense_24_icon_coordinate_length);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        case MAPS_ConfigureAdjust_Tense_12H:
-          Calc_Configure_Adjust_List_Mode_Item((uint8*)cache, LCM_ConfigureAdjust_Tense_12_icon_coordinate, LCM_ConfigureAdjust_Tense_12_icon_coordinate_length);
-          Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
-          break;
-        default:
-          break;
+      case MAPS_ConfigureAdjust_Clock:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_Date:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Date_icon_coordinate, LCM_ConfigureAdjust_Date_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_Tense:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Tense_icon_coordinate, LCM_ConfigureAdjust_Tense_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_Tense_24H:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Tense_24_icon_coordinate, LCM_ConfigureAdjust_Tense_24_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_Tense_12H:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Tense_12_icon_coordinate, LCM_ConfigureAdjust_Tense_12_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      default:
+        break;
       }
     }
     break;
