@@ -19,33 +19,33 @@
 /*
 **Joystick button structure
 */
-//List of joystick buttons
+// List of joystick buttons
 typedef enum
 {
-  Rocker_Up,    //UP key
-  Rocker_Donw,  //DOWN key
-  Rocker_Left,  //LEFT key
-  Rocker_Right, //RIGHT key
-  Rocker_Select,//SELECT key
+  Rocker_Up,     // UP key
+  Rocker_Donw,   // DOWN key
+  Rocker_Left,   // LEFT key
+  Rocker_Right,  // RIGHT key
+  Rocker_Select, // SELECT key
   Rocker_MAX,
-}Rocker_Key_e;
+} Rocker_Key_e;
 
-//List of joystick button states
+// List of joystick button states
 typedef enum
 {
   Rocker_Key_On,
   Rocker_Key_Off,
-}Rocker_Key_Status_e;
+} Rocker_Key_Status_e;
 
-//Joystick button message structure
+// Joystick button message structure
 typedef struct
 {
-  Rocker_Key_e  Key;//key number            
-  Rocker_Key_Status_e   Key_Statu;//key status
-}Rocker_Key_Message_s;
+  Rocker_Key_e Key;              // key number
+  Rocker_Key_Status_e Key_Statu; // key status
+} Rocker_Key_Message_s;
 
-//Joystick button macro
-#define Rocker_Key_Delay(ms)    DELAY_MS(ms)
+// Joystick button macro
+#define Rocker_Key_Delay(ms) DELAY_MS(ms)
 
 /*
 **variate declaration
