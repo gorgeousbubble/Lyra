@@ -16,7 +16,7 @@
 #include "common.h"
 
 /*
-** Beep Port Macro
+** Beep port macro definition
 */
 // Beep port initialization
 #ifndef BEEP_PORT_INIT

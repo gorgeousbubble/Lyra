@@ -29,6 +29,7 @@
 #define MK64_BUS_CLK 50   // bus clock frequency
 #define MK64_FLEX_CLK 25  // flex clock frequency
 #define MK64_FLASH_CLK 25 // flash clock frequency
+
 /*
 **SIM division factors
 */
