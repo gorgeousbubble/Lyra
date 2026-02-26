@@ -21,15 +21,15 @@
  */
 __RAMFUNC uint8 Flash_CMD(void)
 {
-  FTFE_FSTAT = (0
-                | FTFE_FSTAT_CCIF_MASK        //Instruction completion flag (write 1 clear 0)
-                | FTFE_FSTAT_RDCOLERR_MASK    //Read conflict error flag (write 1 clear 0)
-                | FTFE_FSTAT_ACCERR_MASK      //Access error flag (write 1 clear 0)
-                | FTFE_FSTAT_FPVIOL_MASK      //Illegal access protection flag (write 1 clear 0)
-                );
-  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK)); //Waiting for the command to complete
-  
-  if(FTFE_FSTAT & (FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_RDCOLERR_MASK | FTFE_FSTAT_FPVIOL_MASK | FTFE_FSTAT_MGSTAT0_MASK))
+  FTFE_FSTAT = (0 | FTFE_FSTAT_CCIF_MASK   // Instruction completion flag (write 1 clear 0)
+                | FTFE_FSTAT_RDCOLERR_MASK // Read conflict error flag (write 1 clear 0)
+                | FTFE_FSTAT_ACCERR_MASK   // Access error flag (write 1 clear 0)
+                | FTFE_FSTAT_FPVIOL_MASK   // Illegal access protection flag (write 1 clear 0)
+  );
+  while (!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK))
+    ; // Waiting for the command to complete
+
+  if (FTFE_FSTAT & (FTFE_FSTAT_ACCERR_MASK | FTFE_FSTAT_RDCOLERR_MASK | FTFE_FSTAT_FPVIOL_MASK | FTFE_FSTAT_MGSTAT0_MASK))
   {
     return 0;
   }
@@ -47,15 +47,15 @@ __RAMFUNC void Flash_Init(void)
 {
   // Clear Flash pre read buffer
   FMC_PFB0CR |= FMC_PFB0CR_S_B_INV_MASK;
-  
-  while(!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK));
-  
-  FTFE_FSTAT = (0
-                | FTFE_FSTAT_CCIF_MASK        //Instruction completion flag (write 1 clear 0)
-                | FTFE_FSTAT_RDCOLERR_MASK    //Read conflict error flag (write 1 clear 0)
-                | FTFE_FSTAT_ACCERR_MASK      //Access error flag (write 1 clear 0)
-                | FTFE_FSTAT_FPVIOL_MASK      //Illegal access protection flag (write 1 clear 0)
-                );
+
+  while (!(FTFE_FSTAT & FTFE_FSTAT_CCIF_MASK))
+    ;
+
+  FTFE_FSTAT = (0 | FTFE_FSTAT_CCIF_MASK   // Instruction completion flag (write 1 clear 0)
+                | FTFE_FSTAT_RDCOLERR_MASK // Read conflict error flag (write 1 clear 0)
+                | FTFE_FSTAT_ACCERR_MASK   // Access error flag (write 1 clear 0)
+                | FTFE_FSTAT_FPVIOL_MASK   // Illegal access protection flag (write 1 clear 0)
+  );
   DELAY_MS(10);
 }
 
@@ -69,25 +69,25 @@ __RAMFUNC void Flash_Init(void)
 __RAMFUNC uint8 Flash_Erase_Sector(uint16 sector_num)
 {
   uint32 addr = sector_num * FLASH_SECTOR_SIZE;
-  
-  //Set erase command
+
+  // Set erase command
   FCMD = ERSSCR;
 
-  //Set target address
+  // Set target address
   FADDR2 = ((Dtype *)&addr)->B[2];
   FADDR1 = ((Dtype *)&addr)->B[1];
   FADDR0 = ((Dtype *)&addr)->B[0];
-  
-  if(Flash_CMD() == 0)//Is the Flash_CMD command completed
+
+  if (Flash_CMD() == 0) // Is the Flash_CMD command completed
   {
     return 0;
   }
-  
-  if(sector_num == 0)//Sector number should not be 0
+
+  if (sector_num == 0) // Sector number should not be 0
   {
-    return Flash_Write(sector_num,0x000408,0xFFFFFFFFFFFFFFFF);
+    return Flash_Write(sector_num, 0x000408, 0xFFFFFFFFFFFFFFFF);
   }
-  
+
   return 1;
 }
 
@@ -104,39 +104,39 @@ __RAMFUNC uint8 Flash_Write(uint16 sector_num, uint16 offset, FLASH_WRITE_TYPE d
 {
   uint32 addr = sector_num * FLASH_SECTOR_SIZE + offset;
   uint32 tmpdata;
-  
-  //The offset address is not a multiple of FLASH_LIGN_ADDR or the offset address is greater than the sector size, resulting in execution failure
-  if(offset % FLASH_ALIGN_ADDR != 0 || offset > FLASH_SECTOR_SIZE)
+
+  // The offset address is not a multiple of FLASH_LIGN_ADDR or the offset address is greater than the sector size, resulting in execution failure
+  if (offset % FLASH_ALIGN_ADDR != 0 || offset > FLASH_SECTOR_SIZE)
   {
     return 0;
   }
-  
-  //Set target address
+
+  // Set target address
   FADDR2 = ((Dtype *)&addr)->B[2];
   FADDR1 = ((Dtype *)&addr)->B[1];
   FADDR0 = ((Dtype *)&addr)->B[0];
-  
-  //Set low 32-bit data
+
+  // Set low 32-bit data
   tmpdata = (uint32)data;
-  FDATA0 = ((Dtype *)&tmpdata)->B[3];                  //Set write data
+  FDATA0 = ((Dtype *)&tmpdata)->B[3]; // Set write data
   FDATA1 = ((Dtype *)&tmpdata)->B[2];
   FDATA2 = ((Dtype *)&tmpdata)->B[1];
   FDATA3 = ((Dtype *)&tmpdata)->B[0];
-  
-  FCMD = PGM8;
-  
-  tmpdata = (uint32)(data>>32);
 
-  FDATA4 = ((Dtype *)&tmpdata)->B[3];                 //Set write data
+  FCMD = PGM8;
+
+  tmpdata = (uint32)(data >> 32);
+
+  FDATA4 = ((Dtype *)&tmpdata)->B[3]; // Set write data
   FDATA5 = ((Dtype *)&tmpdata)->B[2];
   FDATA6 = ((Dtype *)&tmpdata)->B[1];
   FDATA7 = ((Dtype *)&tmpdata)->B[0];
-  
-  if(Flash_CMD() == 0)
+
+  if (Flash_CMD() == 0)
   {
     return 0;
   }
-  
+
   return 1;
 }
 
@@ -152,51 +152,51 @@ __RAMFUNC uint8 Flash_Write(uint16 sector_num, uint16 offset, FLASH_WRITE_TYPE d
  */
 __RAMFUNC uint8 Flash_Write_Buff(uint16 sector_num, uint16 offset, uint16 cnt, uint8 *buf)
 {
-  uint32  size;
-  uint32  addr;
-  uint32  data;
-  
-  //The offset address is not a multiple of FLASH_LIGN_ADDR or the offset address is greater than the sector size, resulting in execution failure
-  if(offset % FLASH_ALIGN_ADDR != 0 || offset > FLASH_SECTOR_SIZE)
+  uint32 size;
+  uint32 addr;
+  uint32 data;
+
+  // The offset address is not a multiple of FLASH_LIGN_ADDR or the offset address is greater than the sector size, resulting in execution failure
+  if (offset % FLASH_ALIGN_ADDR != 0 || offset > FLASH_SECTOR_SIZE)
   {
     return 0;
   }
-  
+
   addr = sector_num * FLASH_SECTOR_SIZE + offset;
-  
+
   FCMD = PGM8;
-  
-  for(size = 0; size < cnt; size += FLASH_ALIGN_ADDR)
+
+  for (size = 0; size < cnt; size += FLASH_ALIGN_ADDR)
   {
-    //Set target address
+    // Set target address
     FADDR2 = ((Dtype *)&addr)->B[2];
     FADDR1 = ((Dtype *)&addr)->B[1];
     FADDR0 = ((Dtype *)&addr)->B[0];
-    
-    //Set low 32-bit data
-    data =  *(uint32 *)buf;
-    
-    FDATA0 = ((Dtype *)&data)->B[3];                    //Set write data
+
+    // Set low 32-bit data
+    data = *(uint32 *)buf;
+
+    FDATA0 = ((Dtype *)&data)->B[3]; // Set write data
     FDATA1 = ((Dtype *)&data)->B[2];
     FDATA2 = ((Dtype *)&data)->B[1];
     FDATA3 = ((Dtype *)&data)->B[0];
-    
-    //Set high 32-bit data
-    data = *(uint32 *)(buf+4);
 
-    FDATA4 = ((Dtype *)&data)->B[3];                    //Set write data
+    // Set high 32-bit data
+    data = *(uint32 *)(buf + 4);
+
+    FDATA4 = ((Dtype *)&data)->B[3]; // Set write data
     FDATA5 = ((Dtype *)&data)->B[2];
     FDATA6 = ((Dtype *)&data)->B[1];
     FDATA7 = ((Dtype *)&data)->B[0];
-    
-    if(Flash_CMD() == 0)
+
+    if (Flash_CMD() == 0)
     {
       return 0;
     }
-    
+
     addr += FLASH_ALIGN_ADDR;
     buf += FLASH_ALIGN_ADDR;
   }
-  
+
   return 1;
 }
