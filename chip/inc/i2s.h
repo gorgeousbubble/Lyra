@@ -15,5 +15,4 @@
 
 #include "common.h"
 
-
 #endif
