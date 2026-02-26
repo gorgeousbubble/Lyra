@@ -64,7 +64,7 @@ typedef enum
   PLL180,
   PLL200,
   PLLMAX,
-}PLLn;
+} PLLn;
 
 /*
 **PLL frequency division factor structure
@@ -72,9 +72,9 @@ typedef enum
 typedef struct
 {
   uint16 PLL_CLK;
-  uint8  PLL_PRDIV;
-  uint8  PLL_VDIV;
-}MCG_PLL_DIV;
+  uint8 PLL_PRDIV;
+  uint8 PLL_VDIV;
+} MCG_PLL_DIV;
 
 /*
 **SIM clock division factor structure
@@ -85,7 +85,7 @@ typedef struct
   uint8 SIM_BUS_DIV;
   uint8 SIM_FLEX_DIV;
   uint8 SIM_FLASH_DIV;
-}MCG_SIM_DIV;
+} MCG_SIM_DIV;
 
 /*
 **variate declaration
@@ -98,6 +98,5 @@ extern MCG_SIM_DIV MCG_DIV;
 */
 extern void MCG_DIV_Count(PLLn PLLx);
 extern uint8 PLL_Init(PLLn PLLx);
-
 
 #endif
