@@ -15,13 +15,12 @@
 
 #include "common.h"
 
-#define DWT_CLK_KHZ             MK64_Core_KHz
+#define DWT_CLK_KHZ MK64_Core_KHz
 
 /*
 **function declaration
 */
 extern void DWT_Delay_us(uint32 DWT_us);
 extern void DWT_Delay_ms(uint32 DWT_ms);
-
 
 #endif
