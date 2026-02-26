@@ -13,7 +13,6 @@
 #ifndef __SYSTICK_H__
 #define __SYSTICK_H__
 
-
 #include "common.h"
 
 /*
@@ -21,12 +20,12 @@
 */
 #define SYSTICK_CLK_KHZ MK64_Core_KHz
 
-#define SysTick_DELAY_US(us)    SysTick_Delay(us * (SYSTICK_CLK_KHZ / 1000))
-#define SysTick_DELAY_NS(ns)    SysTick_Delay(ns * (SYSTICK_CLK_KHZ / 1000000))
+#define SysTick_DELAY_US(us) SysTick_Delay(us *(SYSTICK_CLK_KHZ / 1000))
+#define SysTick_DELAY_NS(ns) SysTick_Delay(ns *(SYSTICK_CLK_KHZ / 1000000))
 
-#define SysTick_TIMING_MS(ms)   SysTick_Timing(ms * (SYSTICK_CLK_KHZ))
-#define SysTick_TIMING_US(us)   SysTick_Timing(us * (SYSTICK_CLK_KHZ / 1000))
-#define SysTick_TIMING_NS(ns)   SysTick_Timing(ns * (SYSTICK_CLK_KHZ / 1000000))
+#define SysTick_TIMING_MS(ms) SysTick_Timing(ms *(SYSTICK_CLK_KHZ))
+#define SysTick_TIMING_US(us) SysTick_Timing(us *(SYSTICK_CLK_KHZ / 1000))
+#define SysTick_TIMING_NS(ns) SysTick_Timing(ns *(SYSTICK_CLK_KHZ / 1000000))
 
 /*
 **function declaration
