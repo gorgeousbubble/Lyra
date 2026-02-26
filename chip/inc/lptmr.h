@@ -20,29 +20,28 @@
 */
 typedef enum
 {
-  LPT0_ALT1=1,//PTA19
-  LPT0_ALT2=2,//PTC5
-}LPT0_ALTn;
+  LPT0_ALT1 = 1, // PTA19
+  LPT0_ALT2 = 2, // PTC5
+} LPT0_ALTn;
 
 /*
 **LPTMR pulse counting triggering method
 */
 typedef enum
 {
-  LPT_Rising, //Rising edge trigger
-  LPT_Falling,//Falling edge trigger
-}LPT_CFG;
+  LPT_Rising,  // Rising edge trigger
+  LPT_Falling, // Falling edge trigger
+} LPT_CFG;
 
 /*
 **LPTMR macros
 */
-#define LPTMR_Flag_Clear        (LPTMR0_CSR |= LPTMR_CSR_TCF_MASK)//Clear LPT comparison bit
-
+#define LPTMR_Flag_Clear (LPTMR0_CSR |= LPTMR_CSR_TCF_MASK) // Clear LPT comparison bit
 
 /*
 **function declaration
 */
-extern void LPTMR_Pluse_Init(LPT0_ALTn LPT0_ALTx,LPT_CFG LPT_CFG_x,uint16 LPT_Count);
+extern void LPTMR_Pluse_Init(LPT0_ALTn LPT0_ALTx, LPT_CFG LPT_CFG_x, uint16 LPT_Count);
 extern uint16 LPTMR_Pluse_Get(void);
 extern void LPTMR_Count_Clean(void);
 extern void LPTMR_Delay_ms(uint16 LPTMR_Delay);
