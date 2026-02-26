@@ -20,20 +20,19 @@
  */
 void WDOG_Unlock(void)
 {
-  uint8 WDOG_Temp=0;
-  
-  WDOG_Temp = __get_BASEPRI();//Return the value of PRIMASK register (1-bit): 1: close interrupt 0: Open interrupt
-  
-  DisableInterrupts;//close all interrupts
-  
-  WDOG_UNLOCK = 0xC520;//write 0xC520 and 0xD928 to the WDOG-UNLOCK register to unlock WDOG
+  uint8 WDOG_Temp = 0;
+
+  WDOG_Temp = __get_BASEPRI(); // Return the value of PRIMASK register (1-bit): 1: close interrupt 0: Open interrupt
+
+  DisableInterrupts; // close all interrupts
+
+  WDOG_UNLOCK = 0xC520; // write 0xC520 and 0xD928 to the WDOG-UNLOCK register to unlock WDOG
   WDOG_UNLOCK = 0xD928;
-  
-  if(WDOG_Temp == 0)//before unlocking, it was interrupted
+
+  if (WDOG_Temp == 0) // before unlocking, it was interrupted
   {
-    EnableInterrupts;//open all interrupts
+    EnableInterrupts; // open all interrupts
   }
-  
 }
 
 /*
@@ -42,18 +41,18 @@ void WDOG_Unlock(void)
  */
 void WDOG_Feed(void)
 {
-  uint8 WDOG_Temp=0;
-  
-  WDOG_Temp = __get_BASEPRI();//Return the value of PRIMASK register (1-bit): 1: close interrupt 0: Open interrupt
-  
-  DisableInterrupts;//close all interrupts
-  
-  WDOG_REFRESH = 0xA602;//update WDOG counter, Feed Dog
+  uint8 WDOG_Temp = 0;
+
+  WDOG_Temp = __get_BASEPRI(); // Return the value of PRIMASK register (1-bit): 1: close interrupt 0: Open interrupt
+
+  DisableInterrupts; // close all interrupts
+
+  WDOG_REFRESH = 0xA602; // update WDOG counter, Feed Dog
   WDOG_REFRESH = 0xB480;
-  
-  if(WDOG_Temp == 0)//before unlocking, it was interrupted
+
+  if (WDOG_Temp == 0) // before unlocking, it was interrupted
   {
-    EnableInterrupts;//open all interrupts
+    EnableInterrupts; // open all interrupts
   }
 }
 
@@ -63,8 +62,8 @@ void WDOG_Feed(void)
  */
 void WDOG_Disable(void)
 {
-  WDOG_Unlock();//unlock WDOG,configure WDOG register
-  WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK;//WDOGEN clear to 0, disable WDOG
+  WDOG_Unlock();                             // unlock WDOG,configure WDOG register
+  WDOG_STCTRLH &= ~WDOG_STCTRLH_WDOGEN_MASK; // WDOGEN clear to 0, disable WDOG
 }
 
 /*
@@ -73,8 +72,8 @@ void WDOG_Disable(void)
  */
 void WDOG_Enable(void)
 {
-  WDOG_Unlock();//unlock WDOG,configure WDOG register
-  WDOG_STCTRLH |= WDOG_STCTRLH_WDOGEN_MASK;//WDOGEN set to 1, enable WDOG
+  WDOG_Unlock();                            // unlock WDOG,configure WDOG register
+  WDOG_STCTRLH |= WDOG_STCTRLH_WDOGEN_MASK; // WDOGEN set to 1, enable WDOG
 }
 
 /*
@@ -84,19 +83,18 @@ void WDOG_Enable(void)
  */
 void WDOG_Init(uint32 WDOG_Cnt)
 {
-  ASSERT(WDOG_Cnt >= 4);//the minimum counting clock is 4 milliseconds
-  
-  WDOG_Unlock();//unlock WDOG,configure WDOG register
-  
-  WDOG_PRESC = WDOG_PRESC_PRESCVAL(0);//set the division factor to PRESSCVAL+1 (PRESSCVAL values range from 0 to 7)
-  
-  WDOG_TOVALH = WDOG_Cnt >> 16;//Set WDOG time
+  ASSERT(WDOG_Cnt >= 4); // the minimum counting clock is 4 milliseconds
+
+  WDOG_Unlock(); // unlock WDOG,configure WDOG register
+
+  WDOG_PRESC = WDOG_PRESC_PRESCVAL(0); // set the division factor to PRESSCVAL+1 (PRESSCVAL values range from 0 to 7)
+
+  WDOG_TOVALH = WDOG_Cnt >> 16; // Set WDOG time
   WDOG_TOVALL = (uint16)(WDOG_Cnt & 0x0000ffff);
-  
-  WDOG_STCTRLH = (0 | WDOG_STCTRLH_WDOGEN_MASK          //WDOG enable
-                    | WDOG_STCTRLH_ALLOWUPDATE_MASK     //WDOG allow update
-                    | WDOG_STCTRLH_STOPEN_MASK          //WDOG stop mode
-                    | WDOG_STCTRLH_WAITEN_MASK          //WDOG wait mode
-                  );
-  
+
+  WDOG_STCTRLH = (0 | WDOG_STCTRLH_WDOGEN_MASK    // WDOG enable
+                  | WDOG_STCTRLH_ALLOWUPDATE_MASK // WDOG allow update
+                  | WDOG_STCTRLH_STOPEN_MASK      // WDOG stop mode
+                  | WDOG_STCTRLH_WAITEN_MASK      // WDOG wait mode
+  );
 }
