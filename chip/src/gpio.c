@@ -16,13 +16,13 @@
 /*
 **GPIO base address pointer
 */
-GPIO_MemMapPtr GPIOX[PORT_PTX_MAX]=
-{
-  PTA_BASE_PTR,//PTA base address pointer
-  PTB_BASE_PTR,//PTB base address pointer
-  PTC_BASE_PTR,//PTC base address pointer
-  PTD_BASE_PTR,//PTD base address pointer
-  PTE_BASE_PTR,//PTE base address pointer
+GPIO_MemMapPtr GPIOX[PORT_PTX_MAX] =
+    {
+        PTA_BASE_PTR, // PTA base address pointer
+        PTB_BASE_PTR, // PTB base address pointer
+        PTC_BASE_PTR, // PTC base address pointer
+        PTD_BASE_PTR, // PTD base address pointer
+        PTE_BASE_PTR, // PTE base address pointer
 };
 
 /*
@@ -33,29 +33,27 @@ GPIO_MemMapPtr GPIOX[PORT_PTX_MAX]=
  *  @since      v1.0
  *  Sample usage:       GPIO_Init(PTA8, GPI,0);    //Init PTA8 port as input
  */
-void GPIO_Init(PTXn PTXx,GPIO_CFG CFG,uint8 DATA)
+void GPIO_Init(PTXn PTXx, GPIO_CFG CFG, uint8 DATA)
 {
-  PORT_Init(PTXx,ALT1);//Init GPIO
-  
-  if(CFG == GPI)//GPIO Input
+  PORT_Init(PTXx, ALT1); // Init GPIO
+
+  if (CFG == GPI) // GPIO Input
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDDR port number clear to 0, GPIO port as input direction
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx)); // GPIO PDDR port number clear to 0, GPIO port as input direction
   }
-  else//GPIO Output
+  else // GPIO Output
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDDR port number set to 1, GPIO port as output direction
-    
-    if(DATA == 0)//low level
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx)); // GPIO PDDR port number set to 1, GPIO port as output direction
+
+    if (DATA == 0) // low level
     {
-      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDOR port number clear to 0, GPIO port as low level output
+      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx)); // GPIO PDOR port number clear to 0, GPIO port as low level output
     }
-    else//high level
+    else // high level
     {
-      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDOR port number set to 1, GPIO port as high level output
+      GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx)); // GPIO PDOR port number set to 1, GPIO port as high level output
     }
-    
   }
-  
 }
 
 /*
@@ -65,15 +63,15 @@ void GPIO_Init(PTXn PTXx,GPIO_CFG CFG,uint8 DATA)
  *  @since      v1.0
  *  Sample usage:       GPIO_DDR(PTA8, GPI);    //set PTA8 port as input
  */
-void GPIO_DDR(PTXn PTXx,GPIO_CFG CFG)
+void GPIO_DDR(PTXn PTXx, GPIO_CFG CFG)
 {
-  if(CFG == GPI)
+  if (CFG == GPI)
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDDR port number clear to 0, GPIO port as input direction
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx)); // GPIO PDDR port number clear to 0, GPIO port as input direction
   }
   else
   {
-    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDDR port number set to 1, GPIO port as output direction
+    GPIO_PDDR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx)); // GPIO PDDR port number set to 1, GPIO port as output direction
   }
 }
 
@@ -85,17 +83,17 @@ void GPIO_DDR(PTXn PTXx,GPIO_CFG CFG)
  *  @warning    should ensure port data direction is output(assert enable in debug mode)
  *  Sample usage:       GPIO_Set(PTA8, 1);    // PTA8 port output high level
  */
-void GPIO_Set(PTXn PTXx,uint8 DATA)
+void GPIO_Set(PTXn PTXx, uint8 DATA)
 {
-  ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)),PORT_PTn(PTXx)) == GPO);
-  
-  if(DATA == 0)//low level
+  ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)), PORT_PTn(PTXx)) == GPO);
+
+  if (DATA == 0) // low level
   {
-    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));// GPIO PDOR port number clear to 0, GPIO port output low level
+    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx)); // GPIO PDOR port number clear to 0, GPIO port output low level
   }
-  else//high level
+  else // high level
   {
-    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));// GPIO PDOR port number set to 1, GPIO port output high level
+    GPIO_PDOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx)); // GPIO PDOR port number set to 1, GPIO port output high level
   }
 }
 
@@ -108,10 +106,9 @@ void GPIO_Set(PTXn PTXx,uint8 DATA)
  */
 void GPIO_Turn(PTXn PTXx)
 {
-  ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)),PORT_PTn(PTXx)) == GPO);
-  
-  GPIO_PTOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));//GPIO port turn
+  ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)), PORT_PTn(PTXx)) == GPO);
 
+  GPIO_PTOR_REG(GPIOX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx)); // GPIO port turn
 }
 
 /*
@@ -124,11 +121,11 @@ void GPIO_Turn(PTXn PTXx)
  */
 uint8 GPIO_Get(PTXn PTXx)
 {
-  uint8 GPIO_Data=0;
-  
-  ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)),PORT_PTn(PTXx)) == GPI);
-  
+  uint8 GPIO_Data = 0;
+
+  ASSERT(BIT_GET(GPIO_PDDR_REG(GPIOX_BASE(PTXx)), PORT_PTn(PTXx)) == GPI);
+
   GPIO_Data = (GPIO_PDIR_REG(GPIOX_BASE(PTXx)) >> PORT_PTn(PTXx)) & 0x01;
-  
+
   return GPIO_Data;
 }
