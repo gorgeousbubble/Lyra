@@ -24,7 +24,7 @@ typedef enum
   **disable channel
   */
   Channel_Disabled = 0,
-  
+
   /*
   **UART
   */
@@ -37,13 +37,13 @@ typedef enum
   DMA_UART3_Rx = 8,
   DMA_UART3_Tx = 9,
   DMA_UART4_Rx_Or_Tx = 10,
-  
+
   /*
   **I2S
   */
   DMA_I2S0_Rx = 12,
   DMA_I2S0_Tx = 13,
-  
+
   /*
   **SPI
   */
@@ -51,13 +51,13 @@ typedef enum
   DMA_SPI0_Tx = 15,
   DMA_SPI1_Rx = 16,
   DMA_SPI1_Tx = 17,
-  
+
   /*
   **I2C
   */
   DMA_I2C0_Or_I2C3 = 18,
   DMA_I2C1_Or_I2C2 = 19,
-  
+
   /*
   **FTM
   */
@@ -81,7 +81,7 @@ typedef enum
   DMA_FTM3_CH5 = 37,
   DMA_FTM3_CH6_Or_SPI2_Rx = 38,
   DMA_FTM3_CH7_Or_SPI2_Tx = 39,
-  
+
   /*
   **ADC&DAC
   */
@@ -94,7 +94,7 @@ typedef enum
   DMA_DAC1 = 46,
   DMA_CMT = 47,
   DMA_PDB = 48,
-  
+
   /*
   **PORT
   */
@@ -103,7 +103,7 @@ typedef enum
   DMA_PORTC = 51,
   DMA_PORTD = 52,
   DMA_PORTE = 53,
-  
+
   /*
   **IEEE
   */
@@ -111,13 +111,13 @@ typedef enum
   DMA_IEEE_TIM1_Or_TPM1 = 55,
   DMA_IEEE_TIM2_Or_TPM2 = 56,
   DMA_IEEE_TIM3 = 57,
-  
+
   /*
   **LPUART
   */
   DMA_LPUART0_Rx = 58,
   DMA_LPUART0_Tx = 59,
-  
+
   /*
   **DMA_MUX
   */
@@ -125,17 +125,17 @@ typedef enum
   DMA_Always_EN2 = 61,
   DMA_Always_EN3 = 62,
   DMA_Always_EN4 = 63,
-  
-}DMA_Sources;
+
+} DMA_Sources;
 
 /*
 **DMA configuration
 */
 typedef enum
 {
-  DADDR_RECOVER,//recovered destination address
-  DADDR_KEEPON, //destination address remains unchanged
-}DMA_CFG;
+  DADDR_RECOVER, // recovered destination address
+  DADDR_KEEPON,  // destination address remains unchanged
+} DMA_CFG;
 
 /*
 **DMA transmission enamurate
@@ -146,7 +146,7 @@ typedef enum
   DMA_BYTE2 = 1,
   DMA_BYTE4 = 2,
   DMA_BYTE16 = 4,
-}DMA_BYTEn;
+} DMA_BYTEn;
 
 /*
 **DMA transmission channel
@@ -169,25 +169,25 @@ typedef enum
   DMA_CH13,
   DMA_CH14,
   DMA_CH15,
-}DMA_CHn;
+} DMA_CHn;
 
 /*
 **DMA interrupts related macros
 */
-#define  DMA_EN(DMA_CHn)        DMA_ERQ |= (DMA_ERQ_ERQ0_MASK<<(DMA_CHn))                       //DMA transmission channel
-#define  DMA_DIS(DMA_CHn)       DMA_ERQ &=~(DMA_ERQ_ERQ0_MASK<<(DMA_CHn))                       //Prohibit channel hardware DMA requests
+#define DMA_EN(DMA_CHn) DMA_ERQ |= (DMA_ERQ_ERQ0_MASK << (DMA_CHn))   // DMA transmission channel
+#define DMA_DIS(DMA_CHn) DMA_ERQ &= ~(DMA_ERQ_ERQ0_MASK << (DMA_CHn)) // Prohibit channel hardware DMA requests
 
-#define  DMA_IRQ_EN(DMA_CHn)    enable_irq((IRQn_Type)((IRQn_Type)DMA_CHn + DMA0_IRQn))   //Allow DMA channel transfer completion interrupt
-#define  DMA_IRQ_DIS(DMA_CHn)   disable_irq((IRQn_Type)((IRQn_Type)DMA_CHn + DMA0_IRQn))  //Prohibit DMA channel transfer completion interrupt
-#define  DMA_IRQ_CLEAN(DMA_CHn) DMA_INT|=(DMA_INT_INT0_MASK<<DMA_CHn)                           //Clear the channel transmission interrupt flag bit
+#define DMA_IRQ_EN(DMA_CHn) enable_irq((IRQn_Type)((IRQn_Type)DMA_CHn + DMA0_IRQn))   // Allow DMA channel transfer completion interrupt
+#define DMA_IRQ_DIS(DMA_CHn) disable_irq((IRQn_Type)((IRQn_Type)DMA_CHn + DMA0_IRQn)) // Prohibit DMA channel transfer completion interrupt
+#define DMA_IRQ_CLEAN(DMA_CHn) DMA_INT |= (DMA_INT_INT0_MASK << DMA_CHn)              // Clear the channel transmission interrupt flag bit
 
-#define  DMA_CHn_DIS(DMA_CHn)   DMAMUX_CHCFG_REG(DMAMUX_BASE_PTR,DMA_CHn) &= ~DMAMUX_CHCFG_SOURCE(Channel_Disabled)  //Disable channel
+#define DMA_CHn_DIS(DMA_CHn) DMAMUX_CHCFG_REG(DMAMUX_BASE_PTR, DMA_CHn) &= ~DMAMUX_CHCFG_SOURCE(Channel_Disabled) // Disable channel
 
 /*
 **DMA counter related macros
 */
-#define DMA_COUNTSADDR      0x4004000C      //DMA counter source address
-#define DMA_COUNTDADDR      0x4004000C      //DMA counter destination address
+#define DMA_COUNTSADDR 0x4004000C // DMA counter source address
+#define DMA_COUNTDADDR 0x4004000C // DMA counter destination address
 
 /*
 **variate declaration
@@ -197,10 +197,9 @@ extern uint32 DMA_Count_Array[32];
 /*
 **function declaration
 */
-extern void DMA_PORTX_To_Buff_Init(DMA_CHn DMA_CHx,void *SADDR,void *DADDR,PTXn PTXx,DMA_BYTEn DMA_BYTEx,uint32 Count,DMA_CFG CFG);
-extern void DMA_Count_Init(DMA_CHn DMA_CHx,PTXn PTXx,uint32 DMA_Count,PORT_CFG DMA_cfg);
+extern void DMA_PORTX_To_Buff_Init(DMA_CHn DMA_CHx, void *SADDR, void *DADDR, PTXn PTXx, DMA_BYTEn DMA_BYTEx, uint32 Count, DMA_CFG CFG);
+extern void DMA_Count_Init(DMA_CHn DMA_CHx, PTXn PTXx, uint32 DMA_Count, PORT_CFG DMA_cfg);
 extern uint32 DMA_Count_Get(DMA_CHn DMA_CHx);
 extern void DMA_Count_Reset(DMA_CHn DMA_CHx);
-
 
 #endif
