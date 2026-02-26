@@ -19,13 +19,11 @@
  */
 void PDB_Init(void)
 {
-  SIM_SCGC6 |= SIM_SCGC6_PDB_MASK;//PDB module clock enable
-  
-  //PDB state control register
-  PDB_SC_REG(PDB0_BASE_PTR) = (0
-                               | PDB_SC_CONT_MASK       //PDB continuous mode
-                               | PDB_SC_TRGSEL(15)      //PDB software trigger
-                               | PDB_SC_PDBEN_MASK      //PDB module enable
-                               );
-  
+  SIM_SCGC6 |= SIM_SCGC6_PDB_MASK; // PDB module clock enable
+
+  // PDB state control register
+  PDB_SC_REG(PDB0_BASE_PTR) = (0 | PDB_SC_CONT_MASK // PDB continuous mode
+                               | PDB_SC_TRGSEL(15)  // PDB software trigger
+                               | PDB_SC_PDBEN_MASK  // PDB module enable
+  );
 }
