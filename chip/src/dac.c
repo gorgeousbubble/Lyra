@@ -16,10 +16,10 @@
 /*
 **DAC base pointer
 */
-DAC_MemMapPtr DACN[DAC_DAC_MAX]=
-{
-  DAC0_BASE_PTR,//DAC0 base pointer
-  DAC1_BASE_PTR,//DAC1 base pointer
+DAC_MemMapPtr DACN[DAC_DAC_MAX] =
+    {
+        DAC0_BASE_PTR, // DAC0 base pointer
+        DAC1_BASE_PTR, // DAC1 base pointer
 };
 
 /*
@@ -31,43 +31,41 @@ DAC_MemMapPtr DACN[DAC_DAC_MAX]=
 void DAC_Init(DAC_DACn DAC_DACx)
 {
   ASSERT(DAC_DACx <= DAC_DAC1);
-  
-  switch(DAC_DACx)
+
+  switch (DAC_DACx)
   {
-    case DAC_DAC0:
-                  SIM_SCGC2 |= SIM_SCGC2_DAC0_MASK;//DAC0 clock enablement
-                  break;
-    case DAC_DAC1:
-                  SIM_SCGC2 |= SIM_SCGC2_DAC1_MASK;//DAC1 clock enablement
-                  break;
-    default:
-                  ASSERT(0);
-                  break;
+  case DAC_DAC0:
+    SIM_SCGC2 |= SIM_SCGC2_DAC0_MASK; // DAC0 clock enablement
+    break;
+  case DAC_DAC1:
+    SIM_SCGC2 |= SIM_SCGC2_DAC1_MASK; // DAC1 clock enablement
+    break;
+  default:
+    ASSERT(0);
+    break;
   }
-  
+
   /*
   **DAC_C0 register configuration
   */
-  DAC_C0_REG(DACN[DAC_DACx]) = (0
-                                | DAC_C0_DACTRGSEL_MASK         //DAC software trigger
-                                | DAC_C0_DACRFS_MASK            //DAC reference source VDD (3.3V)
-                                | DAC_C0_DACEN_MASK             //DAC system enable
-                                );
-  
+  DAC_C0_REG(DACN[DAC_DACx]) = (0 | DAC_C0_DACTRGSEL_MASK // DAC software trigger
+                                | DAC_C0_DACRFS_MASK      // DAC reference source VDD (3.3V)
+                                | DAC_C0_DACEN_MASK       // DAC system enable
+  );
+
   /*
   **DAC_C1 register configuration
   */
   DAC_C1_REG(DACN[DAC_DACx]) = (0);
-  
+
   /*
   **DAC_C2 register configuration
   */
   DAC_C2_REG(DACN[DAC_DACx]) = (0 | DAC_C2_DACBFRP(0));
-  
-  //Output minimum voltage
-  DAC_DATH_REG(DACN[DAC_DACx],0) = 0;
-  DAC_DATL_REG(DACN[DAC_DACx],0) = 0;
-    
+
+  // Output minimum voltage
+  DAC_DATH_REG(DACN[DAC_DACx], 0) = 0;
+  DAC_DATL_REG(DACN[DAC_DACx], 0) = 0;
 }
 
 /*
@@ -77,12 +75,11 @@ void DAC_Init(DAC_DACn DAC_DACx)
  *  @since      v1.0
  *  Sample usage:       DAC_Out (DAC1 ,0x100);    //Initialize DAC1 to output analog quantity corresponding to 0x100 digital quantity
  */
-void DAC_Out(DAC_DACn DAC_DACx,uint16 DAC_Value)
+void DAC_Out(DAC_DACn DAC_DACx, uint16 DAC_Value)
 {
-  //Assert that the DAC output value is 12 bits
+  // Assert that the DAC output value is 12 bits
   ASSERT(DAC_Value < 0x1000);
-  
-  DAC_DATH_REG(DACN[DAC_DACx],0) = (DAC_Value >> 8);    //DAC output high-order register
-  DAC_DATL_REG(DACN[DAC_DACx],0) = (DAC_Value & 0xff);  //DAC output status register
-  
+
+  DAC_DATH_REG(DACN[DAC_DACx], 0) = (DAC_Value >> 8);   // DAC output high-order register
+  DAC_DATL_REG(DACN[DAC_DACx], 0) = (DAC_Value & 0xff); // DAC output status register
 }
