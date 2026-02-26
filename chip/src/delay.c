@@ -10,7 +10,6 @@
  * @date       2025-06-24
  */
 
-
 #include "delay.h"
 #include "system_init.h"
 
@@ -22,18 +21,17 @@
  */
 void DELAY_us(uint32 Delay_Time)
 {
-  uint32 i=0;
-  uint32 j=0;
-  uint32 DELAY_Clk=MK64_Core_MHz;//Delay reference clock
-  
-  for(i=0;i<Delay_Time;i++)
+  uint32 i = 0;
+  uint32 j = 0;
+  uint32 DELAY_Clk = MK64_Core_MHz; // Delay reference clock
+
+  for (i = 0; i < Delay_Time; i++)
   {
-    for(j=0;j<DELAY_Clk;j++)
+    for (j = 0; j < DELAY_Clk; j++)
     {
       asm("nop");
     }
   }
-  
 }
 
 /*
@@ -44,16 +42,15 @@ void DELAY_us(uint32 Delay_Time)
  */
 void DELAY_ms(uint32 Delay_Time)
 {
-  uint32 i=0;
-  uint32 j=0;
-  uint32 DELAY_Clk=MK64_Core_KHz;//Delay reference clock
-  
-  for(i=0;i<Delay_Time;i++)
+  uint32 i = 0;
+  uint32 j = 0;
+  uint32 DELAY_Clk = MK64_Core_KHz; // Delay reference clock
+
+  for (i = 0; i < Delay_Time; i++)
   {
-    for(j=0;j<DELAY_Clk;j++)
+    for (j = 0; j < DELAY_Clk; j++)
     {
       asm("nop");
     }
   }
-  
 }
