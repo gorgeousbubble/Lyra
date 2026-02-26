@@ -20,24 +20,25 @@
  */
 void DWT_Delay_us(uint32 DWT_us)
 {
-  uint32 DWT_St=0;
-  uint32 DWT_Et=0;
-  uint32 DWT_Ts=0;
-  
-  ((CoreDebug_Type*)CoreDebug_BASE)->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;//Debug clock enable
-  ((DWT_Type*)DWT_BASE)->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-  
-  DWT_St = ((DWT_Type*)DWT_BASE)->CYCCNT;
+  uint32 DWT_St = 0;
+  uint32 DWT_Et = 0;
+  uint32 DWT_Ts = 0;
+
+  ((CoreDebug_Type *)CoreDebug_BASE)->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk; // Debug clock enable
+  ((DWT_Type *)DWT_BASE)->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
+  DWT_St = ((DWT_Type *)DWT_BASE)->CYCCNT;
   DWT_Ts = DWT_us * (DWT_CLK_KHZ / 1000);
   DWT_Et = DWT_St + DWT_Ts;
-  
-  if(DWT_Et < DWT_St)
+
+  if (DWT_Et < DWT_St)
   {
-    while((((DWT_Type*)DWT_BASE)->CYCCNT) > DWT_Et);
+    while ((((DWT_Type *)DWT_BASE)->CYCCNT) > DWT_Et)
+      ;
   }
-  
-  while((((DWT_Type*)DWT_BASE)->CYCCNT) < DWT_Et);
-  
+
+  while ((((DWT_Type *)DWT_BASE)->CYCCNT) < DWT_Et)
+    ;
 }
 
 /*
@@ -47,7 +48,7 @@ void DWT_Delay_us(uint32 DWT_us)
  */
 void DWT_Delay_ms(uint32 DWT_ms)
 {
-  while(DWT_ms--)
+  while (DWT_ms--)
   {
     DWT_Delay_us(1000);
   }
