@@ -25,7 +25,7 @@ typedef enum
   FTM_FTM2,
   FTM_FTM3,
   FTM_FTM_MAX,
-}FTM_FTMn;
+} FTM_FTMn;
 
 /*
 **FTM channel number
@@ -40,7 +40,7 @@ typedef enum
   FTM_CH5,
   FTM_CH6,
   FTM_CH7,
-}FTM_CHn;
+} FTM_CHn;
 
 /*
 **FTM frequency division coefficient
@@ -56,26 +56,25 @@ typedef enum
   FTM_PS_64,
   FTM_PS_128,
   FTM_PS_MAX,
-}FTM_PS_n;
+} FTM_PS_n;
 
 /*
 **FTM input capture
 */
 typedef enum
 {
-  FTM_Rising,                   //Rising edge capture
-  FTM_Falling,                  //Falling edge capture
-  FTM_Rising_or_Falling,        //Jump edge capture
-}FTM_INPUT_CFG;
+  FTM_Rising,            // Rising edge capture
+  FTM_Falling,           // Falling edge capture
+  FTM_Rising_or_Falling, // Jump edge capture
+} FTM_INPUT_CFG;
 
 /*
 **FTM module PWM accuracy setting
 */
-#define FTM0_PRECISON   10000u     //Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
-#define FTM1_PRECISON   10000u     //Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
-#define FTM2_PRECISON   10000u     //Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
-#define FTM3_PRECISON   10000u     //Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
-
+#define FTM0_PRECISON 10000u // Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
+#define FTM1_PRECISON 10000u // Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
+#define FTM2_PRECISON 10000u // Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
+#define FTM3_PRECISON 10000u // Define the precision of duty cycle, where 100 represents 1% precision and 1000u represents 0.1% precision. This is used for inputting duty cycle parameters, i.e. duty cycle is duty/FTM-PRECISON
 
 /*
 **variate declaration
@@ -85,11 +84,11 @@ extern FTM_MemMapPtr FTMN[FTM_FTM_MAX];
 /*
 **function declaration
 */
-extern void FTM_PWM_Init(FTM_FTMn FTM_FTMx,FTM_CHn FTM_CHx,uint32 FTM_Freq,uint32 FTM_Duty);
-extern void FTM_PWM_Duty(FTM_FTMn FTM_FTMx,FTM_CHn FTM_CHx,uint32 FTM_Duty);
-extern void FTM_PWM_Freq(FTM_FTMn FTM_FTMx,uint32 FTM_Freq);
-extern void FTM_Input_Init(FTM_FTMn FTM_FTMx,FTM_CHn FTM_CHx,FTM_INPUT_CFG FTM_CFG,FTM_PS_n FTM_PS_x);
-extern uint16 FTM_Input_Get(FTM_FTMn FTM_FTMx,FTM_CHn FTM_CHx);
+extern void FTM_PWM_Init(FTM_FTMn FTM_FTMx, FTM_CHn FTM_CHx, uint32 FTM_Freq, uint32 FTM_Duty);
+extern void FTM_PWM_Duty(FTM_FTMn FTM_FTMx, FTM_CHn FTM_CHx, uint32 FTM_Duty);
+extern void FTM_PWM_Freq(FTM_FTMn FTM_FTMx, uint32 FTM_Freq);
+extern void FTM_Input_Init(FTM_FTMn FTM_FTMx, FTM_CHn FTM_CHx, FTM_INPUT_CFG FTM_CFG, FTM_PS_n FTM_PS_x);
+extern uint16 FTM_Input_Get(FTM_FTMn FTM_FTMx, FTM_CHn FTM_CHx);
 extern void FTM_Input_Clean(FTM_FTMn FTM_FTMx);
 extern void FTM_QUAD_Init(FTM_FTMn FTM_FTMx);
 extern int16 FTM_QUAD_Get(FTM_FTMn FTM_FTMx);
