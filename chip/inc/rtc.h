@@ -19,14 +19,14 @@
 /*
 **RTC macros
 */
-#define RTC_ALARM_IRQ_EN()      RTC_IER |= RTC_IER_TAIE_MASK      //Enable alarm clock interruption
-#define RTC_ALARM_IRQ_DIS()     RTC_IER &= ~RTC_IER_TAIE_MASK     //Disable alarm clock interruption
+#define RTC_ALARM_IRQ_EN() RTC_IER |= RTC_IER_TAIE_MASK   // Enable alarm clock interruption
+#define RTC_ALARM_IRQ_DIS() RTC_IER &= ~RTC_IER_TAIE_MASK // Disable alarm clock interruption
 
-#define RTC_OVERFLOW_IRQ_EN()   RTC_IER |= RTC_IER_TOIE_MASK      //Enable overflow interrupt
-#define RTC_OVERFLOW_IRQ_DIS()  RTC_IER &= ~RTC_IER_TOIE_MASK     //Disable overflow interrupt
+#define RTC_OVERFLOW_IRQ_EN() RTC_IER |= RTC_IER_TOIE_MASK   // Enable overflow interrupt
+#define RTC_OVERFLOW_IRQ_DIS() RTC_IER &= ~RTC_IER_TOIE_MASK // Disable overflow interrupt
 
-#define RTC_INVALID_IRQ_EN()    RTC_IER |= RTC_IER_TIIE_MASK      //Enable invalid interrupt settings
-#define RTC_INVALID_IRQ_DIS()   RTC_IER &= ~RTC_IER_TIIE_MASK     //Disable invalid interrupt settings
+#define RTC_INVALID_IRQ_EN() RTC_IER |= RTC_IER_TIIE_MASK   // Enable invalid interrupt settings
+#define RTC_INVALID_IRQ_DIS() RTC_IER &= ~RTC_IER_TIIE_MASK // Disable invalid interrupt settings
 
 /*
 **function declaration
