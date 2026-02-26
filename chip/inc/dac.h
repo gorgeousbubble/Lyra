@@ -23,7 +23,7 @@ typedef enum
   DAC_DAC0,
   DAC_DAC1,
   DAC_DAC_MAX,
-}DAC_DACn;
+} DAC_DACn;
 
 /*
 **variate declaration
@@ -34,7 +34,6 @@ extern DAC_MemMapPtr DACN[DAC_DAC_MAX];
 **function declaration
 */
 extern void DAC_Init(DAC_DACn DAC_DACx);
-extern void DAC_Out(DAC_DACn DAC_DACx,uint16 DAC_Value);
-
+extern void DAC_Out(DAC_DACn DAC_DACx, uint16 DAC_Value);
 
 #endif
