@@ -23,15 +23,15 @@
 void SysTick_Delay(uint32 SysTick_Time)
 {
   ASSERT(SysTick_Time > 0 && SysTick_Time <= SysTick_LOAD_RELOAD_Msk);
-  
-  ((SysTick_Type*)SysTick_BASE)->CTRL = 0;
-  ((SysTick_Type*)SysTick_BASE)->LOAD = SysTick_Time;
-  ((SysTick_Type*)SysTick_BASE)->VAL = 0;
-  
-  ((SysTick_Type*)SysTick_BASE)->CTRL = (0 | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk);
-  
-  while(!(((SysTick_Type*)SysTick_BASE)->CTRL & SysTick_CTRL_COUNTFLAG_Msk));
-  
+
+  ((SysTick_Type *)SysTick_BASE)->CTRL = 0;
+  ((SysTick_Type *)SysTick_BASE)->LOAD = SysTick_Time;
+  ((SysTick_Type *)SysTick_BASE)->VAL = 0;
+
+  ((SysTick_Type *)SysTick_BASE)->CTRL = (0 | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_CLKSOURCE_Msk);
+
+  while (!(((SysTick_Type *)SysTick_BASE)->CTRL & SysTick_CTRL_COUNTFLAG_Msk))
+    ;
 }
 
 /*
@@ -42,7 +42,7 @@ void SysTick_Delay(uint32 SysTick_Time)
  */
 void SysTick_Delay_ms(uint32 SysTick_Time_ms)
 {
-  while(SysTick_Time_ms--)
+  while (SysTick_Time_ms--)
   {
     SysTick_Delay(SYSTICK_CLK_KHZ);
   }
@@ -57,12 +57,12 @@ void SysTick_Delay_ms(uint32 SysTick_Time_ms)
 void SysTick_Timing(uint32 SysTick_Time)
 {
   ASSERT(SysTick_Time > 0 && SysTick_Time <= SysTick_LOAD_RELOAD_Msk);
-  
-  ((SysTick_Type*)SysTick_BASE)->LOAD = SysTick_Time;
-  
-  NVIC_SetPriority(SysTick_IRQn,(1 << __NVIC_PRIO_BITS) - 1);
-  
-  ((SysTick_Type*)SysTick_BASE)->VAL = 0;
-  
-  ((SysTick_Type*)SysTick_BASE)->CTRL = (0 | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_CLKSOURCE_Msk);
+
+  ((SysTick_Type *)SysTick_BASE)->LOAD = SysTick_Time;
+
+  NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+
+  ((SysTick_Type *)SysTick_BASE)->VAL = 0;
+
+  ((SysTick_Type *)SysTick_BASE)->CTRL = (0 | SysTick_CTRL_ENABLE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_CLKSOURCE_Msk);
 }
