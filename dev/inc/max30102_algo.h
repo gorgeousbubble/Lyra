@@ -18,11 +18,11 @@
 #define true 1
 #define false 0
 #define FS 100
-#define BUFFER_SIZE  (FS* 5) 
+#define BUFFER_SIZE (FS * 5)
 #define HR_FIFO_SIZE 7
-#define MA4_SIZE  4 // DO NOT CHANGE
-#define HAMMING_SIZE  5// DO NOT CHANGE
-#define min(x,y) ((x) < (y) ? (x) : (y))
+#define MA4_SIZE 4     // DO NOT CHANGE
+#define HAMMING_SIZE 5 // DO NOT CHANGE
+#define min(x, y) ((x) < (y) ? (x) : (y))
 
 extern void maxim_heart_rate_and_oxygen_saturation(uint32 *pun_ir_buffer, int32 n_ir_buffer_length, uint32 *pun_red_buffer, int32 *pn_spo2, int8 *pch_spo2_valid, int32 *pn_heart_rate, int8 *pch_hr_valid);
 extern void maxim_find_peaks(int32 *pn_locs, int32 *pn_npks, int32 *pn_x, int32 n_size, int32 n_min_height, int32 n_min_distance, int32 n_max_num);
