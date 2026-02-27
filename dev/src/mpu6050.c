@@ -19,13 +19,13 @@
 */
 void I2C_GPIO_Start(void)
 {
-  I2C_DDR_OUT_SDA;      //SDA output
-  I2C_SET_SDA_H;        //SDA high level
-  I2C_SET_SCL_H;        //SCL high level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  I2C_SET_SDA_L;        //SDA low level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  I2C_SET_SCL_L;        //SCL low level
+  I2C_DDR_OUT_SDA; // SDA output
+  I2C_SET_SDA_H;   // SDA high level
+  I2C_SET_SCL_H;   // SCL high level
+  I2C_DELAY_TIME;  // I2C delay of 10 Nop
+  I2C_SET_SDA_L;   // SDA low level
+  I2C_DELAY_TIME;  // I2C delay of 10 Nop
+  I2C_SET_SCL_L;   // SCL low level
 }
 
 /*
@@ -33,12 +33,12 @@ void I2C_GPIO_Start(void)
 */
 void I2C_GPIO_Stop(void)
 {
-  I2C_DDR_OUT_SDA;      //SDA output
-  I2C_SET_SDA_L;        //SDA low level
-  I2C_SET_SCL_H;        //SCL high level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  I2C_SET_SDA_H;        //SDA high level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
+  I2C_DDR_OUT_SDA; // SDA output
+  I2C_SET_SDA_L;   // SDA low level
+  I2C_SET_SCL_H;   // SCL high level
+  I2C_DELAY_TIME;  // I2C delay of 10 Nop
+  I2C_SET_SDA_H;   // SDA high level
+  I2C_DELAY_TIME;  // I2C delay of 10 Nop
 }
 
 /*
@@ -46,19 +46,19 @@ void I2C_GPIO_Stop(void)
 */
 void I2C_GPIO_Send_Ack(int Ack)
 {
-  I2C_DDR_OUT_SDA;      //SDA output
-  if(Ack == 0)
+  I2C_DDR_OUT_SDA; // SDA output
+  if (Ack == 0)
   {
-    I2C_SET_SDA_L;      //SDA low level
+    I2C_SET_SDA_L; // SDA low level
   }
   else
   {
-    I2C_SET_SDA_H;      //SDA high level
+    I2C_SET_SDA_H; // SDA high level
   }
-  I2C_SET_SCL_H;        //SCL high level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  I2C_SET_SCL_L;        //SCL low level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
+  I2C_SET_SCL_H;  // SCL high level
+  I2C_DELAY_TIME; // I2C delay of 10 Nop
+  I2C_SET_SCL_L;  // SCL low level
+  I2C_DELAY_TIME; // I2C delay of 10 Nop
 }
 
 /*
@@ -66,14 +66,14 @@ void I2C_GPIO_Send_Ack(int Ack)
 */
 uint8 I2C_GPIO_Recv_Ack(void)
 {
-  uint8 Recv=0;
-  
-  I2C_DDR_IN_SDA;       //SDA input
-  I2C_SET_SCL_H;        //SCL high level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  Recv = I2C_GET_SDA_IN;//Read SDA signal
-  I2C_SET_SCL_L;        //SCL low level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
+  uint8 Recv = 0;
+
+  I2C_DDR_IN_SDA;        // SDA input
+  I2C_SET_SCL_H;         // SCL high level
+  I2C_DELAY_TIME;        // I2C delay of 10 Nop
+  Recv = I2C_GET_SDA_IN; // Read SDA signal
+  I2C_SET_SCL_L;         // SCL low level
+  I2C_DELAY_TIME;        // I2C delay of 10 Nop
   return Recv;
 }
 
@@ -82,33 +82,33 @@ uint8 I2C_GPIO_Recv_Ack(void)
 */
 uint8 I2C_GPIO_Send_Byte(uint8 I2C_Data)
 {
-  uint8 i=0;
-  uint8 Ack=0;
-  
-  I2C_DDR_OUT_SDA;      //SDA output
-  for(i=0;i<8;i++)
+  uint8 i = 0;
+  uint8 Ack = 0;
+
+  I2C_DDR_OUT_SDA; // SDA output
+  for (i = 0; i < 8; i++)
   {
-    if((I2C_Data<<i)&0x80)
+    if ((I2C_Data << i) & 0x80)
     {
-      I2C_SET_SDA_H;    //SDA high level
+      I2C_SET_SDA_H; // SDA high level
     }
     else
     {
-      I2C_SET_SDA_L;    //SDA low level
+      I2C_SET_SDA_L; // SDA low level
     }
-    I2C_DELAY_TIME;     //I2C delay of 10 Nop
-    I2C_SET_SCL_H;      //SCL high level
-    I2C_DELAY_TIME;     //I2C delay of 10 Nop
-    I2C_SET_SCL_L;      //SCL low level
-    I2C_DELAY_TIME;     //I2C delay of 10 Nop
+    I2C_DELAY_TIME; // I2C delay of 10 Nop
+    I2C_SET_SCL_H;  // SCL high level
+    I2C_DELAY_TIME; // I2C delay of 10 Nop
+    I2C_SET_SCL_L;  // SCL low level
+    I2C_DELAY_TIME; // I2C delay of 10 Nop
   }
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  I2C_SET_SDA_H;        //SDA high level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  I2C_SET_SCL_H;        //SCL high level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
-  I2C_DDR_IN_SDA;       //SDA input
-  if(I2C_GET_SDA_IN == 1)
+  I2C_DELAY_TIME; // I2C delay of 10 Nop
+  I2C_SET_SDA_H;  // SDA high level
+  I2C_DELAY_TIME; // I2C delay of 10 Nop
+  I2C_SET_SCL_H;  // SCL high level
+  I2C_DELAY_TIME; // I2C delay of 10 Nop
+  I2C_DDR_IN_SDA; // SDA input
+  if (I2C_GET_SDA_IN == 1)
   {
     Ack = 0;
   }
@@ -116,8 +116,8 @@ uint8 I2C_GPIO_Send_Byte(uint8 I2C_Data)
   {
     Ack = 1;
   }
-  I2C_SET_SCL_L;        //SCL low level
-  I2C_DELAY_TIME;       //I2C delay of 10 Nop
+  I2C_SET_SCL_L;  // SCL low level
+  I2C_DELAY_TIME; // I2C delay of 10 Nop
   return Ack;
 }
 
@@ -126,20 +126,20 @@ uint8 I2C_GPIO_Send_Byte(uint8 I2C_Data)
 */
 uint8 I2C_GPIO_Recv_Byte(void)
 {
-  uint8 i=0;
-  uint8 Data=0;
-  
-  I2C_DDR_OUT_SDA;      //SDA output
-  I2C_SET_SDA_H;        //SDA high level
-  I2C_DDR_IN_SDA;       //SDA input
-  for(i=0;i<8;i++)
+  uint8 i = 0;
+  uint8 Data = 0;
+
+  I2C_DDR_OUT_SDA; // SDA output
+  I2C_SET_SDA_H;   // SDA high level
+  I2C_DDR_IN_SDA;  // SDA input
+  for (i = 0; i < 8; i++)
   {
-    Data<<=1;
-    I2C_SET_SCL_H;      //SCL high level
-    I2C_DELAY_TIME;     //I2C delay of 10 Nop
-    Data|=I2C_GET_SDA_IN;
-    I2C_SET_SCL_L;      //SCL low level
-    I2C_DELAY_TIME;     //I2C delay of 10 Nop
+    Data <<= 1;
+    I2C_SET_SCL_H;  // SCL high level
+    I2C_DELAY_TIME; // I2C delay of 10 Nop
+    Data |= I2C_GET_SDA_IN;
+    I2C_SET_SCL_L;  // SCL low level
+    I2C_DELAY_TIME; // I2C delay of 10 Nop
   }
   return Data;
 }
@@ -147,7 +147,7 @@ uint8 I2C_GPIO_Recv_Byte(void)
 /*
 **I2C Write register
 */
-void I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr,uint8 I2C_Data)
+void I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 I2C_Data)
 {
   I2C_GPIO_Start();
   I2C_GPIO_Send_Byte(I2C_Div_Adr);
@@ -159,33 +159,33 @@ void I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr,uint8 I2C_Data)
 /*
 **I2C Read Register
 */
-//Read a byte
-uint8 I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr)
+// Read a byte
+uint8 I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
-  uint8 I2C_Data=0;
-  
+  uint8 I2C_Data = 0;
+
   I2C_GPIO_Start();
   I2C_GPIO_Send_Byte(I2C_Div_Adr);
   I2C_GPIO_Send_Byte(I2C_Reg_Adr);
   I2C_GPIO_Start();
-  I2C_GPIO_Send_Byte(I2C_Div_Adr+1);
+  I2C_GPIO_Send_Byte(I2C_Div_Adr + 1);
   I2C_Data = I2C_GPIO_Recv_Byte();
   I2C_GPIO_Send_Ack(1);
   I2C_GPIO_Stop();
-  
+
   return I2C_Data;
 }
 
-//Read a byte
-int I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr)
+// Read a byte
+int I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
-  uint8 I2C_Reg_H=0;
-  uint8 I2C_Reg_L=0;
-  
-  I2C_Reg_H = I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr,I2C_Reg_Adr);
-  I2C_Reg_L = I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr,I2C_Reg_Adr+1);
-  
-  return ((I2C_Reg_H<<8)+I2C_Reg_L);
+  uint8 I2C_Reg_H = 0;
+  uint8 I2C_Reg_L = 0;
+
+  I2C_Reg_H = I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr, I2C_Reg_Adr);
+  I2C_Reg_L = I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr, I2C_Reg_Adr + 1);
+
+  return ((I2C_Reg_H << 8) + I2C_Reg_L);
 }
 
 /*
@@ -193,8 +193,8 @@ int I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr,uint8 I2C_Reg_Adr)
 */
 int MPU_Get_Acc_X(void)
 {
-  int Temp=0;
-  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050,ACCEL_XOUT_H);
+  int Temp = 0;
+  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, ACCEL_XOUT_H);
   return Temp;
 }
 
@@ -203,8 +203,8 @@ int MPU_Get_Acc_X(void)
 */
 int MPU_Get_Acc_Y(void)
 {
-  int Temp=0;
-  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050,ACCEL_YOUT_H);
+  int Temp = 0;
+  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, ACCEL_YOUT_H);
   return Temp;
 }
 
@@ -213,8 +213,8 @@ int MPU_Get_Acc_Y(void)
 */
 int MPU_Get_Acc_Z(void)
 {
-  int Temp=0;
-  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050,ACCEL_ZOUT_H);
+  int Temp = 0;
+  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, ACCEL_ZOUT_H);
   return Temp;
 }
 
@@ -223,8 +223,8 @@ int MPU_Get_Acc_Z(void)
 */
 int MPU_Get_Gyro_X(void)
 {
-  int Temp=0;
-  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050,GYRO_XOUT_H);
+  int Temp = 0;
+  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, GYRO_XOUT_H);
   return Temp;
 }
 
@@ -233,8 +233,8 @@ int MPU_Get_Gyro_X(void)
 */
 int MPU_Get_Gyro_Y(void)
 {
-  int Temp=0;
-  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050,GYRO_YOUT_H);
+  int Temp = 0;
+  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, GYRO_YOUT_H);
   return Temp;
 }
 
@@ -243,8 +243,8 @@ int MPU_Get_Gyro_Y(void)
 */
 int MPU_Get_Gyro_Z(void)
 {
-  int Temp=0;
-  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050,GYRO_ZOUT_H);
+  int Temp = 0;
+  Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, GYRO_ZOUT_H);
   return Temp;
 }
 
@@ -255,9 +255,9 @@ void MPU6050_Init(void)
 {
   I2C_PORT_INIT_SCL;
   I2C_PORT_INIT_SDA;
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050,PWR_MGMT_1,0x00);
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050,SMPLRT_DIV,0x00);
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050,CONFIG,0x00);
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050,ACCEL_CONFIG,0x01);
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050,GYRO_CONFIG,0x18);
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, PWR_MGMT_1, 0x00);
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, SMPLRT_DIV, 0x00);
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, CONFIG, 0x00);
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, ACCEL_CONFIG, 0x01);
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, GYRO_CONFIG, 0x18);
 }
