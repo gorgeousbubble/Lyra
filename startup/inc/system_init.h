@@ -15,13 +15,12 @@
 
 #include "common.h"
 
-
 /*
 **variate declaration
 */
-extern uint16  MK64_Core_MHz;
-extern uint32  MK64_Core_KHz;
-extern uint32  MK64_Bus_KHz;
+extern uint16 MK64_Core_MHz;
+extern uint32 MK64_Core_KHz;
+extern uint32 MK64_Bus_KHz;
 
 /*
 **function declaration
@@ -29,6 +28,5 @@ extern uint32  MK64_Bus_KHz;
 extern void Common_StartUp(void);
 extern void SysInit(void);
 extern void Start(void);
-
 
 #endif
