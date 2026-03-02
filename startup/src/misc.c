@@ -19,9 +19,9 @@
  *  @since      v1.0
  *  Sample usage:       write_vtor ((uint32)__VECTOR_RAM);
  */
-void write_vtor (int vtor)
+void write_vtor(int vtor)
 {
-    ASSERT(vtor % 0x200 == 0);   //Vector Table base offset field. This value must be a multiple of 0x200.
+    ASSERT(vtor % 0x200 == 0); // Vector Table base offset field. This value must be a multiple of 0x200.
 
     /* Write the VTOR with the new value */
     SCB->VTOR = vtor;
@@ -32,7 +32,7 @@ void write_vtor (int vtor)
  *  @since      v1.0
  *  Sample usage:       Set_Vector_Handler(UART3_RX_TX_VECTORn , uart3_handler);
  */
-void Set_Vector_Handler(VECTORn_t vector,void pfunc_handler(void))
+void Set_Vector_Handler(VECTORn_t vector, void pfunc_handler(void))
 {
     extern uint32 __VECTOR_RAM[];
 
