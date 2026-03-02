@@ -26,9 +26,9 @@
 /*
 ** System Frequency
 */
-uint16  MK64_Core_MHz=0;
-uint32  MK64_Core_KHz=0;
-uint32  MK64_Bus_KHz=0;
+uint16 MK64_Core_MHz = 0;
+uint32 MK64_Core_KHz = 0;
+uint32 MK64_Bus_KHz = 0;
 
 /*
  *  @brief      Copy interrupt vector tables and necessary data into RAM
@@ -42,14 +42,13 @@ void Common_StartUp(void)
     /* Declare pointers for various data sections. These pointers
      * are initialized using values pulled in from the linker file
      */
-    uint8 *data_ram, * data_rom, * data_rom_end;
-    uint8 *bss_start, * bss_end;
-    
+    uint8 *data_ram, *data_rom, *data_rom_end;
+    uint8 *bss_start, *bss_end;
 
     /* Get VECTOR_TABLE and VECTOR_RAM addresses from linker (*.icf)*/
     extern uint32 __VECTOR_TABLE[];
     extern uint32 __VECTOR_RAM[];
-    
+
     /* Copy pointer from interrupt vector tables */
     uint32 *VECTOR_TABLE_P = &__VECTOR_TABLE[0];
     uint32 *VECTOR_RAM_P = &__VECTOR_RAM[0];
@@ -57,12 +56,12 @@ void Common_StartUp(void)
     /* Copy interrupt vector table from ROM to RAM */
     if (__VECTOR_RAM != __VECTOR_TABLE)
     {
-        for (n=0; n<0x410; n++)
+        for (n = 0; n < 0x410; n++)
             *VECTOR_RAM_P++ = *VECTOR_TABLE_P++;
     }
     /* Specific latest interrupt vector table address __VECTOR_RAM */
     write_vtor((uint32)__VECTOR_RAM);
-    //write_vtor((uint32)__VECTOR_TABLE);
+    // write_vtor((uint32)__VECTOR_TABLE);
 
     /* Copy variables data from ROM to RAM */
     data_ram = __section_begin(".data");
@@ -80,7 +79,7 @@ void Common_StartUp(void)
 
     /* Clean variable and provide zero value */
     n = bss_end - bss_start;
-    while(n--)
+    while (n--)
         *bss_start++ = 0;
 
     /* Copy __ramfunc functions to RAM */
@@ -101,9 +100,9 @@ void Common_StartUp(void)
  */
 void SysInit(void)
 {
-  MK64_Core_MHz = PLL_Init(MK64_CORE_PLL_CLK);
-  MK64_Core_KHz = MK64_Core_MHz * 1000;
-  MK64_Bus_KHz  = MK64_Core_KHz / (((SIM_CLKDIV1 & SIM_CLKDIV1_OUTDIV2_MASK) >> SIM_CLKDIV1_OUTDIV2_SHIFT) + 1);  
+    MK64_Core_MHz = PLL_Init(MK64_CORE_PLL_CLK);
+    MK64_Core_KHz = MK64_Core_MHz * 1000;
+    MK64_Bus_KHz = MK64_Core_KHz / (((SIM_CLKDIV1 & SIM_CLKDIV1_OUTDIV2_MASK) >> SIM_CLKDIV1_OUTDIV2_SHIFT) + 1);
 }
 
 /*
@@ -113,17 +112,18 @@ void SysInit(void)
  */
 void Start(void)
 {
-  #if ((__FPU_PRESENT == 1) && (__FPU_USED == 1))
-  SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));//FPU support
-  #endif
-  
-  WDOG_Disable();// disable WDOG
-  
-  Common_StartUp();// Copy interrupt vector tables and data to RAM
-  
-  SysInit();//System Init with PLL Clock
-  
-  main();
-  
-  while(1);
+#if ((__FPU_PRESENT == 1) && (__FPU_USED == 1))
+    SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2)); // FPU support
+#endif
+
+    WDOG_Disable(); // disable WDOG
+
+    Common_StartUp(); // Copy interrupt vector tables and data to RAM
+
+    SysInit(); // System Init with PLL Clock
+
+    main();
+
+    while (1)
+        ;
 }
