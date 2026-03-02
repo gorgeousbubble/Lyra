@@ -18,12 +18,12 @@
 /*
 ** interrupts
 */
-#define enable_irq(irq)                 NVIC_EnableIRQ(irq)
-#define disable_irq(irq)                NVIC_DisableIRQ(irq)
-#define set_irq_priority(irq,pri0)      NVIC_SetPriority(irq,pri0)
+#define enable_irq(irq) NVIC_EnableIRQ(irq)
+#define disable_irq(irq) NVIC_DisableIRQ(irq)
+#define set_irq_priority(irq, pri0) NVIC_SetPriority(irq, pri0)
 
-#define EnableInterrupts                __enable_irq()
-#define DisableInterrupts               __disable_irq()
+#define EnableInterrupts __enable_irq()
+#define DisableInterrupts __disable_irq()
 
 /*
 **variate declaration
@@ -32,8 +32,7 @@
 /*
 **function declaration
 */
-extern void write_vtor (int vtor);
-extern void Set_Vector_Handler(VECTORn_t vector,void pfunc_handler(void));
-
+extern void write_vtor(int vtor);
+extern void Set_Vector_Handler(VECTORn_t vector, void pfunc_handler(void));
 
 #endif
