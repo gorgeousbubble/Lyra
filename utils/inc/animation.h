@@ -18,21 +18,24 @@
 #define ARRAY_LENGTH(arr) (sizeof(arr) / sizeof(arr[0]))
 
 // Define a structure to hold coordinates
-struct CoordNode {
+struct CoordNode
+{
     uint8 x;
     uint8 y;
-    struct CoordNode* next;
+    struct CoordNode *next;
 };
 typedef struct CoordNode CoordNode;
 
-struct Coord {
+struct Coord
+{
     uint8 x;
     uint8 y;
 };
 typedef struct Coord Coord;
 
-struct CoordCache {
-    Coord* coord;
+struct CoordCache
+{
+    Coord *coord;
     int length;
 };
 typedef struct CoordCache CoordCache;
