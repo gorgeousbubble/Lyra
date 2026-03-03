@@ -243,10 +243,10 @@ void Calculate_Euler_Angles(ComplementaryFilter *filter)
 // Normalize Angle
 float Normalize_Angle(float angle)
 {
-    while (angle > 180.0f)
-        angle -= 360.0f;
-    while (angle < -180.0f)
-        angle += 360.0f;
+    while (angle > 90.0f)
+        angle -= 180.0f;
+    while (angle < -90.0f)
+        angle += 180.0f;
     return angle;
 }
 
