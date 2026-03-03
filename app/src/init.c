@@ -125,7 +125,7 @@ void AllInit(void)
   /*
   **Kalman Filter (Complementary Filter)
   */
-  Complementary_Filter_Init(&CF, 0.5f, 0.001f, 0.001f); // Complementary Filter initialization
+  Complementary_Filter_Init(&CF, 2.0f, 0.000f, 0.01f); // Complementary Filter initialization
 
   /*
   **Interrupts

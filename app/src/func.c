@@ -25,54 +25,54 @@
  * @return     void
  * @since      v1.0
  * Sample usage:       Calc_World_Clock_Time(&array, LCM_WorldClock_City_coordinate, LCM_WorldClock_City_coordinate_length, time, 10, 30);
-*/
+ */
 void UART_Send_Parameters()
 {
     signed int temp;
     unsigned char temp1, temp2;
-    
+
     UART_PutChar(UART_UART4, 0xFF);
     UART_PutChar(UART_UART4, 0x00);
     UART_PutChar(UART_UART4, 0x16);
     UART_PutChar(UART_UART4, 0x08);
-      
+
     /*Acc.X(1)*/
     temp = (signed int)MPU6050_Norm.Acc.X; // MPU6050.Acc.X
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
-    
+
     /*Acc.Y(2)*/
-    temp = (signed int)MPU6050_Norm.Acc.Y; 
+    temp = (signed int)MPU6050_Norm.Acc.Y;
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
-    
+
     /*Acc.Z(3)*/
-    temp = (signed int)MPU6050_Norm.Acc.Z;        
+    temp = (signed int)MPU6050_Norm.Acc.Z;
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Gyro.X(4)*/
-    temp = (signed int)MPU6050_Norm.Gyro.X; // MPU6050.Gyro.X
+    temp = (signed int)MPU6050_Angle.Angle_X; // MPU6050.Gyro.X
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Gyro.Y(5)*/
-    temp = (signed int)MPU6050_Norm.Gyro.Y;  // MPU6050.Gyro.Y
+    temp = (signed int)MPU6050_Angle.Angle_Y; // MPU6050.Gyro.Y
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Gyro.Z(6)*/
-    temp = (signed int)MPU6050_Norm.Gyro.Z;  // MPU6050.Gyro.Z
+    temp = (signed int)MPU6050_Angle.Angle_Z; // MPU6050.Gyro.Z
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
