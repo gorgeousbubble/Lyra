@@ -69,7 +69,7 @@ extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
 extern void Complementary_Filter_Init(ComplementaryFilter *filter, float kp, float ki, float dt);
 extern void Complementary_Filter_Update(ComplementaryFilter *filter, float ax, float ay, float az, float gx, float gy, float gz);
-extern void Convert_Sensor_Data(float *accel, float *gyro, const int acc_raw[3], const int gyro_raw[3], float acc_range, float gyro_range);
+extern void Normalize_Sensor(float *accel, float *gyro, const int acc_raw[3], const int gyro_raw[3], int acc_range, int gyro_range);
 extern void Calculate_Euler_Angles(ComplementaryFilter *filter);
 extern float Normalize_Angle(float angle);
 extern void Get_Attitude_Angles(ComplementaryFilter *filter, float *roll, float *pitch, float *yaw);

@@ -290,7 +290,7 @@ void PIT1_IRQHandler(void)
     gyro_raw[1] = MPU6050.Gyro.Y;
     gyro_raw[2] = MPU6050.Gyro.Z;
 
-    Convert_Sensor_Data(accel, gyro, accel_raw, gyro_raw, 2.0f, 2000.0f);
+    Normalize_Sensor(accel, gyro, accel_raw, gyro_raw, 2, 2000);
 
     MPU6050_Norm.Acc.X = accel[0];
     MPU6050_Norm.Acc.Y = accel[1];

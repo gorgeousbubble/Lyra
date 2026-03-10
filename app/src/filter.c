@@ -169,7 +169,7 @@ void Complementary_Filter_Update(ComplementaryFilter *filter, float ax, float ay
 }
 
 // Convert Sensor Data
-void Convert_Sensor_Data(float *accel, float *gyro, const int acc_raw[3], const int gyro_raw[3], float acc_range, float gyro_range)
+void Normalize_Sensor(float *accel, float *gyro, const int acc_raw[3], const int gyro_raw[3], int acc_range, int gyro_range)
 {
     // accelarometer conversion coefficient
     float acc_scale;
