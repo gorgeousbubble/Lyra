@@ -83,9 +83,9 @@ KalmanFilter KF_Z = {
 };
 
 /*
-**Complementary Filter
+**Fusion Filter
 */
-ComplementaryFilter CF = {
+FusionFilter FF = {
     .angle = {0.0f, 0.0f, 0.0f},
     .quat = {1.0f, 0.0f, 0.0f, 0.0f},
     .kp = 0.5f,

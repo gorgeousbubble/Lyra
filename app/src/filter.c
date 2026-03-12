@@ -59,3 +59,9 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
 
     return kf->angle_f;
 }
+
+// Initialize Fusion filter
+void Fusion_Init()
+{
+
+}
