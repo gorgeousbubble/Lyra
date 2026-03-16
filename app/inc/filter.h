@@ -39,6 +39,7 @@ typedef struct
     float yaw;   // Z-axis rotation
 } Attitude_t;
 
+// Quaternion structure
 typedef struct
 {
     float q0, q1, q2, q3; // Quaternion [w, x, y, z]
@@ -67,5 +68,6 @@ typedef struct
 */
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
+extern void Fusion_Sensor_Covert(float* acc_norm, float* gyro_norm, const int acc_raw[3], const int gyro_raw[3], int acc_range, int gyro_range);
 
 #endif

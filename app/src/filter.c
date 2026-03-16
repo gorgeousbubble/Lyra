@@ -65,3 +65,53 @@ void Fusion_Init()
 {
 
 }
+
+// Initialize Fusion filter
+void Fusion_Sensor_Covert(float* acc_norm, float* gyro_norm, const int acc_raw[3], const int gyro_raw[3], int acc_range, int gyro_range)
+{
+    // accelerometer‌ coefficient convertion
+    float acc_scale = 0.0f;
+    if (acc_range == 2) 
+    {
+        acc_scale = ACCEL_RANGE_2G;
+    }
+    else if (acc_range == 4) 
+    {
+        acc_scale = ACCEL_RANGE_4G;
+    }
+    else if (acc_range == 8) 
+    {
+        acc_scale = ACCEL_RANGE_8G;
+    }
+    else 
+    {
+        acc_scale = ACCEL_RANGE_16G;
+    }
+    // accelerometer data conversion
+    acc_norm[0] = (float)acc_raw[0] / acc_scale; // X-axis acceleration
+    acc_norm[1] = (float)acc_raw[1] / acc_scale;
+    acc_norm[2] = (float)acc_raw[2] / acc_scale;
+
+    // gyroscope coefficient convertion
+    float gyro_scale = 0.0f;
+    if (gyro_range == 250)
+    {
+        gyro_scale = GYRO_RANGE_250;
+    }
+    else if (gyro_range == 500)
+    {
+        gyro_scale = GYRO_RANGE_500;
+    }
+    else if (gyro_range == 1000)
+    {
+        gyro_scale = GYRO_RANGE_1000;
+    }
+    else
+    {
+        gyro_scale = GYRO_RANGE_2000;
+    }
+    // gyroscope data conversion
+    gyro_norm[0] = (float)gyro_raw[0] / gyro_scale * DEG_TO_RAD; // X-axis angular velocity
+    gyro_norm[1] = (float)gyro_raw[1] / gyro_scale * DEG_TO_RAD;
+    gyro_norm[2] = (float)gyro_raw[2] / gyro_scale * DEG_TO_RAD;
+}
