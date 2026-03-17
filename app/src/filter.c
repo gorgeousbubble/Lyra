@@ -61,57 +61,27 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
 }
 
 // Initialize Fusion filter
-void Fusion_Init()
+void Fusion_Init(FusionFilter *ff, float alpha, float dt)
 {
-
+    ff->alpha = alpha; // Default fusion filter coefficient of 0.98
+    ff->dt = dt;       // Default sampling period of 1ms
+    ff->angle_f = 0.0f; // Initial Angle
+    ff->acc_f = 0.0f;   // Initial normalized accelerometer value
+    ff->gyro_f = 0.0f;  // Initial normalized gyroscope value
+    ff->acc_m = 0.0f;   // Initial accelerometer measurement
+    ff->gyro_m = 0.0f;  // Initial gyroscope measurement
 }
 
-// Initialize Fusion filter
-void Fusion_Sensor_Covert(float* acc_norm, float* gyro_norm, const int acc_raw[3], const int gyro_raw[3], int acc_range, int gyro_range)
+// Fusion filter calculation
+void Fusion_Filter(FusionFilter *ff, float acc_m, float gyro_m)
 {
-    // accelerometer‌ coefficient convertion
-    float acc_scale = 0.0f;
-    if (acc_range == 2) 
-    {
-        acc_scale = ACCEL_RANGE_2G;
-    }
-    else if (acc_range == 4) 
-    {
-        acc_scale = ACCEL_RANGE_4G;
-    }
-    else if (acc_range == 8) 
-    {
-        acc_scale = ACCEL_RANGE_8G;
-    }
-    else 
-    {
-        acc_scale = ACCEL_RANGE_16G;
-    }
-    // accelerometer data conversion
-    acc_norm[0] = (float)acc_raw[0] / acc_scale; // X-axis acceleration
-    acc_norm[1] = (float)acc_raw[1] / acc_scale;
-    acc_norm[2] = (float)acc_raw[2] / acc_scale;
+    // Fusion filter calculation
+    ff->acc_m = acc_m; // Assuming accelerometer measurement is the angle
+    ff->gyro_m = gyro_m; // Assuming gyroscope measurement is the angular velocity
+    // Normalization of accelerometer and gyroscope data
+    ff->acc_f = ff->acc_m / 16384.0f; // Assuming accelerometer range is ±2g
+    ff->gyro_f = ff->gyro_m / 131.0f; // Assuming gyroscope range is ±250°/s
 
-    // gyroscope coefficient convertion
-    float gyro_scale = 0.0f;
-    if (gyro_range == 250)
-    {
-        gyro_scale = GYRO_RANGE_250;
-    }
-    else if (gyro_range == 500)
-    {
-        gyro_scale = GYRO_RANGE_500;
-    }
-    else if (gyro_range == 1000)
-    {
-        gyro_scale = GYRO_RANGE_1000;
-    }
-    else
-    {
-        gyro_scale = GYRO_RANGE_2000;
-    }
-    // gyroscope data conversion
-    gyro_norm[0] = (float)gyro_raw[0] / gyro_scale * DEG_TO_RAD; // X-axis angular velocity
-    gyro_norm[1] = (float)gyro_raw[1] / gyro_scale * DEG_TO_RAD;
-    gyro_norm[2] = (float)gyro_raw[2] / gyro_scale * DEG_TO_RAD;
+    // Fusion of accelerometer and gyroscope data
+    ff->angle_f = ff->alpha * ff->acc_f + (1 - ff->alpha) * (ff->gyro_f * ff->dt + ff->angle_f);
 }

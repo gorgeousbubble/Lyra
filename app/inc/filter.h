@@ -31,32 +31,15 @@ typedef struct
 } KalmanFilter;
 
 // Fusion filter structure
-// Attitude structure
 typedef struct
 {
-    float roll;  // X-axis rotation
-    float pitch; // Y-axis rotation
-    float yaw;   // Z-axis rotation
-} Attitude_t;
-
-// Quaternion structure
-typedef struct
-{
-    float q0, q1, q2, q3; // Quaternion [w, x, y, z]
-} Quaternion_t;
-
-// Fusion filter structure
-typedef struct
-{
-    Attitude_t angle;
-    Quaternion_t quat;
-    float kp;
-    float ki;
-    float dt;
-    float exInt;
-    float eyInt;
-    float ezInt;
-    uint8_t initialized;
+    float acc_m;  // Measuring accelerometer
+    float acc_f;  // Normalized accelerometer
+    float gyro_m; // Measuring gyroscope
+    float gyro_f; // Normalized gyroscope
+    float angle_f;  // After angle filtering
+    float alpha;  // Fusion filter coefficient
+    float dt;     // Sample time
 } FusionFilter;
 
 /*
@@ -68,6 +51,7 @@ typedef struct
 */
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
-extern void Fusion_Sensor_Covert(float* acc_norm, float* gyro_norm, const int acc_raw[3], const int gyro_raw[3], int acc_range, int gyro_range);
+extern void Fusion_Init(FusionFilter *ff, float alpha, float dt);
+extern void Fusion_Filter(FusionFilter *ff, float acc_m, float gyro_m);
 
 #endif

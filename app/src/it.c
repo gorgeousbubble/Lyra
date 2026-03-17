@@ -85,16 +85,32 @@ KalmanFilter KF_Z = {
 /*
 **Fusion Filter
 */
-FusionFilter FF = {
-    .angle = {0.0f, 0.0f, 0.0f},
-    .quat = {1.0f, 0.0f, 0.0f, 0.0f},
-    .kp = 0.5f,
-    .ki = 0.000f,
-    .dt = 0.01f,
-    .exInt = 0.0f,
-    .eyInt = 0.0f,
-    .ezInt = 0.0f,
-    .initialized = 0};
+FusionFilter FF_X = {
+    .acc_f = 0.0f,   // Initial normalized accelerometer value
+    .gyro_f = 0.0f,  // Initial normalized gyroscope value
+    .acc_m = 0.0f,   // Initial accelerometer measurement
+    .gyro_m = 0.0f,  // Initial gyroscope measurement
+    .angle_f = 0.0f, // Initial Angle
+    .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
+    .dt = 0.01f};    // Default sampling period of 1ms
+
+FusionFilter FF_Y = {
+    .acc_f = 0.0f,   // Initial normalized accelerometer value
+    .gyro_f = 0.0f,  // Initial normalized gyroscope value
+    .acc_m = 0.0f,   // Initial accelerometer measurement
+    .gyro_m = 0.0f,  // Initial gyroscope measurement
+    .angle_f = 0.0f, // Initial Angle
+    .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
+    .dt = 0.01f};    // Default sampling period of 1ms
+
+FusionFilter FF_Z = {
+    .acc_f = 0.0f,   // Initial normalized accelerometer value
+    .gyro_f = 0.0f,  // Initial normalized gyroscope value
+    .acc_m = 0.0f,   // Initial accelerometer measurement
+    .gyro_m = 0.0f,  // Initial gyroscope measurement
+    .angle_f = 0.0f, // Initial Angle
+    .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
+    .dt = 0.01f};    // Default sampling period of 1ms
 
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X
@@ -275,7 +291,10 @@ void PIT1_IRQHandler(void)
     MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
     MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
 
-    // Kalman filter processing
+    // Kalman (Fusion) filter processing
+    Fusion_Filter(&FF_X, MPU6050.Acc.X, MPU6050.Gyro.X); // Fusion filter calculation for X-axis
+    Fusion_Filter(&FF_Y, MPU6050.Acc.Y, MPU6050.Gyro.Y); // Fusion filter calculation for Y-axis
+    Fusion_Filter(&FF_Z, MPU6050.Acc.Z, MPU6050.Gyro.Z); // Fusion filter calculation for Z-axis
 
     // MAX30102 sensor data read
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);
