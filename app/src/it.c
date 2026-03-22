@@ -92,7 +92,7 @@ FusionFilter FF_X = {
     .gyro_m = 0.0f,  // Initial gyroscope measurement
     .angle_f = 0.0f, // Initial Angle
     .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
-    .dt = 0.1f};    // Default sampling period of 100ms
+    .dt = 0.01f};   // Default sampling period of 100ms
 
 FusionFilter FF_Y = {
     .acc_f = 0.0f,   // Initial normalized accelerometer value
@@ -101,7 +101,7 @@ FusionFilter FF_Y = {
     .gyro_m = 0.0f,  // Initial gyroscope measurement
     .angle_f = 0.0f, // Initial Angle
     .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
-    .dt = 0.1f};    // Default sampling period of 1ms
+    .dt = 0.01f};   // Default sampling period of 1ms
 
 FusionFilter FF_Z = {
     .acc_f = 0.0f,   // Initial normalized accelerometer value
@@ -110,7 +110,7 @@ FusionFilter FF_Z = {
     .gyro_m = 0.0f,  // Initial gyroscope measurement
     .angle_f = 0.0f, // Initial Angle
     .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
-    .dt = 0.1f};    // Default sampling period of 1ms
+    .dt = 0.01f};   // Default sampling period of 1ms
 
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X
@@ -272,17 +272,9 @@ void PIT1_IRQHandler(void)
     PIT1_Count = 100;
   }
 
-  if (PIT1_Count == 100)
+  // Sample period of 10ms
+  if (PIT1_Count % 10 == 0)
   {
-    PIT1_Count = 0;
-
-    PIT1_Flag++;
-
-    if (PIT1_Flag > 3)
-    {
-      PIT1_Flag = 0;
-    }
-
     // MPU6050 sensor data read
     MPU6050.Acc.X = MPU_Get_Acc_X();
     MPU6050.Acc.Y = MPU_Get_Acc_Y();
@@ -295,6 +287,19 @@ void PIT1_IRQHandler(void)
     Fusion_Filter(&FF_X, MPU6050.Acc.X, MPU6050.Gyro.X); // Fusion filter calculation for X-axis
     Fusion_Filter(&FF_Y, MPU6050.Acc.Y, MPU6050.Gyro.Y); // Fusion filter calculation for Y-axis
     Fusion_Filter(&FF_Z, MPU6050.Acc.Z, MPU6050.Gyro.Z); // Fusion filter calculation for Z-axis
+  }
+
+  // Sample period of 100ms
+  if (PIT1_Count == 100)
+  {
+    PIT1_Count = 0;
+
+    PIT1_Flag++;
+
+    if (PIT1_Flag > 3)
+    {
+      PIT1_Flag = 0;
+    }
 
     // MAX30102 sensor data read
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);

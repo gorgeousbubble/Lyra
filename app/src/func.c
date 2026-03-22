@@ -35,42 +35,42 @@ void UART_Send_Parameters()
     UART_PutChar(UART_UART4, 0x00);
 
     /*Curve(1)*/
-    temp = (signed int)MPU6050.Acc.X; // MPU6050.Acc.X
+    temp = (signed int)FF_X.acc_f; // MPU6050.Acc.X
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Curve(2)*/
-    temp = (signed int)MPU6050.Acc.Y;
+    temp = (signed int)FF_X.gyro_f;
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Curve(3)*/
-    temp = (signed int)MPU6050.Acc.Z;
+    temp = (signed int)FF_Y.acc_f;
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Curve(4)*/
-    temp = (signed int)MPU6050.Gyro.X; // MPU6050.Gyro.X
+    temp = (signed int)FF_Y.gyro_f; // MPU6050.Gyro.X
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Curve(5)*/
-    temp = (signed int)MPU6050.Gyro.Y; // MPU6050.Gyro.Y
+    temp = (signed int)FF_Z.acc_f; // MPU6050.Gyro.Y
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
     UART_PutChar(UART_UART4, temp2);
 
     /*Curve(6)*/
-    temp = (signed int)MPU6050.Gyro.Z; // MPU6050.Gyro.Z
+    temp = (signed int)FF_Z.gyro_f; // MPU6050.Gyro.Z
     temp1 = (temp) >> 8;
     temp2 = (temp) & 0xFF;
     UART_PutChar(UART_UART4, temp1);
