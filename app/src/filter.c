@@ -61,11 +61,13 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
 }
 
 // Initialize Fusion filter
-void Fusion_Init(FusionFilter *ff, float alpha, float dt)
+void Fusion_Init(FusionFilter *ff, float alpha, float beta, float dt)
 {
-    ff->alpha = alpha; // Default fusion filter coefficient of 0.98
-    ff->dt = dt;       // Default sampling period of 1ms
+    ff->alpha = alpha;  // Default fusion filter coefficient of 0.98
+    ff->beta = beta;    // Gyroscope coefficient
+    ff->dt = dt;        // Default sampling period of 1ms
     ff->angle_f = 0.0f; // Initial Angle
+    ff->angle_l = 0.0f; // Last Angle
     ff->acc_f = 0.0f;   // Initial normalized accelerometer value
     ff->gyro_f = 0.0f;  // Initial normalized gyroscope value
     ff->acc_m = 0.0f;   // Initial accelerometer measurement
@@ -76,12 +78,15 @@ void Fusion_Init(FusionFilter *ff, float alpha, float dt)
 void Fusion_Filter(FusionFilter *ff, float acc_m, float gyro_m)
 {
     // Fusion filter calculation
-    ff->acc_m = acc_m; // Assuming accelerometer measurement is the angle
+    ff->acc_m = acc_m;   // Assuming accelerometer measurement is the angle
     ff->gyro_m = gyro_m; // Assuming gyroscope measurement is the angular velocity
     // Normalization of accelerometer and gyroscope data
-    ff->acc_f = ff->acc_m / 16384.0f; // Assuming accelerometer range is ±2g
-    ff->gyro_f = ff->gyro_m / 131.0f; // Assuming gyroscope range is ±250°/s
+    // ff->acc_f = ff->acc_m / 16384.0f; // Assuming accelerometer range is ±2g
+    // ff->gyro_f = ff->gyro_m / 131.0f; // Assuming gyroscope range is ±250°/s
+    ff->acc_f = ff->acc_m * 180.0f / 65536.0f - 90.0f; // No normalization for accelerometer
+    ff->gyro_f = ff->gyro_m * ff->beta;                // No normalization for gyroscope
 
     // Fusion of accelerometer and gyroscope data
-    ff->angle_f = ff->alpha * ff->acc_f + (1 - ff->alpha) * (ff->gyro_f * ff->dt + ff->angle_f);
+    ff->angle_f += ff->alpha * (ff->acc_f - ff->angle_l) + (1 - ff->alpha) * (ff->gyro_f * ff->dt);
+    ff->angle_l = ff->angle_f; // Update last angle
 }

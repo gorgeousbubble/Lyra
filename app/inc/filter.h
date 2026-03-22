@@ -33,13 +33,15 @@ typedef struct
 // Fusion filter structure
 typedef struct
 {
-    float acc_m;  // Measuring accelerometer
-    float acc_f;  // Normalized accelerometer
-    float gyro_m; // Measuring gyroscope
-    float gyro_f; // Normalized gyroscope
-    float angle_f;  // After angle filtering
-    float alpha;  // Fusion filter coefficient
-    float dt;     // Sample time
+    float acc_m;   // Measuring accelerometer
+    float acc_f;   // Normalized accelerometer
+    float gyro_m;  // Measuring gyroscope
+    float gyro_f;  // Normalized gyroscope
+    float angle_f; // After angle filtering
+    float angle_l; // Last angle
+    float alpha;   // Fusion filter coefficient
+    float beta;    // Gyroscope coefficient
+    float dt;      // Sample time
 } FusionFilter;
 
 /*
@@ -51,7 +53,7 @@ typedef struct
 */
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
-extern void Fusion_Init(FusionFilter *ff, float alpha, float dt);
+extern void Fusion_Init(FusionFilter *ff, float alpha, float beta, float dt);
 extern void Fusion_Filter(FusionFilter *ff, float acc_m, float gyro_m);
 
 #endif

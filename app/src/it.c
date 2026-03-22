@@ -91,7 +91,9 @@ FusionFilter FF_X = {
     .acc_m = 0.0f,   // Initial accelerometer measurement
     .gyro_m = 0.0f,  // Initial gyroscope measurement
     .angle_f = 0.0f, // Initial Angle
+    .angle_l = 0.0f, // Last Angle
     .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
+    .beta = 0.15f,  // Gyroscope coefficient
     .dt = 0.01f};   // Default sampling period of 100ms
 
 FusionFilter FF_Y = {
@@ -100,7 +102,9 @@ FusionFilter FF_Y = {
     .acc_m = 0.0f,   // Initial accelerometer measurement
     .gyro_m = 0.0f,  // Initial gyroscope measurement
     .angle_f = 0.0f, // Initial Angle
+    .angle_l = 0.0f, // Last Angle
     .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
+    .beta = 0.15f,  // Gyroscope coefficient
     .dt = 0.01f};   // Default sampling period of 1ms
 
 FusionFilter FF_Z = {
@@ -109,7 +113,9 @@ FusionFilter FF_Z = {
     .acc_m = 0.0f,   // Initial accelerometer measurement
     .gyro_m = 0.0f,  // Initial gyroscope measurement
     .angle_f = 0.0f, // Initial Angle
+    .angle_l = 0.0f, // Last Angle
     .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
+    .beta = 0.15f,  // Gyroscope coefficient
     .dt = 0.01f};   // Default sampling period of 1ms
 
 Angle MPU6050_Angle = {
