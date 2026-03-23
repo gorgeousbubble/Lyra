@@ -37,16 +37,16 @@
 */
 typedef struct
 {
-  int X;
-  int Y;
-  int Z;
+  int16 X;
+  int16 Y;
+  int16 Z;
 } ACC;
 
 typedef struct
 {
-  int X;
-  int Y;
-  int Z;
+  int16 X;
+  int16 Y;
+  int16 Z;
 } GYRO;
 
 typedef struct

@@ -78,12 +78,12 @@ void Fusion_Init(FusionFilter *ff, float alpha, float beta, float dt)
 void Fusion_Filter(FusionFilter *ff, float acc_m, float gyro_m)
 {
     // Fusion filter calculation
-    ff->acc_m = acc_m;   // Assuming accelerometer measurement is the angle
-    ff->gyro_m = gyro_m; // Assuming gyroscope measurement is the angular velocity
+    ff->acc_m = acc_m / 16384.0f;   // Assuming accelerometer measurement is the angle
+    ff->gyro_m = gyro_m / 131.0f; // Assuming gyroscope measurement is the angular velocity
     // Normalization of accelerometer and gyroscope data
     // ff->acc_f = ff->acc_m / 16384.0f; // Assuming accelerometer range is ±2g
     // ff->gyro_f = ff->gyro_m / 131.0f; // Assuming gyroscope range is ±250°/s
-    ff->acc_f = ff->acc_m * 180.0f / 65536.0f - 90.0f; // No normalization for accelerometer
+    ff->acc_f = ff->acc_m / 4.0f * 180.0f - 90.0f; // No normalization for accelerometer
     ff->gyro_f = ff->gyro_m * ff->beta;                // No normalization for gyroscope
 
     // Fusion of accelerometer and gyroscope data

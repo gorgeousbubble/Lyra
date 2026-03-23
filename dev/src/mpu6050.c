@@ -177,7 +177,7 @@ uint8 I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 }
 
 // Read a byte
-int I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
+int16 I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
   uint8 I2C_Reg_H = 0;
   uint8 I2C_Reg_L = 0;
@@ -191,7 +191,7 @@ int I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 /*
 **MPU6050 X-axis acceleration value
 */
-int MPU_Get_Acc_X(void)
+int16 MPU_Get_Acc_X(void)
 {
   int Temp = 0;
   Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, ACCEL_XOUT_H);
@@ -201,7 +201,7 @@ int MPU_Get_Acc_X(void)
 /*
 **MPU6050 Y-axis acceleration value
 */
-int MPU_Get_Acc_Y(void)
+int16 MPU_Get_Acc_Y(void)
 {
   int Temp = 0;
   Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, ACCEL_YOUT_H);
@@ -211,7 +211,7 @@ int MPU_Get_Acc_Y(void)
 /*
 **MPU6050 Z-axis acceleration value
 */
-int MPU_Get_Acc_Z(void)
+int16 MPU_Get_Acc_Z(void)
 {
   int Temp = 0;
   Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, ACCEL_ZOUT_H);
@@ -221,7 +221,7 @@ int MPU_Get_Acc_Z(void)
 /*
 **MPU6050 X-axis angular velocity value
 */
-int MPU_Get_Gyro_X(void)
+int16 MPU_Get_Gyro_X(void)
 {
   int Temp = 0;
   Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, GYRO_XOUT_H);
@@ -231,7 +231,7 @@ int MPU_Get_Gyro_X(void)
 /*
 **MPU6050 Y-axis angular velocity value
 */
-int MPU_Get_Gyro_Y(void)
+int16 MPU_Get_Gyro_Y(void)
 {
   int Temp = 0;
   Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, GYRO_YOUT_H);
@@ -241,7 +241,7 @@ int MPU_Get_Gyro_Y(void)
 /*
 **MPU6050 Z-axis angular velocity value
 */
-int MPU_Get_Gyro_Z(void)
+int16 MPU_Get_Gyro_Z(void)
 {
   int Temp = 0;
   Temp = I2C_GPIO_Read_Reg_Word(I2C_ADR_MPU6050, GYRO_ZOUT_H);
