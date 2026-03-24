@@ -59,7 +59,7 @@
         <EnforceMemoryConfiguration>1</EnforceMemoryConfiguration>
     </ArmDriver>
     <DebugChecksum>
-        <Checksum>1190171416</Checksum>
+        <Checksum>666278343</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -129,7 +129,9 @@
         <Bp2>_ 0 "EMUL_CODE" "0xa05e" 0 0 1 "" 0 "" 0</Bp2>
         <Bp3>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\board\src\maps_dock_w25q80.c}.128.3" 0 0 1 "" 0 "" 0</Bp3>
         <Bp4>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\board\src\maps_dock_w25q80.c}.128.3" 0 0 1 "" 0 "" 0</Bp4>
-        <Count>5</Count>
+        <Bp5>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\func.c}.38.5" 0 0 1 "" 0 "" 0</Bp5>
+        <Bp6>_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\app\src\filter.c}.81.5" 0 0 1 "" 0 "" 0</Bp6>
+        <Count>7</Count>
     </Breakpoints2>
     <DriverProfiling>
         <Enabled>0</Enabled>

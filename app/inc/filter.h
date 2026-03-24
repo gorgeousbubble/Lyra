@@ -34,11 +34,11 @@ typedef struct
 typedef struct
 {
     float acc_m;   // Measuring accelerometer
-    float acc_f;   // Normalized accelerometer
+    int16 acc_f;   // Normalized accelerometer
     float gyro_m;  // Measuring gyroscope
-    float gyro_f;  // Normalized gyroscope
-    float angle_f; // After angle filtering
-    float angle_l; // Last angle
+    int16 gyro_f;  // Normalized gyroscope
+    int16 angle_f; // After angle filtering
+    int16 angle_l; // Last angle
     float alpha;   // Fusion filter coefficient
     float beta;    // Gyroscope coefficient
     float dt;      // Sample time
