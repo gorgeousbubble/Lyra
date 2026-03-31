@@ -59,7 +59,7 @@
         <EnforceMemoryConfiguration>1</EnforceMemoryConfiguration>
     </ArmDriver>
     <DebugChecksum>
-        <Checksum>726403389</Checksum>
+        <Checksum>1255959932</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
