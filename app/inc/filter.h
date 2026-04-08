@@ -30,18 +30,28 @@ typedef struct
     float R_angle; // Measurement noise covariance
 } KalmanFilter;
 
-// Fusion filter structure
+// Complementary filter structure (single axis)
 typedef struct
 {
-    float acc_m;   // Measuring accelerometer
-    int16 acc_f;   // Normalized accelerometer
-    float gyro_m;  // Measuring gyroscope
-    int16 gyro_f;  // Normalized gyroscope
-    int16 angle_f; // After angle filtering
-    int16 angle_l; // Last angle
-    float alpha;   // Fusion filter coefficient
-    float beta;    // Gyroscope coefficient
-    float dt;      // Sample time
+    float angle;     // Filtered angle (degrees)
+    float acc_angle; // Accelerometer raw angle (degrees, before filtering)
+    float alpha;     // Complementary coefficient (0~1, weight for gyro integration)
+    float dt;        // Sample time (seconds)
+} ComplementaryFilter;
+
+// Yaw gyro integration structure (no accelerometer reference)
+typedef struct
+{
+    float angle; // Integrated yaw angle (degrees)
+    float dt;    // Sample time (seconds)
+} YawIntegrator;
+
+// Fusion filter structure (pitch & roll complementary + yaw gyro integration)
+typedef struct
+{
+    ComplementaryFilter pitch; // Pitch axis filter
+    ComplementaryFilter roll;  // Roll axis filter
+    YawIntegrator yaw;         // Yaw axis (gyro integration only)
 } FusionFilter;
 
 /*
@@ -53,7 +63,7 @@ typedef struct
 */
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
-extern void Fusion_Init(FusionFilter *ff, float alpha, float beta, float dt);
-extern void Fusion_Filter(FusionFilter *ff, float acc_m, float gyro_m);
+extern void Fusion_Init(FusionFilter *ff, float alpha, float dt);
+extern void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int16 gy, int16 gz);
 
 #endif

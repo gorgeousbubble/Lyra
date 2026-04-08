@@ -12,84 +12,67 @@
 
 #include "func.h"
 #include "it.h"
+#include "mpu6050.h"
 #include "uart.h"
+
+// Send a 16-bit signed value over UART (big-endian)
+static void UART_Send_Int16(int16 val)
+{
+    UART_PutChar(UART_UART4, (uint8)(val >> 8));
+    UART_PutChar(UART_UART4, (uint8)(val & 0xFF));
+}
+
+// Send a float value as int16 with scale factor and clamp to int16 range
+static void UART_Send_Float(float val, float scale)
+{
+    float scaled = val * scale;
+    if (scaled > 32767.0f) scaled = 32767.0f;
+    if (scaled < -32768.0f) scaled = -32768.0f;
+    UART_Send_Int16((int16)scaled);
+}
 
 /*
  * @brief      UART_Send_Parameters
- * @param      uint8* array        OUT   Pointer to the array to store the world clock time coordinates
- * @param      const Coord *city   IN    Pointer to the city coordinate array
- * @param      const int cityLen   IN    Length of the city coordinate array
- * @param      MAPS_WorldClock_Time time IN    World clock time structure
- * @param      int hour            IN    Local hour
- * @param      int minute          IN    Local minute
+ *             Send MPU6050 filter data to host for curve visualization
+ *             Protocol: [0xFF 0x00] [CH1~CH8 x 2bytes] [0xAA 0x55]
+ *
+ *             Curve(1): Pitch acc raw angle   (x100, degrees)
+ *             Curve(2): Pitch filtered angle  (x100, degrees)
+ *             Curve(3): Roll acc raw angle    (x100, degrees)
+ *             Curve(4): Roll filtered angle   (x100, degrees)
+ *             Curve(5): Yaw gyro integrated   (x100, degrees)
+ *             Curve(6): Gyro Z raw            (raw int16)
+ *             Curve(7): Acc X raw             (raw int16)
+ *             Curve(8): Acc Y raw             (raw int16)
+ *
  * @return     void
  * @since      v1.0
- * Sample usage:       Calc_World_Clock_Time(&array, LCM_WorldClock_City_coordinate, LCM_WorldClock_City_coordinate_length, time, 10, 30);
  */
-void UART_Send_Parameters()
+void UART_Send_Parameters(void)
 {
-    signed int temp;
-    unsigned char temp1, temp2;
-
+    // Frame header
     UART_PutChar(UART_UART4, 0xFF);
     UART_PutChar(UART_UART4, 0x00);
 
-    /*Curve(1)*/
-    temp = (signed int)(FF_X.acc_f + 10000); // MPU6050.Acc.X
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
+    // Pitch: acc raw angle vs filtered angle (x100 for 0.01 deg resolution)
+    UART_Send_Float(FF.pitch.acc_angle, 100.0f);
+    UART_Send_Float(FF.pitch.angle, 100.0f);
 
-    /*Curve(2)*/
-    temp = (signed int)(FF_X.angle_f + 10000);
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
+    // Roll: acc raw angle vs filtered angle
+    UART_Send_Float(FF.roll.acc_angle, 100.0f);
+    UART_Send_Float(FF.roll.angle, 100.0f);
 
-    /*Curve(3)*/
-    temp = (signed int)(FF_Y.acc_f + 10000);
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
+    // Yaw: gyro integration angle
+    UART_Send_Float(FF.yaw.angle, 100.0f);
 
-    /*Curve(4)*/
-    temp = (signed int)(FF_Y.angle_f + 10000); // MPU6050.Gyro.X
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
+    // Gyro Z raw (yaw axis reference)
+    UART_Send_Int16(MPU6050.Gyro.Z);
 
-    /*Curve(5)*/
-    temp = (signed int)(FF_Z.acc_f + 10000); // MPU6050.Gyro.Y
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
+    // Accelerometer raw data
+    UART_Send_Int16(MPU6050.Acc.X);
+    UART_Send_Int16(MPU6050.Acc.Y);
 
-    /*Curve(6)*/
-    temp = (signed int)(FF_Z.angle_f + 10000); // MPU6050.Gyro.Z
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
-
-    /*Curve(7)*/
-    temp = (signed int)0; // MPU6050.Gyro.Y
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
-
-    /*Curve(8)*/
-    temp = (signed int)0; // MPU6050.Gyro.Z
-    temp1 = (temp) >> 8;
-    temp2 = (temp) & 0xFF;
-    UART_PutChar(UART_UART4, temp1);
-    UART_PutChar(UART_UART4, temp2);
-
+    // Frame tail
     UART_PutChar(UART_UART4, 0xAA);
     UART_PutChar(UART_UART4, 0x55);
 }

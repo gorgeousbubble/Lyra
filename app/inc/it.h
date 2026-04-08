@@ -112,9 +112,7 @@ extern Angle MPU6050_Angle;              // MPU6050 angle
 extern KalmanFilter KF_X;                // Kalman Filter X
 extern KalmanFilter KF_Y;                // Kalman Filter Y
 extern KalmanFilter KF_Z;                // Kalman Filter Z
-extern FusionFilter FF_X;                // Fusion Filter X
-extern FusionFilter FF_Y;                // Fusion Filter Y
-extern FusionFilter FF_Z;                // Fusion Filter Z
+extern FusionFilter FF;                  // Fusion Filter (Pitch & Roll)
 extern uint32 RTC_Count;
 extern RTC_Time RTC_Time_Now;
 extern uint32 MAX30102_RED;

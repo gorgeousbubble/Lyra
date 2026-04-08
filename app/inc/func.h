@@ -22,6 +22,6 @@
 /*
 **function declaration
 */
-extern void UART_Send_Parameters();
+extern void UART_Send_Parameters(void);
 
 #endif

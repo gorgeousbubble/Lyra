@@ -83,40 +83,12 @@ KalmanFilter KF_Z = {
 };
 
 /*
-**Fusion Filter
+**Fusion Filter (Complementary Filter for Pitch & Roll)
 */
-FusionFilter FF_X = {
-    .acc_f = 0.0f,   // Initial normalized accelerometer value
-    .gyro_f = 0.0f,  // Initial normalized gyroscope value
-    .acc_m = 0.0f,   // Initial accelerometer measurement
-    .gyro_m = 0.0f,  // Initial gyroscope measurement
-    .angle_f = 0.0f, // Initial Angle
-    .angle_l = 0.0f, // Last Angle
-    .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
-    .beta = 0.15f,  // Gyroscope coefficient
-    .dt = 0.01f};   // Default sampling period of 100ms
-
-FusionFilter FF_Y = {
-    .acc_f = 0.0f,   // Initial normalized accelerometer value
-    .gyro_f = 0.0f,  // Initial normalized gyroscope value
-    .acc_m = 0.0f,   // Initial accelerometer measurement
-    .gyro_m = 0.0f,  // Initial gyroscope measurement
-    .angle_f = 0.0f, // Initial Angle
-    .angle_l = 0.0f, // Last Angle
-    .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
-    .beta = 0.15f,  // Gyroscope coefficient
-    .dt = 0.01f};   // Default sampling period of 1ms
-
-FusionFilter FF_Z = {
-    .acc_f = 0.0f,   // Initial normalized accelerometer value
-    .gyro_f = 0.0f,  // Initial normalized gyroscope value
-    .acc_m = 0.0f,   // Initial accelerometer measurement
-    .gyro_m = 0.0f,  // Initial gyroscope measurement
-    .angle_f = 0.0f, // Initial Angle
-    .angle_l = 0.0f, // Last Angle
-    .alpha = 0.85f,  // Default fusion filter coefficient of 0.98
-    .beta = 0.15f,  // Gyroscope coefficient
-    .dt = 0.01f};   // Default sampling period of 1ms
+FusionFilter FF = {
+    .pitch = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.96f, .dt = 0.01f},
+    .roll  = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.96f, .dt = 0.01f},
+    .yaw   = {.angle = 0.0f, .dt = 0.01f}};
 
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X
@@ -289,10 +261,8 @@ void PIT1_IRQHandler(void)
     MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
     MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
 
-    // Kalman (Fusion) filter processing
-    Fusion_Filter(&FF_X, MPU6050.Acc.X, MPU6050.Gyro.X); // Fusion filter calculation for X-axis
-    Fusion_Filter(&FF_Y, MPU6050.Acc.Y, MPU6050.Gyro.Y); // Fusion filter calculation for Y-axis
-    Fusion_Filter(&FF_Z, MPU6050.Acc.Z, MPU6050.Gyro.Z); // Fusion filter calculation for Z-axis
+    // Complementary filter processing (pitch, roll & yaw)
+    Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
   }
 
   // Sample period of 100ms

@@ -12,6 +12,7 @@
 
 #include "filter.h"
 #include "mpu6050.h"
+#include <math.h>
 
 // Initialize Kalman filter
 void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle)
@@ -60,34 +61,60 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
     return kf->angle_f;
 }
 
-// Initialize Fusion filter
-void Fusion_Init(FusionFilter *ff, float alpha, float beta, float dt)
+// Initialize Fusion filter (complementary filter)
+void Fusion_Init(FusionFilter *ff, float alpha, float dt)
 {
-    ff->alpha = alpha;  // Default fusion filter coefficient of 0.98
-    ff->beta = beta;    // Gyroscope coefficient
-    ff->dt = dt;        // Default sampling period of 1ms
-    ff->angle_f = 0.0f; // Initial Angle
-    ff->angle_l = 0.0f; // Last Angle
-    ff->acc_f = 0.0f;   // Initial normalized accelerometer value
-    ff->gyro_f = 0.0f;  // Initial normalized gyroscope value
-    ff->acc_m = 0.0f;   // Initial accelerometer measurement
-    ff->gyro_m = 0.0f;  // Initial gyroscope measurement
+    ff->pitch.angle = 0.0f;
+    ff->pitch.acc_angle = 0.0f;
+    ff->pitch.alpha = alpha;
+    ff->pitch.dt = dt;
+    ff->roll.angle = 0.0f;
+    ff->roll.acc_angle = 0.0f;
+    ff->roll.alpha = alpha;
+    ff->roll.dt = dt;
+    ff->yaw.angle = 0.0f;
+    ff->yaw.dt = dt;
 }
 
-// Fusion filter calculation
-void Fusion_Filter(FusionFilter *ff, float acc_m, float gyro_m)
+// Fusion filter calculation (complementary filter)
+// Input: raw MPU6050 accelerometer (ax, ay, az) and gyroscope (gx, gy) values
+// Assumes: accel range ±2g (16384 LSB/g), gyro range ±250°/s (131 LSB/°/s)
+void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int16 gy, int16 gz)
 {
-    // Fusion filter calculation
-    ff->acc_m = acc_m / 16384.0f;   // Assuming accelerometer measurement is the angle
-    ff->gyro_m = gyro_m / 131.0f; // Assuming gyroscope measurement is the angular velocity
-    // Normalization of accelerometer and gyroscope data
-    // ff->acc_f = ff->acc_m / 16384.0f; // Assuming accelerometer range is ±2g
-    // ff->gyro_f = ff->gyro_m / 131.0f; // Assuming gyroscope range is ±250°/s
-    ff->acc_f = (int16)(ff->acc_m / 4.0f * 180.0f - 90.0f); // No normalization for accelerometer
-    ff->gyro_f = (int16)(ff->gyro_m * ff->beta);                // No normalization for gyroscope
+    float fax = (float)ax;
+    float fay = (float)ay;
+    float faz = (float)az;
 
-    // Fusion of accelerometer and gyroscope data
-    //ff->angle_f += (int16)(ff->alpha * (ff->acc_f - ff->angle_l) + (1 - ff->alpha) * (ff->gyro_f * ff->dt));
-    ff->angle_f = (int16)(ff->angle_l + (ff->alpha * (ff->acc_f - ff->angle_l) + ff->gyro_f) * ff->dt); // Complementary filter fusion
-    ff->angle_l = ff->angle_f; // Update last angle
+    // Reject invalid accelerometer data (free-fall or extreme vibration)
+    float acc_mag = sqrtf(fax * fax + fay * fay + faz * faz);
+    if (acc_mag < ACCEL_RANGE_2G * 0.5f || acc_mag > ACCEL_RANGE_2G * 1.5f)
+    {
+        float gyro_pitch = (float)gy / GYRO_RANGE_250;
+        float gyro_roll  = (float)gx / GYRO_RANGE_250;
+        ff->pitch.angle += gyro_pitch * ff->pitch.dt;
+        ff->roll.angle  += gyro_roll  * ff->roll.dt;
+        ff->yaw.angle   += (float)gz / GYRO_RANGE_250 * ff->yaw.dt;
+        return;
+    }
+
+    // Calculate angles from accelerometer using atan2
+    // atan2(-ax, az) gives continuous ±180° pitch without jump at ±90°
+    // atan2(ay, az)  gives continuous ±180° roll  without jump at ±90°
+    float acc_pitch = atan2f(-fax, faz) * RAD_TO_DEG;
+    float acc_roll  = atan2f(fay, faz)  * RAD_TO_DEG;
+
+    // Save raw accelerometer angles for comparison
+    ff->pitch.acc_angle = acc_pitch;
+    ff->roll.acc_angle  = acc_roll;
+
+    // Convert gyroscope raw data to °/s
+    float gyro_pitch = (float)gy / GYRO_RANGE_250;
+    float gyro_roll  = (float)gx / GYRO_RANGE_250;
+
+    // Complementary filter: angle = alpha * (angle + gyro * dt) + (1 - alpha) * acc_angle
+    ff->pitch.angle = ff->pitch.alpha * (ff->pitch.angle + gyro_pitch * ff->pitch.dt) + (1.0f - ff->pitch.alpha) * acc_pitch;
+    ff->roll.angle  = ff->roll.alpha  * (ff->roll.angle  + gyro_roll  * ff->roll.dt)  + (1.0f - ff->roll.alpha)  * acc_roll;
+
+    // Yaw: pure gyro integration (no accelerometer reference)
+    ff->yaw.angle += (float)gz / GYRO_RANGE_250 * ff->yaw.dt;
 }
