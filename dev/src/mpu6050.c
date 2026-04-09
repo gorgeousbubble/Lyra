@@ -256,8 +256,8 @@ void MPU6050_Init(void)
   I2C_PORT_INIT_SCL;
   I2C_PORT_INIT_SDA;
   I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, PWR_MGMT_1, 0x00);
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, SMPLRT_DIV, 0x09);   // Sample rate = 1kHz / (1+9) = 100Hz
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, CONFIG, 0x06);        // DLPF 5Hz, reduce acc noise
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, ACCEL_CONFIG, 0x00);  // ±2g, no self-test
-  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, GYRO_CONFIG, 0x00);   // ±250°/s, no self-test
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, SMPLRT_DIV, 0x07);   // Sample rate = 1kHz / (1+7) = 125Hz
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, CONFIG, 0x04);        // DLPF 20Hz
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, ACCEL_CONFIG, 0x01);  // ±2g
+  I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, GYRO_CONFIG, 0x00);   // ±250°/s
 }

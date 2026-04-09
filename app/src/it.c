@@ -86,9 +86,10 @@ KalmanFilter KF_Z = {
 **Fusion Filter (Complementary Filter for Pitch & Roll)
 */
 FusionFilter FF = {
-    .pitch = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.96f, .dt = 0.01f},
-    .roll  = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.96f, .dt = 0.01f},
-    .yaw   = {.angle = 0.0f, .dt = 0.01f}};
+    .pitch = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.93f, .dt = 0.01f},
+    .roll  = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.93f, .dt = 0.01f},
+    .yaw   = {.angle = 0.0f, .dt = 0.01f},
+    .gyro_bias = {0.0f, 0.0f, 0.0f, 0}};
 
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X
@@ -124,6 +125,7 @@ Stop_Watch_Time Stop_Watch_Now = {
 
 int Stop_Watch_Count = 0; // Stop Watch count
 int Stop_Watch_State = 0; // Stop Watch state (0: stop, 1: start)
+volatile uint8 UART_Send_Flag = 0; // UART send flag (set in PIT1, cleared in main)
 
 /*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
@@ -261,8 +263,17 @@ void PIT1_IRQHandler(void)
     MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
     MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
 
-    // Complementary filter processing (pitch, roll & yaw)
-    Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
+    // Gyro calibration (first 2 seconds after power-on, sensor must be stationary)
+    if (!FF.gyro_bias.calibrated)
+    {
+      Fusion_Calibrate(&FF, MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
+    }
+    else
+    {
+      // Complementary filter processing (pitch, roll & yaw)
+      Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
+    }
+    UART_Send_Flag = 1; // Signal main loop to send data
   }
 
   // Sample period of 100ms

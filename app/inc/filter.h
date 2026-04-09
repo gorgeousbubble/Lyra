@@ -46,12 +46,22 @@ typedef struct
     float dt;    // Sample time (seconds)
 } YawIntegrator;
 
+// Gyro zero-bias calibration structure
+typedef struct
+{
+    float bias_x;    // X-axis gyro bias (°/s)
+    float bias_y;    // Y-axis gyro bias (°/s)
+    float bias_z;    // Z-axis gyro bias (°/s)
+    uint8 calibrated; // Calibration done flag
+} GyroBias;
+
 // Fusion filter structure (pitch & roll complementary + yaw gyro integration)
 typedef struct
 {
     ComplementaryFilter pitch; // Pitch axis filter
     ComplementaryFilter roll;  // Roll axis filter
     YawIntegrator yaw;         // Yaw axis (gyro integration only)
+    GyroBias gyro_bias;        // Gyro zero-bias calibration
 } FusionFilter;
 
 /*
@@ -64,6 +74,7 @@ typedef struct
 extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
 extern void Fusion_Init(FusionFilter *ff, float alpha, float dt);
+extern void Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz);
 extern void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int16 gy, int16 gz);
 
 #endif

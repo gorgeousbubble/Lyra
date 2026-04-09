@@ -125,7 +125,7 @@ void AllInit(void)
   /*
   **Kalman Filter (Fusion Filter)
   */
-  Fusion_Init(&FF, 0.96f, 0.01f); // Initialize Complementary Filter with alpha = 0.96 and dt = 0.01s
+  Fusion_Init(&FF, 0.93f, 0.01f); // Initialize Complementary Filter with alpha = 0.93 and dt = 0.01s
 
   /*
   **Interrupts

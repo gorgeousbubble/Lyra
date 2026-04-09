@@ -12,6 +12,7 @@
 
 #include "func.h"
 #include "init.h"
+#include "it.h"
 #include "main.h"
 #include "maps_dock_lcd.h"
 #include "maps_dock_key.h"
@@ -123,6 +124,10 @@ void main(void)
         {
                 MAPS_Dock_KEY_Incident();           // Independent button serial port transmission
                 MAPS_Dock_Rocker_Key_LCM_Control(); // LCM display
-                UART_Send_Parameters();
+                if (UART_Send_Flag)
+                {
+                    UART_Send_Flag = 0;
+                    UART_Send_Parameters();
+                }
         }
 }
