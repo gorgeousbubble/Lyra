@@ -11,6 +11,7 @@
  */
 
 #include "func.h"
+#include "health.h"
 #include "init.h"
 #include "it.h"
 #include "main.h"
@@ -129,5 +130,6 @@ void main(void)
                     UART_Send_Flag = 0;
                     UART_Send_Parameters();
                 }
+                Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(); // SpO2 & HR algorithm (heavy, runs in main loop)
         }
 }

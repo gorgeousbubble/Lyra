@@ -16,6 +16,7 @@
 #include "common.h"
 
 #define MAX_BRIGHTNESS 255
+#define HEALTH_BUFFER_SIZE 500 // Must match BUFFER_SIZE in max30102_algo.h
 
 // Health Sensor Port Macro
 // INT port initialization
@@ -46,19 +47,13 @@
 /*
 **variate declaration
 */
-typedef struct Node
-{
-    uint32 data;
-    struct Node *next;
-} Node;
-
+// Ring buffer for MAX30102 sensor data
 typedef struct
 {
-    Node *head;
-    Node *tail;
-    int size;
-    int capacity;
-} LinkedList;
+    uint32 data[HEALTH_BUFFER_SIZE];
+    int head;     // Write index
+    int count;    // Current number of samples
+} RingBuffer;
 
 extern int32 SPO2;       // SPO2 value
 extern int32 Heart_Rate; // Heart Rate value
@@ -68,7 +63,7 @@ extern uint32 RD_Duty;
 **function declaration
 */
 extern void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(void);
-extern void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Clean(void);
+extern void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(uint32 red, uint32 ir);
 extern void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void);
 
 #endif

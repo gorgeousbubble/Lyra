@@ -16,63 +16,28 @@
 #include "max30102.h"
 #include "max30102_algo.h"
 
-LinkedList *IR_Buff = NULL;  // IR LED sensor data
-LinkedList *RED_Buff = NULL; // Red LED sensor data
+// Static ring buffers (no malloc, no fragmentation)
+static RingBuffer IR_Buff = {0};
+static RingBuffer RED_Buff = {0};
 
-int32 SPO2 = 0;       // SPO2 value
-int32 Heart_Rate = 0; // Heart Rate value
-
+int32 SPO2 = 0;
+int32 Heart_Rate = 0;
 uint32 RD_Duty = 0;
 
-LinkedList *createLinkedList(int capacity)
+// Add a sample to ring buffer
+static void RingBuffer_Add(RingBuffer *rb, uint32 data)
 {
-  LinkedList *list = (LinkedList *)malloc(sizeof(LinkedList));
-  list->head = NULL;
-  list->tail = NULL;
-  list->size = 0;
-  list->capacity = capacity;
-  return list;
+    rb->data[rb->head] = data;
+    rb->head = (rb->head + 1) % HEALTH_BUFFER_SIZE;
+    if (rb->count < HEALTH_BUFFER_SIZE)
+        rb->count++;
 }
 
-void addNode(LinkedList *list, int data)
+// Get sample by index (0 = oldest)
+static uint32 RingBuffer_Get(RingBuffer *rb, int index)
 {
-  if (list->size >= list->capacity)
-  {
-    // If the list is full, remove the head node
-    Node *temp = list->head;
-    list->head = list->head->next;
-    free(temp);
-    list->size--;
-  }
-  Node *newNode = (Node *)malloc(sizeof(Node));
-  newNode->data = data;
-  newNode->next = NULL;
-
-  if (list->tail == NULL)
-  {
-    // If the list is empty, set head and tail to the new node
-    list->head = newNode;
-    list->tail = newNode;
-  }
-  else
-  {
-    // Link the new node to the end of the list
-    list->tail->next = newNode;
-    list->tail = newNode;
-  }
-  list->size++;
-}
-
-void freeLinkedList(LinkedList *list)
-{
-  Node *current = list->head;
-  while (current != NULL)
-  {
-    Node *temp = current;
-    current = current->next;
-    free(temp);
-  }
-  free(list);
+    int pos = (rb->head - rb->count + index + HEALTH_BUFFER_SIZE) % HEALTH_BUFFER_SIZE;
+    return rb->data[pos];
 }
 
 /*
@@ -80,129 +45,56 @@ void freeLinkedList(LinkedList *list)
 */
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(void)
 {
-  // Initialize the GPIO ports for MAX30102
-  MAX30102_PORT_INIT_RD;
-  MAX30102_PORT_INIT_IRD;
-  MAX30102_PORT_INIT_INT;
-
-  // Initialize the linked lists for IR and RED data
-  IR_Buff = createLinkedList(500);  // Example capacity
-  RED_Buff = createLinkedList(500); // Example capacity
-
-  // Initialize the MAX30102 sensor
-  MAX30102_Init();
+    MAX30102_PORT_INIT_RD;
+    MAX30102_PORT_INIT_IRD;
+    MAX30102_PORT_INIT_INT;
+    MAX30102_Init();
 }
 
 /*
-**heart rate and oxygen saturation sensor cleanup
+**Collect one sample from MAX30102 (call from ISR at 100Hz)
 */
-void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Clean(void)
+void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(uint32 red, uint32 ir)
 {
-  // Free the linked lists
-  freeLinkedList(IR_Buff);
-  freeLinkedList(RED_Buff);
-
-  // Reset the SPO2 and Heart Rate values
-  SPO2 = 0;
-  Heart_Rate = 0;
+    RingBuffer_Add(&IR_Buff, ir);
+    RingBuffer_Add(&RED_Buff, red);
 }
 
 /*
-**heart rate and oxygen saturation sensor calculation once per second
+**Run heart rate and SpO2 algorithm (call from main loop, not ISR)
 */
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
 {
-  uint32 min = 0x3FFFF;
-  uint32 max = 0;
-  uint32 pre_data = 0;
-  uint32 cur_data = 0;
-  uint32 ir_data = 0;
-  uint32 red_data = 0;
-  int32 spo2 = 0;
-  int8 spo2_valid = 0;
-  int32 heart_rate = 0;
-  int8 heart_rate_valid = 0;
-  int32 brightness = 0;
-  float temp = 0.0f;
+    int32 spo2 = 0;
+    int8 spo2_valid = 0;
+    int32 heart_rate = 0;
+    int8 heart_rate_valid = 0;
 
-  // Check if the linked lists are initialized
-  // pre_data = RED_Buff->tail->data;
+    // Need full buffer for algorithm
+    if (IR_Buff.count < HEALTH_BUFFER_SIZE)
+        return;
 
-  // read RED & IR LED sensor data
-  MAX30102_ReadFIFO(&red_data, &ir_data);
-
-  // add the data to the linked lists
-  addNode(IR_Buff, ir_data);
-  addNode(RED_Buff, red_data);
-
-  // find the minimum and maximum values in the RED data
-  Node *current = RED_Buff->head;
-  while (current != NULL)
-  {
-    if (current->data < min)
+    // Copy ring buffer to contiguous arrays for algorithm
+    static uint32 ir_array[HEALTH_BUFFER_SIZE];
+    static uint32 red_array[HEALTH_BUFFER_SIZE];
+    for (int i = 0; i < HEALTH_BUFFER_SIZE; i++)
     {
-      min = current->data;
+        ir_array[i] = RingBuffer_Get(&IR_Buff, i);
+        red_array[i] = RingBuffer_Get(&RED_Buff, i);
     }
-    if (current->data > max)
-    {
-      max = current->data;
-    }
-    current = current->next;
-  }
 
-  // calculate the current data as the difference from the minimum
-  cur_data = RED_Buff->tail->data;
-  if (cur_data > pre_data) // just to determine the brightness of LED according to the deviation of adjacent two AD data
-  {
-    temp = cur_data - pre_data;
-    temp /= (max - min);
-    temp *= MAX_BRIGHTNESS;
-    brightness -= (int)temp;
-    if (brightness < 0)
-      brightness = 0;
-  }
-  else
-  {
-    temp = pre_data - cur_data;
-    temp /= (max - min);
-    temp *= MAX_BRIGHTNESS;
-    brightness += (int)temp;
-    if (brightness > MAX_BRIGHTNESS)
-      brightness = MAX_BRIGHTNESS;
-  }
+    // Calculate heart rate and SpO2
+    maxim_heart_rate_and_oxygen_saturation(
+        ir_array,
+        HEALTH_BUFFER_SIZE,
+        red_array,
+        &spo2,
+        &spo2_valid,
+        &heart_rate,
+        &heart_rate_valid);
 
-  RD_Duty = (uint32)((1 - (float)brightness / 256) * 10000); // Convert brightness to duty cycle
-  if (RD_Duty > 10000)
-  {
-    RD_Duty = 10000;
-  }
-  else if (RD_Duty <= 0)
-  {
-    RD_Duty = 0;
-  }
-  FTM_PWM_Duty(FTM_FTM0, FTM_CH4, RD_Duty); // Update PWM duty cycle
-
-  /*if(brightness < 120)
-    MAX30102_SET_IRD_H; // Set IRD port high level
-  else
-    MAX30102_SET_IRD_L; // Set IRD port low level*/
-
-  // calculate SPO2 using the formula
-  maxim_heart_rate_and_oxygen_saturation(
-      (uint32 *)IR_Buff->head,
-      IR_Buff->size,
-      (uint32 *)RED_Buff->head,
-      &spo2,
-      &spo2_valid,
-      &heart_rate,
-      &heart_rate_valid);
-  // update the global SPO2 and Heart Rate values
-  if (spo2_valid)
-  {
-    SPO2 = spo2;
-  }
-  if (heart_rate_valid)
-  {
-    Heart_Rate = heart_rate;
-  }
+    if (spo2_valid)
+        SPO2 = spo2;
+    if (heart_rate_valid)
+        Heart_Rate = heart_rate;
 }
