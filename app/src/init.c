@@ -96,7 +96,7 @@ void AllInit(void)
   // DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
   MPU6050_Init();  // MPU6050 initialization
   Oled_I2C_Init(); // Oled initialization
-  MAX30102_Init(); // MAX30102 initialization
+  Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(); // MAX30102 + health GPIO initialization
   RTC_Init();      // RTC initialization
   Beep_Init();     // Beep initialization
 

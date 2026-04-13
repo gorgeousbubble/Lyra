@@ -176,16 +176,24 @@ uint8 I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
   return I2C_Data;
 }
 
-// Read a byte
+// Read two bytes atomically in a single I2C transaction
 int16 I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
   uint8 I2C_Reg_H = 0;
   uint8 I2C_Reg_L = 0;
 
-  I2C_Reg_H = I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr, I2C_Reg_Adr);
-  I2C_Reg_L = I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr, I2C_Reg_Adr + 1);
+  I2C_GPIO_Start();
+  I2C_GPIO_Send_Byte(I2C_Div_Adr);      // Write address
+  I2C_GPIO_Send_Byte(I2C_Reg_Adr);      // Register address
+  I2C_GPIO_Start();                      // Repeated start
+  I2C_GPIO_Send_Byte(I2C_Div_Adr + 1); // Read address
+  I2C_Reg_H = I2C_GPIO_Recv_Byte();    // Read high byte, send ACK
+  I2C_GPIO_Send_Ack(0);
+  I2C_Reg_L = I2C_GPIO_Recv_Byte();    // Read low byte, send NACK
+  I2C_GPIO_Send_Ack(1);
+  I2C_GPIO_Stop();
 
-  return ((I2C_Reg_H << 8) + I2C_Reg_L);
+  return (int16)((I2C_Reg_H << 8) | I2C_Reg_L);
 }
 
 /*

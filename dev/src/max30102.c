@@ -11,6 +11,7 @@
  */
 
 #include "max30102.h"
+#include "delay.h"
 #include "gpio.h"
 #include "i2c.h"
 
@@ -239,16 +240,7 @@ void MAX30102_Init(void)
 void MAX30102_Reset(void)
 {
   MAX30102_I2C_GPIO_Write_Reg(MAX30102_DEVICE_ADDR, REG_MODE_CONFIG, 0x40);
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
-  MAX30102_I2C_DELAY_TIME;
+  DELAY_ms(2); // Wait at least 1ms for reset to complete (datasheet requirement)
 }
 
 /*

@@ -108,9 +108,13 @@ void Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz)
 // Normalize angle to [-180, 180) range
 static float Normalize_Angle(float angle)
 {
-    while (angle > 180.0f)  angle -= 360.0f;
-    while (angle <= -180.0f) angle += 360.0f;
-    return angle;
+    // Guard against NaN or infinity
+    if (angle != angle || angle > 1e9f || angle < -1e9f)
+        return 0.0f;
+    angle = fmodf(angle + 180.0f, 360.0f);
+    if (angle < 0.0f)
+        angle += 360.0f;
+    return angle - 180.0f;
 }
 
 // Complementary filter for single axis

@@ -103,23 +103,20 @@ typedef struct
 /*
 **variate declaration
 */
-extern int PIT0_Count;                   // PIT0 counter
-extern int PIT1_Count;                   // PIT1 counter
-extern uint16 ADC_Convert_Result[2];     // ADC sample
-extern MPU6050_Sensor MPU6050;           // MPU6050
-extern MPU6050_Sensor_Norm MPU6050_Norm; // MPU6050 normalized data
-extern Angle MPU6050_Angle;              // MPU6050 angle
-extern KalmanFilter KF_X;                // Kalman Filter X
-extern KalmanFilter KF_Y;                // Kalman Filter Y
-extern KalmanFilter KF_Z;                // Kalman Filter Z
-extern FusionFilter FF;                  // Fusion Filter (Pitch & Roll)
-extern uint32 RTC_Count;
-extern RTC_Time RTC_Time_Now;
-extern uint32 MAX30102_RED;
-extern uint32 MAX30102_IR;
-extern Stop_Watch_Time Stop_Watch_Now;
-extern int Stop_Watch_Count;
-extern int Stop_Watch_State;
+extern volatile int PIT0_Count;                   // PIT0 counter
+extern volatile int PIT1_Count;                   // PIT1 counter
+extern uint16 ADC_Convert_Result[2];              // ADC sample
+extern volatile MPU6050_Sensor MPU6050;           // MPU6050
+extern MPU6050_Sensor_Norm MPU6050_Norm;          // MPU6050 normalized data
+extern Angle MPU6050_Angle;                       // MPU6050 angle
+extern FusionFilter FF;                           // Fusion Filter (Pitch & Roll)
+extern volatile uint32 RTC_Count;
+extern volatile RTC_Time RTC_Time_Now;
+extern volatile uint32 MAX30102_RED;
+extern volatile uint32 MAX30102_IR;
+extern volatile Stop_Watch_Time Stop_Watch_Now;
+extern volatile int Stop_Watch_Count;
+extern volatile int Stop_Watch_State;
 extern volatile uint8 UART_Send_Flag;
 
 /*

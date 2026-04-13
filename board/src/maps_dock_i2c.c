@@ -84,18 +84,11 @@ uint8 MAPS_Dock_24C02_Read_Byte(uint8 Addr)
  *  @since      v1.0
  *  Sample usage:       MAPS_Dock_24C02_Write_Buff();
  */
-void MAPS_Dock_24C02_Write_Buff(uint8 Addr, uint8 *Buff)
+void MAPS_Dock_24C02_Write_Buff(uint8 Addr, uint8 *Buff, uint8 Length)
 {
   uint8 i = 0;
-  uint8 Len = 0; // array length
-  uint8 *Buff_Size = Buff;
 
-  while (*Buff_Size++ != 0)
-  {
-    Len++;
-  }
-
-  for (i = 0; i < Len; i++)
+  for (i = 0; i < Length; i++)
   {
     MAPS_Dock_I2C_Write_Reg(I2C_I2C0, I2C_ADR_24C02, (Addr + i), *(Buff + i));
     MAPS_Dock_I2C_Delay(5000); // Writing E2PROM requires a delay of 5Ms
