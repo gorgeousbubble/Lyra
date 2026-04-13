@@ -35,10 +35,13 @@ typedef struct Coord Coord;
 
 struct CoordCache
 {
-    Coord *coord;
+    Coord *coord;  // Points to static storage, do NOT free
     int length;
 };
 typedef struct CoordCache CoordCache;
+
+// Maximum pixels in a 128x64 frame
+#define COORD_CACHE_MAX_SIZE 8192
 
 /*
 **variate declaration

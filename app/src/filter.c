@@ -77,6 +77,10 @@ void Fusion_Init(FusionFilter *ff, float alpha, float dt)
     ff->gyro_bias.bias_x = 0.0f;
     ff->gyro_bias.bias_y = 0.0f;
     ff->gyro_bias.bias_z = 0.0f;
+    ff->gyro_bias.sum_x  = 0.0f;
+    ff->gyro_bias.sum_y  = 0.0f;
+    ff->gyro_bias.sum_z  = 0.0f;
+    ff->gyro_bias.count  = 0;
     ff->gyro_bias.calibrated = 0;
 }
 
@@ -85,21 +89,18 @@ void Fusion_Init(FusionFilter *ff, float alpha, float dt)
 #define GYRO_CALIB_SAMPLES 200
 void Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz)
 {
-    static float sum_x = 0.0f, sum_y = 0.0f, sum_z = 0.0f;
-    static int count = 0;
-
     if (ff->gyro_bias.calibrated) return;
 
-    sum_x += (float)gx / GYRO_RANGE_250;
-    sum_y += (float)gy / GYRO_RANGE_250;
-    sum_z += (float)gz / GYRO_RANGE_250;
-    count++;
+    ff->gyro_bias.sum_x += (float)gx / GYRO_RANGE_250;
+    ff->gyro_bias.sum_y += (float)gy / GYRO_RANGE_250;
+    ff->gyro_bias.sum_z += (float)gz / GYRO_RANGE_250;
+    ff->gyro_bias.count++;
 
-    if (count >= GYRO_CALIB_SAMPLES)
+    if (ff->gyro_bias.count >= GYRO_CALIB_SAMPLES)
     {
-        ff->gyro_bias.bias_x = sum_x / (float)count;
-        ff->gyro_bias.bias_y = sum_y / (float)count;
-        ff->gyro_bias.bias_z = sum_z / (float)count;
+        ff->gyro_bias.bias_x = ff->gyro_bias.sum_x / (float)ff->gyro_bias.count;
+        ff->gyro_bias.bias_y = ff->gyro_bias.sum_y / (float)ff->gyro_bias.count;
+        ff->gyro_bias.bias_z = ff->gyro_bias.sum_z / (float)ff->gyro_bias.count;
         ff->gyro_bias.calibrated = 1;
     }
 }

@@ -49,9 +49,13 @@ typedef struct
 // Gyro zero-bias calibration structure
 typedef struct
 {
-    float bias_x;    // X-axis gyro bias (°/s)
-    float bias_y;    // Y-axis gyro bias (°/s)
-    float bias_z;    // Z-axis gyro bias (°/s)
+    float bias_x;     // X-axis gyro bias (°/s)
+    float bias_y;     // Y-axis gyro bias (°/s)
+    float bias_z;     // Z-axis gyro bias (°/s)
+    float sum_x;      // Accumulator for calibration
+    float sum_y;
+    float sum_z;
+    int   count;      // Sample count
     uint8 calibrated; // Calibration done flag
 } GyroBias;
 

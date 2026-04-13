@@ -1344,74 +1344,40 @@ void MAPS_Dock_KEY_Incident(void)
 
 /*
  *  @brief      Calc_Dynamic_Animation_Cache_Array
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
- *  @since      v1.0
- *  Sample usage:       Calc_Dynamic_Animation_Cache_Array(10,15,90);
+ *              Convert a 64x16 bitmap to a Coord array stored in static memory.
+ *              No malloc/free - uses two static ping-pong buffers.
  */
 void Calc_Dynamic_Animation_Cache_Array(Coord **buff, int *buffSize, const uint8 array[64][16])
 {
-  CoordNode *head = NULL;
-  CoordNode *current = NULL;
+  // Two static ping-pong buffers, each large enough for a full 128x64 frame
+  static Coord static_buf[2][COORD_CACHE_MAX_SIZE];
+  static int buf_index = 0;
+
+  // Alternate between the two buffers so both CoordCache slots stay valid
+  // during the animation (one holds src, the other holds dst)
+  buf_index = (buf_index + 1) % 2;
+  Coord *buf = static_buf[buf_index];
   int counter = 0;
-  // if buff is not NULL free the memory
-  if (*buff != NULL)
+
+  // Directly scan bitmap and fill Coord array - no linked list, no malloc
+  for (int i = 0; i < 64 && counter < COORD_CACHE_MAX_SIZE; i++)
   {
-    free(*buff);
-    *buff = NULL;
-    *buffSize = 0;
-  }
-  // conver array to coordinate array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
+    for (int j = 0; j < 16 && counter < COORD_CACHE_MAX_SIZE; j++)
     {
-      for (int k = 0; k < 8; k++)
+      for (int k = 0; k < 8 && counter < COORD_CACHE_MAX_SIZE; k++)
       {
         if (array[i][j] & (0x01 << (7 - k)))
         {
-          // if the pixel is set, add to coordinate array
-          uint8 x = j * 8 + k;
-          uint8 y = i;
-          // create a new coordinate node for the pixel
-          CoordNode *node = (CoordNode *)malloc(sizeof(CoordNode));
-          node->x = x;
-          node->y = y;
-          node->next = NULL;
-          // link the coordinate node to the list
-          if (head == NULL)
-          {
-            head = node;    // if head is NULL, set head to the coordinate node
-            current = head; // move current to the coordinate node
-          }
-          else
-          {
-            current->next = node; // link the coordinate node to the list
-            current = node;       // move current to the coordinate node
-          }
-          // increment counter
+          buf[counter].x = (uint8)(j * 8 + k);
+          buf[counter].y = (uint8)i;
           counter++;
         }
       }
     }
   }
-  // return the coordinate array
+
+  *buff     = buf;
   *buffSize = counter;
-  *buff = (Coord *)malloc(sizeof(Coord) * counter);
-  int index = 0;
-  for (current = head; current != NULL; current = current->next)
-  {
-    (*buff)[index].x = current->x;
-    (*buff)[index].y = current->y;
-    index++;
-  }
-  // free the linked list
-  while (head != NULL)
-  {
-    CoordNode *temp = head;
-    head = head->next;
-    free(temp);
-  }
 }
 
 /*
@@ -1423,15 +1389,11 @@ void Calc_Dynamic_Animation_Cache_Array(Coord **buff, int *buffSize, const uint8
  */
 void Release_Dynamic_Animation_Cache(CoordCache *array, int len)
 {
+  // coord points to static storage - do NOT free, just clear the reference
   for (int i = 0; i < len; i++)
   {
-    // free dynamic animation cache
-    if (array[i].coord != NULL)
-    {
-      free(array[i].coord);
-      array[i].coord = NULL;
-      array[i].length = 0;
-    }
+    array[i].coord  = NULL;
+    array[i].length = 0;
   }
 }
 

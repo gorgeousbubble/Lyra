@@ -89,7 +89,7 @@ FusionFilter FF = {
     .pitch = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.93f, .dt = 0.01f},
     .roll  = {.angle = 0.0f, .acc_angle = 0.0f, .alpha = 0.93f, .dt = 0.01f},
     .yaw   = {.angle = 0.0f, .dt = 0.01f},
-    .gyro_bias = {0.0f, 0.0f, 0.0f, 0}};
+    .gyro_bias = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0, 0}};
 
 Angle MPU6050_Angle = {
     .Angle_X = 0.0f, // Angle X
