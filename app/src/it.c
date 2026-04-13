@@ -274,8 +274,12 @@ void PIT1_IRQHandler(void)
       Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
     }
     UART_Send_Flag = 1; // Signal main loop to send data
+  }
 
-    // MAX30102 sensor data read (10ms = 100Hz, matches algorithm FS)
+  // MAX30102 read on odd 10ms ticks (5ms offset from MPU6050)
+  // This spreads I2C load across time, preventing ISR overrun
+  if (PIT1_Count % 10 == 5)
+  {
     MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);
     Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(MAX30102_RED, MAX30102_IR);
   }
