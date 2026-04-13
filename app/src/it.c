@@ -3,8 +3,8 @@
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       main.c
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @file       it.c
+ * @brief      Interrupt service routines and shared global variables
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -25,13 +25,19 @@
 #include <time.h>
 
 /*
-**PIT counter
+**PIT0: 1ms tick counter, resets every 100ms
 */
-volatile int PIT0_Count = 0; // PIT0 count
-char PIT0_Flag = 0;          // PIT0 flag
+volatile int PIT0_Count = 0;
+char PIT0_Flag = 0; // 100ms cycle flag (0~3 rolling)
 
-volatile int PIT1_Count = 0; // PIT1 count
-char PIT1_Flag = 0;          // PIT1 flag
+/*
+**PIT1: 1ms tick counter, resets every 100ms
+**  % 10 == 0 : MPU6050 read + filter (10ms, 100Hz)
+**  % 10 == 5 : MAX30102 read + collect (10ms, 100Hz, 5ms offset)
+**  >= 100    : 100ms periodic tasks
+*/
+volatile int PIT1_Count = 0;
+char PIT1_Flag = 0; // 100ms cycle flag (0~3 rolling)
 
 /*
 **ADC convert
@@ -104,9 +110,6 @@ void PORTC_PTC19_IRQHandler(void)
   {
     IRQ_CLEAR(C, 19);
     disable_irq(PORTC_IRQn);
-
-    // Put Your Code...
-
     IRQ_CLEAR(C, 19);
     enable_irq(PORTC_IRQn);
   }
@@ -122,9 +125,6 @@ void PORTD_PTD15_IRQHandler(void)
   {
     IRQ_CLEAR(D, 15);
     disable_irq(PORTD_IRQn);
-
-    // Put Your Code...
-
     IRQ_CLEAR(D, 15);
     enable_irq(PORTD_IRQn);
   }
@@ -139,7 +139,7 @@ void PIT0_IRQHandler(void)
   PIT_Flag_Clear(PIT0);
   disable_irq(PIT0_IRQn);
 
-  // Put Your Code...
+  // Stopwatch centisecond tick (called every 1ms, increments every 10ms)
   if (Stop_Watch_State)
   {
     Stop_Watch_Count++;
@@ -164,9 +164,9 @@ void PIT0_IRQHandler(void)
     }
   }
 
-  // Put Your Code...
   PIT0_Count++;
 
+  // 100ms periodic tasks: LED blink, ADC, RTC update
   if (PIT0_Count >= 100)
   {
     PIT0_Count = 0;
@@ -272,27 +272,19 @@ void PIT1_IRQHandler(void)
 void RTC_IRQHandler(void)
 {
   disable_irq(RTC_IRQn);
-  if (RTC_SR & RTC_SR_TIF_MASK) // Invalid settings
+  if (RTC_SR & RTC_SR_TIF_MASK) // Time invalid
   {
-    RTC_SR = 0;
+    RTC_SR  = 0;
     RTC_TSR = 0;
-
-    // Put Your Code...
   }
-
-  if (RTC_SR & RTC_SR_TOF_MASK) // Count overflow
+  if (RTC_SR & RTC_SR_TOF_MASK) // Counter overflow
   {
-    RTC_SR = 0;
+    RTC_SR  = 0;
     RTC_TSR = 0;
-
-    // Put Your Code...
   }
-
-  if (RTC_SR & RTC_SR_TAF_MASK) // Alarm
+  if (RTC_SR & RTC_SR_TAF_MASK) // Alarm triggered
   {
     RTC_TAR = 0;
-
-    // Put Your Code...
   }
   enable_irq(RTC_IRQn);
 }

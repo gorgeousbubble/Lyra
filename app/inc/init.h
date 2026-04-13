@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       init.h
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @brief      System and peripheral initialization
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -15,15 +15,8 @@
 
 #include "common.h"
 
-/*
-**variate declaration
-*/
-
-/*
-**function declaration
-*/
-extern void Interrupt_Init(void);
-extern void AllInit(void);
-extern void ReadConf(void);
+extern void Interrupt_Init(void); // Configure and enable PIT0, PIT1, RTC interrupts
+extern void AllInit(void);        // Full system initialization (call once at startup)
+extern void ReadConf(void);       // Load persistent configuration from E2PROM
 
 #endif

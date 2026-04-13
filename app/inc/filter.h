@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       filter.h
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @brief      MPU6050 Kalman filter and complementary filter structures
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -15,70 +15,63 @@
 
 #include "common.h"
 
-// Kalman filter structure
+// Kalman filter state (2-state: angle + gyro bias)
 typedef struct
 {
-    float dt;      // Sample time
-    float angle_f; // Filtered angle
-    float angle_m; // Measuring angles
-    float wb_m;    // Angular velocity measurement
-    float wb_f;    // After angular velocity filtering
-    float q_bias;  // Angular velocity offset
-    float P[2][2]; // Covariance matrix
-    float Q_angle; // Process noise covariance (angle)
-    float Q_gyro;  // Process noise covariance (gyroscope)
-    float R_angle; // Measurement noise covariance
+    float dt;      // Sample period (s)
+    float angle_f; // Filtered angle output (degrees)
+    float angle_m; // Reserved
+    float wb_m;    // Reserved
+    float wb_f;    // Reserved
+    float q_bias;  // Estimated gyro bias (degrees/s)
+    float P[2][2]; // Error covariance matrix
+    float Q_angle; // Process noise: angle state
+    float Q_gyro;  // Process noise: gyro bias state
+    float R_angle; // Measurement noise
 } KalmanFilter;
 
-// Complementary filter structure (single axis)
+// Single-axis complementary filter state
 typedef struct
 {
     float angle;     // Filtered angle (degrees)
-    float acc_angle; // Accelerometer raw angle (degrees, before filtering)
-    float alpha;     // Complementary coefficient (0~1, weight for gyro integration)
-    float dt;        // Sample time (seconds)
+    float acc_angle; // Raw accelerometer angle before fusion (degrees)
+    float alpha;     // Gyro weight [0,1]; higher = smoother but slower response
+    float dt;        // Sample period (s)
 } ComplementaryFilter;
 
-// Yaw gyro integration structure (no accelerometer reference)
+// Yaw axis: gyro integration only (no absolute reference)
 typedef struct
 {
-    float angle; // Integrated yaw angle (degrees)
-    float dt;    // Sample time (seconds)
+    float angle; // Integrated yaw angle (degrees, drifts over time)
+    float dt;    // Sample period (s)
 } YawIntegrator;
 
-// Gyro zero-bias calibration structure
+// Gyro zero-bias calibration state
 typedef struct
 {
-    float bias_x;     // X-axis gyro bias (°/s)
-    float bias_y;     // Y-axis gyro bias (°/s)
-    float bias_z;     // Z-axis gyro bias (°/s)
-    float sum_x;      // Accumulator for calibration
+    float bias_x;     // Calibrated X-axis bias (degrees/s)
+    float bias_y;     // Calibrated Y-axis bias (degrees/s)
+    float bias_z;     // Calibrated Z-axis bias (degrees/s)
+    float sum_x;      // Accumulator (cleared by Fusion_Init)
     float sum_y;
     float sum_z;
-    int   count;      // Sample count
-    uint8 calibrated; // Calibration done flag
+    int   count;      // Samples collected so far
+    uint8 calibrated; // 1 = calibration complete
 } GyroBias;
 
-// Fusion filter structure (pitch & roll complementary + yaw gyro integration)
+// Full fusion filter: pitch + roll (complementary) + yaw (gyro integration)
 typedef struct
 {
-    ComplementaryFilter pitch; // Pitch axis filter
-    ComplementaryFilter roll;  // Roll axis filter
-    YawIntegrator yaw;         // Yaw axis (gyro integration only)
-    GyroBias gyro_bias;        // Gyro zero-bias calibration
+    ComplementaryFilter pitch;
+    ComplementaryFilter roll;
+    YawIntegrator       yaw;
+    GyroBias            gyro_bias;
 } FusionFilter;
 
-/*
-**variate declaration
-*/
-
-/*
-**function declaration
-*/
-extern void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
+extern void  Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
-extern void Fusion_Init(FusionFilter *ff, float alpha, float dt);
-extern void Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz);
-extern void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int16 gy, int16 gz);
+extern void  Fusion_Init(FusionFilter *ff, float alpha, float dt);
+extern void  Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz);
+extern void  Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int16 gy, int16 gz);
 
 #endif

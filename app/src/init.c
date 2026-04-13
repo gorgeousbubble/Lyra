@@ -123,9 +123,9 @@ void AllInit(void)
   RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
 
   /*
-  **Kalman Filter (Fusion Filter)
+  **Complementary filter: alpha=0.93 (93% gyro, 7% accel), dt=0.01s (100Hz)
   */
-  Fusion_Init(&FF, 0.93f, 0.01f); // Initialize Complementary Filter with alpha = 0.93 and dt = 0.01s
+  Fusion_Init(&FF, 0.93f, 0.01f);
 
   /*
   **Interrupts
