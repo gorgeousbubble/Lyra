@@ -2077,12 +2077,11 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClo
 
 /*
  *  @brief      Render_Configure_Adjust_List_Mode_Item
- *  @param      uint8* array        OUT   Pointer to the array to store the clock digit coordinates
  *  @param      const Coord *item   IN    Pointer to the item coordinate array
  *  @param      const int itemLen   IN    Length of the item coordinate array
  *  @return     void
  *  @since      v1.0
- * Sample usage:       Render_Configure_Adjust_List_Mode_Item(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+ *  Sample usage:       Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Clock_icon_coordinate, LCM_ConfigureAdjust_Clock_icon_coordinate_length);
 */
 void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen)
 {
@@ -2095,12 +2094,15 @@ void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen
 
 /*
  *  @brief      Render_Configure_Adjust_Clock_Digit
- *  @param      uint8* array        OUT   Pointer to the array to store the clock digit coordinates
- *  @param      const Coord *item   IN    Pointer to the item coordinate array
- *  @param      const int itemLen   IN    Length of the item coordinate array
+ *  @param      const Coord *digit  IN    Pointer to the digit coordinate array
+ *  @param      const int digitLen  IN    Length of the digit coordinate array
+ *  @param      int hour            IN    Current hour
+ *  @param      int minute          IN    Current minute
+ *  @param      int second          IN    Current second
+ *  @param      int number          IN    Currently editing digit index (0-5)
  *  @return     void
  *  @since      v1.0
- * Sample usage:       Render_Configure_Adjust_Clock_Digit(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+ *  Sample usage:       Render_Configure_Adjust_Clock_Digit(LCM_ConfigureAdjust_Clock_Digit_coordinate, LCM_ConfigureAdjust_Clock_Digit_coordinate_length, 10, 30, 0, 0);
 */
 void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen, int hour, int minute, int second, int number)
 {
@@ -2113,12 +2115,15 @@ void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen,
 
 /*
  *  @brief      Render_Configure_Adjust_Date_Digit
- *  @param      uint8* array        OUT   Pointer to the array to store the clock digit coordinates
- *  @param      const Coord *item   IN    Pointer to the item coordinate array
- *  @param      const int itemLen   IN    Length of the item coordinate array
+ *  @param      const Coord *digit  IN    Pointer to the digit coordinate array
+ *  @param      const int digitLen  IN    Length of the digit coordinate array
+ *  @param      int year            IN    Current year
+ *  @param      int month           IN    Current month
+ *  @param      int day             IN    Current day
+ *  @param      int number          IN    Currently editing digit index (0-7)
  *  @return     void
  *  @since      v1.0
- * Sample usage:       Render_Configure_Adjust_Date_Digit(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+ *  Sample usage:       Render_Configure_Adjust_Date_Digit(LCM_ConfigureAdjust_Date_Digit_coordinate, LCM_ConfigureAdjust_Date_Digit_coordinate_length, 2025, 1, 1, 0);
 */
 void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, int year, int month, int day, int number)
 {
@@ -2131,12 +2136,11 @@ void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, 
 
 /*
  *  @brief      Render_Configure_Adjust_Tense_Digit
- *  @param      uint8* array        OUT   Pointer to the array to store the clock digit coordinates
- *  @param      const Coord *item   IN    Pointer to the item coordinate array
- *  @param      const int itemLen   IN    Length of the item coordinate array
+ *  @param      const Coord *digit  IN    Pointer to the tense icon coordinate array
+ *  @param      const int digitLen  IN    Length of the tense icon coordinate array
  *  @return     void
  *  @since      v1.0
- * Sample usage:       Render_Configure_Adjust_Tense_Digit(&array, LCM_Configure_Adjust_List_Mode_Item_coordinate, LCM_Configure_Adjust_List_Mode_Item_coordinate_length);
+ *  Sample usage:       Render_Configure_Adjust_Tense_Digit(LCM_ConfigureAdjust_Tense_24_icon_coordinate, LCM_ConfigureAdjust_Tense_24_icon_coordinate_length);
 */
 void Render_Configure_Adjust_Tense_Digit(const Coord *digit, const int digitLen)
 {
@@ -2148,11 +2152,12 @@ void Render_Configure_Adjust_Tense_Digit(const Coord *digit, const int digitLen)
 }
 
 /*
- *  @brief      Save_Alarm_Clock_Time_To_List
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @brief      Add_Alarm_Clock_Time_To_List
+ *  @param      int hour    IN    Hour of the alarm (0-23)
+ *  @param      int minute  IN    Minute of the alarm (0-59)
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+ *  Sample usage:       Add_Alarm_Clock_Time_To_List(7, 30);
 */
 void Add_Alarm_Clock_Time_To_List(int hour, int minute)
 {
@@ -2180,10 +2185,12 @@ void Add_Alarm_Clock_Time_To_List(int hour, int minute)
 
 /*
  *  @brief      Mod_Alarm_Clock_Time_To_List
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @param      int index   IN    Zero-based index of the alarm to modify
+ *  @param      int hour    IN    New hour (0-23)
+ *  @param      int minute  IN    New minute (0-59)
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Mod_Alarm_Clock_Edit(10,15,90);
+ *  Sample usage:       Mod_Alarm_Clock_Time_To_List(0, 8, 0);
 */
 void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute)
 {
@@ -2204,10 +2211,10 @@ void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute)
 
 /*
  *  @brief      Del_Alarm_Clock_Time_From_List
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @param      int index   IN    Zero-based index of the alarm to delete
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+ *  Sample usage:       Del_Alarm_Clock_Time_From_List(0);
 */
 void Del_Alarm_Clock_Time_From_List(int index)
 {
@@ -2235,11 +2242,12 @@ void Del_Alarm_Clock_Time_From_List(int index)
 
 /*
  *  @brief      Get_Alarm_Clock_Time_From_List
- *  @param      int             index           index of the alarm clock time in the list
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @param      int index       IN    Zero-based index of the alarm to retrieve
+ *  @param      int *hour       OUT   Pointer to store the retrieved hour
+ *  @param      int *minute     OUT   Pointer to store the retrieved minute
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Get_Alarm_Clock_List_Len(10,15,90);
+ *  Sample usage:       Get_Alarm_Clock_Time_From_List(0, &hour, &minute);
 */
 void Get_Alarm_Clock_Time_From_List(int index, int* hour, int* minute)
 {
@@ -2262,10 +2270,9 @@ void Get_Alarm_Clock_Time_From_List(int index, int* hour, int* minute)
 
 /*
  *  @brief      Get_Alarm_Clock_List_Len
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @return     int   Number of alarms currently in the list
  *  @since      v1.0
- *  Sample usage:       Get_Alarm_Clock_List_Len(10,15,90);
+ *  Sample usage:       int len = Get_Alarm_Clock_List_Len();
 */
 int Get_Alarm_Clock_List_Len()
 {
@@ -2281,10 +2288,9 @@ int Get_Alarm_Clock_List_Len()
 
 /*
  *  @brief      Clean_Alarm_Clock_List
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+ *  Sample usage:       Clean_Alarm_Clock_List();
 */
 void Clean_Alarm_Clock_List()
 {
@@ -2300,10 +2306,9 @@ void Clean_Alarm_Clock_List()
 
 /*
  *  @brief      Write_Alarm_Clock_List_To_E2PROM
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Save_Alarm_Clock_Edit(10,15,90);
+ *  Sample usage:       Write_Alarm_Clock_List_To_E2PROM();
 */
 void Write_Alarm_Clock_List_To_E2PROM()
 {
@@ -2329,10 +2334,9 @@ void Write_Alarm_Clock_List_To_E2PROM()
 
 /*
  *  @brief      Read_Alarm_Clock_E2PROM_To_List
- *  @param      int             hour            hour integer parameter
- *  @param      int             minute          minute integer parameter
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Read_Alarm_Clock_E2PROM_To_List(10,15,90);
+ *  Sample usage:       Read_Alarm_Clock_E2PROM_To_List();
 */
 void Read_Alarm_Clock_E2PROM_To_List()
 {
@@ -2362,8 +2366,9 @@ void Read_Alarm_Clock_E2PROM_To_List()
 
 /*
  *  @brief      Write_Configure_Adjust_Tense_Value_To_E2PROM
+ *  @return     void
  *  @since      v1.0
- *  Sample usage:       Write_Configure_Adjust_Tense_Value_To_E2PROM(10,15,90);
+ *  Sample usage:       Write_Configure_Adjust_Tense_Value_To_E2PROM();
 */
 void Write_Configure_Adjust_Tense_Value_To_E2PROM()
 {
@@ -2374,6 +2379,7 @@ void Write_Configure_Adjust_Tense_Value_To_E2PROM()
 
 /*
  *  @brief      Read_Configure_Adjust_Tense_E2PROM_To_Value
+ *  @return     void
  *  @since      v1.0
  *  Sample usage:       Read_Configure_Adjust_Tense_E2PROM_To_Value();
 */
