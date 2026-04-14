@@ -3,8 +3,8 @@
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
  *
- * @file       main.c
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @file       it.c
+ * @brief      Interrupt service routines and shared global variables
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -25,13 +25,19 @@
 #include <time.h>
 
 /*
-**PIT counter
+**PIT0: 1ms tick counter, resets every 100ms
 */
-int PIT0_Count = 0; // PIT0 count
-char PIT0_Flag = 0; // PIT0 flag
+volatile int PIT0_Count = 0;
+char PIT0_Flag = 0; // 100ms cycle flag (0~3 rolling)
 
-int PIT1_Count = 0; // PIT1 count
-char PIT1_Flag = 0; // PIT1 flag
+/*
+**PIT1: 1ms tick counter, resets every 100ms
+**  % 10 == 0 : MPU6050 read + filter (10ms, 100Hz)
+**  % 10 == 5 : MAX30102 read + collect (10ms, 100Hz, 5ms offset)
+**  >= 100    : 100ms periodic tasks
+*/
+volatile int PIT1_Count = 0;
+char PIT1_Flag = 0; // 100ms cycle flag (0~3 rolling)
 
 /*
 **ADC convert
@@ -41,46 +47,13 @@ uint16 ADC_Convert_Result[2] = {0};
 /*
 **MPU6050 sensor
 */
-MPU6050_Sensor MPU6050 = {
+volatile MPU6050_Sensor MPU6050 = {
     .Acc = {0, 0, 0},
     .Gyro = {0, 0, 0}};
 
 MPU6050_Sensor_Norm MPU6050_Norm = {
     .Acc = {0, 0, 0},
     .Gyro = {0, 0, 0}};
-
-/*
-**Kalman Filter
-*/
-KalmanFilter KF_X = {
-    .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.1f,        // Default sampling period of 1ms
-    .Q_angle = 0.001f, // Process noise parameters (angle)
-    .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
-    .R_angle = 0.5f,   // Measure noise parameters
-    .q_bias = 0.0f,    // Initial value of gyroscope offset
-    .angle_f = 0.0f    // Initial Angle
-};
-
-KalmanFilter KF_Y = {
-    .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.1f,        // Default sampling period of 1ms
-    .Q_angle = 0.001f, // Process noise parameters (angle)
-    .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
-    .R_angle = 0.5f,   // Measure noise parameters
-    .q_bias = 0.0f,    // Initial value of gyroscope offset
-    .angle_f = 0.0f    // Initial Angle
-};
-
-KalmanFilter KF_Z = {
-    .P = {{1.0f, 0.0f}, {0.0f, 1.0f}},
-    .dt = 0.1f,        // Default sampling period of 1ms
-    .Q_angle = 0.001f, // Process noise parameters (angle)
-    .Q_gyro = 0.003f,  // Process noise parameters (gyroscope)
-    .R_angle = 0.5f,   // Measure noise parameters
-    .q_bias = 0.0f,    // Initial value of gyroscope offset
-    .angle_f = 0.0f    // Initial Angle
-};
 
 /*
 **Fusion Filter (Complementary Filter for Pitch & Roll)
@@ -100,8 +73,8 @@ Angle MPU6050_Angle = {
 /*
 **RTC counter
 */
-uint32 RTC_Count = 0;
-RTC_Time RTC_Time_Now = {
+volatile uint32 RTC_Count = 0;
+volatile RTC_Time RTC_Time_Now = {
     .Year = 0,
     .Month = 0,
     .Day = 0,
@@ -112,19 +85,19 @@ RTC_Time RTC_Time_Now = {
 /*
 **MAX30102 counter
 */
-uint32 MAX30102_RED = 0;
-uint32 MAX30102_IR = 0;
+volatile uint32 MAX30102_RED = 0;
+volatile uint32 MAX30102_IR = 0;
 
 /*
 **Stop Watch counter
 */
-Stop_Watch_Time Stop_Watch_Now = {
+volatile Stop_Watch_Time Stop_Watch_Now = {
     .Minute = 0,
     .Second = 0,
     .Centisecond = 0};
 
-int Stop_Watch_Count = 0; // Stop Watch count
-int Stop_Watch_State = 0; // Stop Watch state (0: stop, 1: start)
+volatile int Stop_Watch_Count = 0; // Stop Watch count
+volatile int Stop_Watch_State = 0; // Stop Watch state (0: stop, 1: start)
 volatile uint8 UART_Send_Flag = 0; // UART send flag (set in PIT1, cleared in main)
 
 /*
@@ -137,9 +110,6 @@ void PORTC_PTC19_IRQHandler(void)
   {
     IRQ_CLEAR(C, 19);
     disable_irq(PORTC_IRQn);
-
-    // Put Your Code...
-
     IRQ_CLEAR(C, 19);
     enable_irq(PORTC_IRQn);
   }
@@ -155,9 +125,6 @@ void PORTD_PTD15_IRQHandler(void)
   {
     IRQ_CLEAR(D, 15);
     disable_irq(PORTD_IRQn);
-
-    // Put Your Code...
-
     IRQ_CLEAR(D, 15);
     enable_irq(PORTD_IRQn);
   }
@@ -172,7 +139,7 @@ void PIT0_IRQHandler(void)
   PIT_Flag_Clear(PIT0);
   disable_irq(PIT0_IRQn);
 
-  // Put Your Code...
+  // Stopwatch centisecond tick (called every 1ms, increments every 10ms)
   if (Stop_Watch_State)
   {
     Stop_Watch_Count++;
@@ -197,15 +164,10 @@ void PIT0_IRQHandler(void)
     }
   }
 
-  // Put Your Code...
   PIT0_Count++;
 
-  if (PIT0_Count > 100)
-  {
-    PIT0_Count = 100;
-  }
-
-  if (PIT0_Count == 100)
+  // 100ms periodic tasks: LED blink, ADC, RTC update
+  if (PIT0_Count >= 100)
   {
     PIT0_Count = 0;
 
@@ -243,16 +205,9 @@ void PIT1_IRQHandler(void)
   PIT_Flag_Clear(PIT1);
   disable_irq(PIT1_IRQn);
 
-  // Put Your Code...
-
   PIT1_Count++;
 
-  if (PIT1_Count > 100)
-  {
-    PIT1_Count = 100;
-  }
-
-  // Sample period of 10ms
+  // Sample period of 10ms: MPU6050 read + filter
   if (PIT1_Count % 10 == 0)
   {
     // MPU6050 sensor data read
@@ -266,31 +221,40 @@ void PIT1_IRQHandler(void)
     // Gyro calibration (first 2 seconds after power-on, sensor must be stationary)
     if (!FF.gyro_bias.calibrated)
     {
-      Fusion_Calibrate(&FF, MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
+      int16 gx = MPU6050.Gyro.X;
+      int16 gy = MPU6050.Gyro.Y;
+      int16 gz = MPU6050.Gyro.Z;
+      Fusion_Calibrate(&FF, gx, gy, gz);
     }
     else
     {
-      // Complementary filter processing (pitch, roll & yaw)
-      Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
+      int16 ax = MPU6050.Acc.X;
+      int16 ay = MPU6050.Acc.Y;
+      int16 az = MPU6050.Acc.Z;
+      int16 gx = MPU6050.Gyro.X;
+      int16 gy = MPU6050.Gyro.Y;
+      int16 gz = MPU6050.Gyro.Z;
+      Fusion_Filter(&FF, ax, ay, az, gx, gy, gz);
     }
     UART_Send_Flag = 1; // Signal main loop to send data
   }
 
   // MAX30102 read on odd 10ms ticks (5ms offset from MPU6050)
-  // This spreads I2C load across time, preventing ISR overrun
   if (PIT1_Count % 10 == 5)
   {
-    MAX30102_ReadFIFO(&MAX30102_RED, &MAX30102_IR);
-    Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(MAX30102_RED, MAX30102_IR);
+    uint32 red = 0, ir = 0;
+    MAX30102_ReadFIFO(&red, &ir);
+    MAX30102_RED = red;
+    MAX30102_IR  = ir;
+    Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(red, ir);
   }
 
   // Sample period of 100ms
-  if (PIT1_Count == 100)
+  if (PIT1_Count >= 100)
   {
     PIT1_Count = 0;
 
     PIT1_Flag++;
-
     if (PIT1_Flag > 3)
     {
       PIT1_Flag = 0;
@@ -308,27 +272,19 @@ void PIT1_IRQHandler(void)
 void RTC_IRQHandler(void)
 {
   disable_irq(RTC_IRQn);
-  if (RTC_SR & RTC_SR_TIF_MASK) // Invalid settings
+  if (RTC_SR & RTC_SR_TIF_MASK) // Time invalid
   {
-    RTC_SR = 0;
+    RTC_SR  = 0;
     RTC_TSR = 0;
-
-    // Put Your Code...
   }
-
-  if (RTC_SR & RTC_SR_TOF_MASK) // Count overflow
+  if (RTC_SR & RTC_SR_TOF_MASK) // Counter overflow
   {
-    RTC_SR = 0;
+    RTC_SR  = 0;
     RTC_TSR = 0;
-
-    // Put Your Code...
   }
-
-  if (RTC_SR & RTC_SR_TAF_MASK) // Alarm
+  if (RTC_SR & RTC_SR_TAF_MASK) // Alarm triggered
   {
     RTC_TAR = 0;
-
-    // Put Your Code...
   }
   enable_irq(RTC_IRQn);
 }

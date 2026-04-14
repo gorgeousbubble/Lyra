@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       it.h
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @brief      ISR declarations and shared global variables
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -17,6 +17,7 @@
 #include "filter.h"
 #include "vectors.h"
 
+// Interrupt vector table bindings
 #undef VECTOR_077
 #define VECTOR_077 PORTC_PTC19_IRQHandler
 
@@ -32,56 +33,20 @@
 #undef VECTOR_062
 #define VECTOR_062 RTC_IRQHandler
 
-/*
-**variate definition
-*/
-typedef struct
-{
-  int16 X;
-  int16 Y;
-  int16 Z;
-} ACC;
+// MPU6050 raw sensor data (written by PIT1 ISR, read by main loop)
+typedef struct { int16 X; int16 Y; int16 Z; } ACC;
+typedef struct { int16 X; int16 Y; int16 Z; } GYRO;
+typedef struct { ACC Acc; GYRO Gyro; } MPU6050_Sensor;
 
-typedef struct
-{
-  int16 X;
-  int16 Y;
-  int16 Z;
-} GYRO;
+// MPU6050 normalized data (reserved, not currently used)
+typedef struct { float X; float Y; float Z; } ACC_Norm;
+typedef struct { float X; float Y; float Z; } GYRO_Norm;
+typedef struct { ACC_Norm Acc; GYRO_Norm Gyro; } MPU6050_Sensor_Norm;
 
-typedef struct
-{
-  ACC Acc;
-  GYRO Gyro;
-} MPU6050_Sensor;
+// Euler angles computed from filter output (reserved)
+typedef struct { float Angle_X; float Angle_Y; float Angle_Z; } Angle;
 
-typedef struct
-{
-  float X;
-  float Y;
-  float Z;
-} ACC_Norm;
-
-typedef struct
-{
-  float X;
-  float Y;
-  float Z;
-} GYRO_Norm;
-
-typedef struct
-{
-  ACC_Norm Acc;
-  GYRO_Norm Gyro;
-} MPU6050_Sensor_Norm;
-
-typedef struct
-{
-  float Angle_X; // Angle X
-  float Angle_Y; // Angle Y
-  float Angle_Z; // Angle Z
-} Angle;
-
+// RTC calendar time (written by PIT0 ISR every 100ms)
 typedef struct
 {
   int Year;
@@ -92,7 +57,7 @@ typedef struct
   int Second;
 } RTC_Time;
 
-// stop watch time
+// Stopwatch elapsed time (written by PIT0 ISR every 1ms)
 typedef struct
 {
   int Minute;
@@ -100,31 +65,24 @@ typedef struct
   int Centisecond;
 } Stop_Watch_Time;
 
-/*
-**variate declaration
-*/
-extern int PIT0_Count;                   // PIT0 counter
-extern int PIT1_Count;                   // PIT1 counter
-extern uint16 ADC_Convert_Result[2];     // ADC sample
-extern MPU6050_Sensor MPU6050;           // MPU6050
-extern MPU6050_Sensor_Norm MPU6050_Norm; // MPU6050 normalized data
-extern Angle MPU6050_Angle;              // MPU6050 angle
-extern KalmanFilter KF_X;                // Kalman Filter X
-extern KalmanFilter KF_Y;                // Kalman Filter Y
-extern KalmanFilter KF_Z;                // Kalman Filter Z
-extern FusionFilter FF;                  // Fusion Filter (Pitch & Roll)
-extern uint32 RTC_Count;
-extern RTC_Time RTC_Time_Now;
-extern uint32 MAX30102_RED;
-extern uint32 MAX30102_IR;
-extern Stop_Watch_Time Stop_Watch_Now;
-extern int Stop_Watch_Count;
-extern int Stop_Watch_State;
-extern volatile uint8 UART_Send_Flag;
+// --- Shared variables (volatile: written in ISR, read in main loop) ---
+extern volatile int            PIT0_Count;          // 1ms tick, resets every 100ms
+extern volatile int            PIT1_Count;          // 1ms tick, resets every 100ms
+extern          uint16         ADC_Convert_Result[2];
+extern volatile MPU6050_Sensor MPU6050;
+extern          MPU6050_Sensor_Norm MPU6050_Norm;   // Reserved
+extern          Angle          MPU6050_Angle;        // Reserved
+extern          FusionFilter   FF;                   // Complementary filter state
+extern volatile uint32         RTC_Count;
+extern volatile RTC_Time       RTC_Time_Now;
+extern volatile uint32         MAX30102_RED;
+extern volatile uint32         MAX30102_IR;
+extern volatile Stop_Watch_Time Stop_Watch_Now;
+extern volatile int            Stop_Watch_Count;
+extern volatile int            Stop_Watch_State;    // 0=stopped, 1=running
+extern volatile uint8          UART_Send_Flag;       // Set by PIT1, cleared by main
 
-/*
-**function declaration
-*/
+// ISR function declarations
 extern void PORTC_PTC19_IRQHandler(void);
 extern void PORTD_PTD15_IRQHandler(void);
 extern void PIT0_IRQHandler(void);

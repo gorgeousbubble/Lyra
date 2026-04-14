@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       filter.c
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @brief      MPU6050 Kalman filter and complementary filter implementation
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -14,78 +14,95 @@
 #include "mpu6050.h"
 #include <math.h>
 
-// Initialize Kalman filter
+/*
+ * Kalman filter initialization
+ * p        : initial covariance matrix (2x2)
+ * dt       : sample period in seconds
+ * q_angle  : process noise for angle state
+ * q_gyro   : process noise for gyro bias state
+ * r_angle  : measurement noise
+ */
 void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle)
 {
     kf->P[0][0] = p[0][0];
     kf->P[0][1] = p[0][1];
     kf->P[1][0] = p[1][0];
     kf->P[1][1] = p[1][1];
-    kf->dt = dt;           // Default sampling period of 1ms
-    kf->Q_angle = q_angle; // Process noise parameters (angle)
-    kf->Q_gyro = q_gyro;   // Process noise parameters (gyroscope)
-    kf->R_angle = r_angle; // Measure noise parameters
-    kf->q_bias = 0.0f;     // Initial value of gyroscope offset
-    kf->angle_f = 0.0f;    // Initial Angle
+    kf->dt      = dt;
+    kf->Q_angle = q_angle;
+    kf->Q_gyro  = q_gyro;
+    kf->R_angle = r_angle;
+    kf->q_bias  = 0.0f;
+    kf->angle_f = 0.0f;
 }
 
-// Kalman filter calculation
+/*
+ * Kalman filter update
+ * angle_m : angle measured by accelerometer (degrees)
+ * gyro_m  : angular velocity measured by gyroscope (degrees/s)
+ * returns : filtered angle (degrees)
+ */
 float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
 {
-    // Prediction stage
+    // Predict
     kf->angle_f += (gyro_m - kf->q_bias) * kf->dt;
     kf->P[0][0] += kf->dt * (kf->dt * kf->P[1][1] - kf->P[0][1] - kf->P[1][0] + kf->Q_angle);
     kf->P[0][1] -= kf->dt * kf->P[1][1];
     kf->P[1][0] -= kf->dt * kf->P[1][1];
     kf->P[1][1] += kf->Q_gyro * kf->dt;
 
-    // Updating phase
+    // Update
     float angle_err = angle_m - kf->angle_f;
-    float S = kf->P[0][0] + kf->R_angle;
-    float K[2];
-    K[0] = kf->P[0][0] / S;
-    K[1] = kf->P[1][0] / S;
+    float S  = kf->P[0][0] + kf->R_angle;
+    float K0 = kf->P[0][0] / S;
+    float K1 = kf->P[1][0] / S;
 
-    // Status update
-    kf->angle_f += K[0] * angle_err;
-    kf->q_bias += K[1] * angle_err;
+    kf->angle_f += K0 * angle_err;
+    kf->q_bias  += K1 * angle_err;
 
-    // Covariance update
-    float P00_temp = kf->P[0][0];
-    float P01_temp = kf->P[0][1];
-    kf->P[0][0] -= K[0] * P00_temp;
-    kf->P[0][1] -= K[0] * P01_temp;
-    kf->P[1][0] -= K[1] * P00_temp;
-    kf->P[1][1] -= K[1] * P01_temp;
+    float P00 = kf->P[0][0];
+    float P01 = kf->P[0][1];
+    kf->P[0][0] -= K0 * P00;
+    kf->P[0][1] -= K0 * P01;
+    kf->P[1][0] -= K1 * P00;
+    kf->P[1][1] -= K1 * P01;
 
     return kf->angle_f;
 }
 
-// Initialize Fusion filter (complementary filter)
+/*
+ * Complementary filter initialization
+ * alpha : gyro weight (0~1), recommended 0.93~0.98
+ * dt    : sample period in seconds
+ */
 void Fusion_Init(FusionFilter *ff, float alpha, float dt)
 {
-    ff->pitch.angle = 0.0f;
+    ff->pitch.angle     = 0.0f;
     ff->pitch.acc_angle = 0.0f;
-    ff->pitch.alpha = alpha;
-    ff->pitch.dt = dt;
-    ff->roll.angle = 0.0f;
-    ff->roll.acc_angle = 0.0f;
-    ff->roll.alpha = alpha;
-    ff->roll.dt = dt;
-    ff->yaw.angle = 0.0f;
-    ff->yaw.dt = dt;
-    ff->gyro_bias.bias_x = 0.0f;
-    ff->gyro_bias.bias_y = 0.0f;
-    ff->gyro_bias.bias_z = 0.0f;
-    ff->gyro_bias.sum_x  = 0.0f;
-    ff->gyro_bias.sum_y  = 0.0f;
-    ff->gyro_bias.sum_z  = 0.0f;
-    ff->gyro_bias.count  = 0;
+    ff->pitch.alpha     = alpha;
+    ff->pitch.dt        = dt;
+    ff->roll.angle      = 0.0f;
+    ff->roll.acc_angle  = 0.0f;
+    ff->roll.alpha      = alpha;
+    ff->roll.dt         = dt;
+    ff->yaw.angle       = 0.0f;
+    ff->yaw.dt          = dt;
+    ff->gyro_bias.bias_x     = 0.0f;
+    ff->gyro_bias.bias_y     = 0.0f;
+    ff->gyro_bias.bias_z     = 0.0f;
+    ff->gyro_bias.sum_x      = 0.0f;
+    ff->gyro_bias.sum_y      = 0.0f;
+    ff->gyro_bias.sum_z      = 0.0f;
+    ff->gyro_bias.count      = 0;
     ff->gyro_bias.calibrated = 0;
 }
 
-// Gyro zero-bias calibration (call multiple times while sensor is stationary)
-// Averages N samples to determine gyro offset
+/*
+ * Gyroscope zero-bias calibration
+ * Call repeatedly at 100Hz while sensor is stationary.
+ * Collects GYRO_CALIB_SAMPLES samples (2 seconds) then computes average bias.
+ * Sets calibrated flag when done; subsequent calls are no-ops.
+ */
 #define GYRO_CALIB_SAMPLES 200
 void Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz)
 {
@@ -105,64 +122,69 @@ void Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz)
     }
 }
 
-// Normalize angle to [-180, 180) range
+// Wrap angle into [-180, 180) using fmodf. Guards against NaN/infinity.
 static float Normalize_Angle(float angle)
 {
-    while (angle > 180.0f)  angle -= 360.0f;
-    while (angle <= -180.0f) angle += 360.0f;
-    return angle;
+    if (angle != angle || angle > 1e9f || angle < -1e9f)
+        return 0.0f;
+    angle = fmodf(angle + 180.0f, 360.0f);
+    if (angle < 0.0f)
+        angle += 360.0f;
+    return angle - 180.0f;
 }
 
-// Complementary filter for single axis
-// Uses shortest-path correction to avoid ±180° boundary jump
+/*
+ * Single-axis complementary filter update with shortest-path correction.
+ * Predicts with gyro, then corrects toward accelerometer angle via the
+ * shortest angular path to avoid jumps at the ±180° boundary.
+ */
 static float Complementary_Update(float prev_angle, float acc_angle, float gyro_dps, float alpha, float dt)
 {
-    // Gyro prediction
     float predicted = prev_angle + gyro_dps * dt;
-
-    // Shortest-path error from acc (handles ±180° wrap-around)
-    float err = Normalize_Angle(acc_angle - predicted);
-
-    // Correction: blend gyro prediction with acc error
+    float err       = Normalize_Angle(acc_angle - predicted);
     return Normalize_Angle(predicted + (1.0f - alpha) * err);
 }
 
-// Fusion filter calculation (complementary filter)
-// Input: raw MPU6050 accelerometer (ax, ay, az) and gyroscope (gx, gy, gz) values
-// Assumes: accel range ±2g (16384 LSB/g), gyro range ±250°/s (131 LSB/°/s)
+/*
+ * Complementary filter update for pitch, roll and yaw.
+ *
+ * Input (raw MPU6050 values):
+ *   ax, ay, az : accelerometer  (±2g range, 16384 LSB/g)
+ *   gx, gy, gz : gyroscope      (±250°/s range, 131 LSB/°/s)
+ *
+ * Pitch and roll use accelerometer + gyro fusion.
+ * Yaw uses gyro integration only (no absolute reference without magnetometer).
+ * Accelerometer data is rejected when magnitude deviates >50% from 1g
+ * (free-fall or strong vibration), falling back to gyro-only integration.
+ */
 void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int16 gy, int16 gz)
 {
     float fax = (float)ax;
     float fay = (float)ay;
     float faz = (float)az;
 
-    // Convert gyroscope raw data to °/s and subtract bias
     float gyro_pitch = (float)gy / GYRO_RANGE_250 - ff->gyro_bias.bias_y;
     float gyro_roll  = (float)gx / GYRO_RANGE_250 - ff->gyro_bias.bias_x;
     float gyro_yaw   = (float)gz / GYRO_RANGE_250 - ff->gyro_bias.bias_z;
 
-    // Reject invalid accelerometer data (free-fall or extreme vibration)
+    // Reject accelerometer when magnitude is far from 1g
     float acc_mag = sqrtf(fax * fax + fay * fay + faz * faz);
     if (acc_mag < ACCEL_RANGE_2G * 0.5f || acc_mag > ACCEL_RANGE_2G * 1.5f)
     {
         ff->pitch.angle = Normalize_Angle(ff->pitch.angle + gyro_pitch * ff->pitch.dt);
         ff->roll.angle  = Normalize_Angle(ff->roll.angle  + gyro_roll  * ff->roll.dt);
-        ff->yaw.angle   += gyro_yaw * ff->yaw.dt;
+        ff->yaw.angle  += gyro_yaw * ff->yaw.dt;
         return;
     }
 
-    // Calculate angles from accelerometer using atan2
+    // atan2(-ax, az) gives continuous ±180° pitch; atan2(ay, az) gives roll
     float acc_pitch = atan2f(-fax, faz) * RAD_TO_DEG;
-    float acc_roll  = atan2f(fay, faz)  * RAD_TO_DEG;
+    float acc_roll  = atan2f(fay,  faz) * RAD_TO_DEG;
 
-    // Save raw accelerometer angles for comparison
     ff->pitch.acc_angle = acc_pitch;
     ff->roll.acc_angle  = acc_roll;
 
-    // Complementary filter with wrap-around handling
     ff->pitch.angle = Complementary_Update(ff->pitch.angle, acc_pitch, gyro_pitch, ff->pitch.alpha, ff->pitch.dt);
     ff->roll.angle  = Complementary_Update(ff->roll.angle,  acc_roll,  gyro_roll,  ff->roll.alpha,  ff->roll.dt);
-
-    // Yaw: pure gyro integration (no accelerometer reference)
-    ff->yaw.angle += gyro_yaw * ff->yaw.dt;
+    ff->yaw.angle  += gyro_yaw * ff->yaw.dt;
 }

@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       health.c
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @brief      MAX30102 heart rate and SpO2 measurement
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -16,15 +16,15 @@
 #include "max30102.h"
 #include "max30102_algo.h"
 
-// Static ring buffers (no malloc, no fragmentation)
-static RingBuffer IR_Buff = {0};
+// IR and RED channel ring buffers (static, no heap allocation)
+static RingBuffer IR_Buff  = {0};
 static RingBuffer RED_Buff = {0};
 
-int32 SPO2 = 0;
-int32 Heart_Rate = 0;
-uint32 RD_Duty = 0;
+int32  SPO2       = 0;
+int32  Heart_Rate = 0;
+uint32 RD_Duty    = 0;
 
-// Add a sample to ring buffer
+// Write one sample into the ring buffer (overwrites oldest when full)
 static void RingBuffer_Add(RingBuffer *rb, uint32 data)
 {
     rb->data[rb->head] = data;
@@ -33,16 +33,14 @@ static void RingBuffer_Add(RingBuffer *rb, uint32 data)
         rb->count++;
 }
 
-// Get sample by index (0 = oldest)
+// Read sample at logical index (0 = oldest, count-1 = newest)
 static uint32 RingBuffer_Get(RingBuffer *rb, int index)
 {
     int pos = (rb->head - rb->count + index + HEALTH_BUFFER_SIZE) % HEALTH_BUFFER_SIZE;
     return rb->data[pos];
 }
 
-/*
-**heart rate and oxygen saturation sensor initialization
-*/
+// Initialize MAX30102 sensor and health-related GPIO ports (IRD LED, INT pin)
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(void)
 {
     MAX30102_PORT_INIT_RD;
@@ -52,49 +50,44 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(void)
 }
 
 /*
-**Collect one sample from MAX30102 (call from ISR at 100Hz)
-*/
+ * Collect one RED/IR sample into the ring buffers.
+ * Call from PIT1 ISR at 100Hz to match the algorithm's expected sample rate.
+ */
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(uint32 red, uint32 ir)
 {
-    RingBuffer_Add(&IR_Buff, ir);
+    RingBuffer_Add(&IR_Buff,  ir);
     RingBuffer_Add(&RED_Buff, red);
 }
 
 /*
-**Run heart rate and SpO2 algorithm (call from main loop, not ISR)
-*/
+ * Run the heart rate and SpO2 algorithm.
+ * Call from the main loop (NOT from ISR) — computation takes several milliseconds.
+ * Does nothing until the ring buffer holds HEALTH_BUFFER_SIZE samples (5 seconds at 100Hz).
+ * Results are written to the global SPO2 and Heart_Rate variables.
+ */
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
 {
-    int32 spo2 = 0;
-    int8 spo2_valid = 0;
-    int32 heart_rate = 0;
-    int8 heart_rate_valid = 0;
+    int32 spo2           = 0;
+    int8  spo2_valid     = 0;
+    int32 heart_rate     = 0;
+    int8  heart_rate_valid = 0;
 
-    // Need full buffer for algorithm
     if (IR_Buff.count < HEALTH_BUFFER_SIZE)
         return;
 
-    // Copy ring buffer to contiguous arrays for algorithm
+    // Copy ring buffer into contiguous arrays required by the algorithm
     static uint32 ir_array[HEALTH_BUFFER_SIZE];
     static uint32 red_array[HEALTH_BUFFER_SIZE];
     for (int i = 0; i < HEALTH_BUFFER_SIZE; i++)
     {
-        ir_array[i] = RingBuffer_Get(&IR_Buff, i);
+        ir_array[i]  = RingBuffer_Get(&IR_Buff,  i);
         red_array[i] = RingBuffer_Get(&RED_Buff, i);
     }
 
-    // Calculate heart rate and SpO2
     maxim_heart_rate_and_oxygen_saturation(
-        ir_array,
-        HEALTH_BUFFER_SIZE,
-        red_array,
-        &spo2,
-        &spo2_valid,
-        &heart_rate,
-        &heart_rate_valid);
+        ir_array, HEALTH_BUFFER_SIZE, red_array,
+        &spo2, &spo2_valid, &heart_rate, &heart_rate_valid);
 
-    if (spo2_valid)
-        SPO2 = spo2;
-    if (heart_rate_valid)
-        Heart_Rate = heart_rate;
+    if (spo2_valid)      SPO2       = spo2;
+    if (heart_rate_valid) Heart_Rate = heart_rate;
 }

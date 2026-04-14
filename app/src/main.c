@@ -123,13 +123,13 @@ void main(void)
 
         for (;;)
         {
-                MAPS_Dock_KEY_Incident();           // Independent button serial port transmission
-                MAPS_Dock_Rocker_Key_LCM_Control(); // LCM display
-                if (UART_Send_Flag)
+                MAPS_Dock_KEY_Incident();            // OLED key handling and display
+                MAPS_Dock_Rocker_Key_LCM_Control();  // LCM rocker key handling and display
+                if (UART_Send_Flag)                  // Send filter data to host (set by PIT1 every 10ms)
                 {
                     UART_Send_Flag = 0;
                     UART_Send_Parameters();
                 }
-                Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(); // SpO2 & HR algorithm (heavy, runs in main loop)
+                Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(); // SpO2/HR algorithm (runs when buffer full)
         }
 }

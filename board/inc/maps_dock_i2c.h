@@ -37,7 +37,7 @@
 */
 extern void MAPS_Dock_24C02_Write_Byte(uint8 Addr, uint8 Data);
 extern uint8 MAPS_Dock_24C02_Read_Byte(uint8 Addr);
-extern void MAPS_Dock_24C02_Write_Buff(uint8 Addr, uint8 *Buff);
+extern void MAPS_Dock_24C02_Write_Buff(uint8 Addr, uint8 *Buff, uint8 Length);
 extern void MAPS_Dock_24C02_Read_Buff(uint8 Addr, uint8 *Buff, uint8 Length);
 
 #endif

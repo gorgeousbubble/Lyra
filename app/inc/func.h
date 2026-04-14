@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       func.h
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @brief      UART data transmission for host-side visualization
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -15,13 +15,7 @@
 
 #include "common.h"
 
-/*
-**variate declaration
-*/
-
-/*
-**function declaration
-*/
+// Send one frame of MPU6050 filter data over UART4 to the host PC
 extern void UART_Send_Parameters(void);
 
 #endif

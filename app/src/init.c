@@ -96,7 +96,7 @@ void AllInit(void)
   // DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
   MPU6050_Init();  // MPU6050 initialization
   Oled_I2C_Init(); // Oled initialization
-  MAX30102_Init(); // MAX30102 initialization
+  Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(); // MAX30102 + health GPIO initialization
   RTC_Init();      // RTC initialization
   Beep_Init();     // Beep initialization
 
@@ -123,9 +123,9 @@ void AllInit(void)
   RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
 
   /*
-  **Kalman Filter (Fusion Filter)
+  **Complementary filter: alpha=0.93 (93% gyro, 7% accel), dt=0.01s (100Hz)
   */
-  Fusion_Init(&FF, 0.93f, 0.01f); // Initialize Complementary Filter with alpha = 0.93 and dt = 0.01s
+  Fusion_Init(&FF, 0.93f, 0.01f);
 
   /*
   **Interrupts
