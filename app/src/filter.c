@@ -95,6 +95,11 @@ void Fusion_Init(FusionFilter *ff, float alpha, float dt)
     ff->gyro_bias.sum_z      = 0.0f;
     ff->gyro_bias.count      = 0;
     ff->gyro_bias.calibrated = 0;
+
+    // Kalman filter initialization (Q_angle=0.001, Q_gyro=0.003, R_angle=0.03)
+    float p_init[2][2] = {{1.0f, 0.0f}, {0.0f, 1.0f}};
+    Kalman_Init(&ff->kf_pitch, p_init, dt, 0.001f, 0.003f, 0.03f);
+    Kalman_Init(&ff->kf_roll,  p_init, dt, 0.001f, 0.003f, 0.03f);
 }
 
 /*
@@ -152,7 +157,8 @@ static float Complementary_Update(float prev_angle, float acc_angle, float gyro_
  *   ax, ay, az : accelerometer  (±2g range, 16384 LSB/g)
  *   gx, gy, gz : gyroscope      (±250°/s range, 131 LSB/°/s)
  *
- * Pitch and roll use accelerometer + gyro fusion.
+ * Pitch and roll use accelerometer + gyro fusion (complementary or Kalman,
+ * selected by FILTER_MODE in filter.h).
  * Yaw uses gyro integration only (no absolute reference without magnetometer).
  * Accelerometer data is rejected when magnitude deviates >50% from 1g
  * (free-fall or strong vibration), falling back to gyro-only integration.
@@ -184,7 +190,12 @@ void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int
     ff->pitch.acc_angle = acc_pitch;
     ff->roll.acc_angle  = acc_roll;
 
+#if FILTER_MODE == FILTER_MODE_KALMAN
+    ff->pitch.angle = Kalman_Filter(&ff->kf_pitch, acc_pitch, gyro_pitch);
+    ff->roll.angle  = Kalman_Filter(&ff->kf_roll,  acc_roll,  gyro_roll);
+#else
     ff->pitch.angle = Complementary_Update(ff->pitch.angle, acc_pitch, gyro_pitch, ff->pitch.alpha, ff->pitch.dt);
     ff->roll.angle  = Complementary_Update(ff->roll.angle,  acc_roll,  gyro_roll,  ff->roll.alpha,  ff->roll.dt);
+#endif
     ff->yaw.angle  += gyro_yaw * ff->yaw.dt;
 }
