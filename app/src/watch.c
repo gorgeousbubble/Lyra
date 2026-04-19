@@ -99,8 +99,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
     // calculate the angle for the number
     float32_t angle = i * 30.0; // 360 degrees / 12 numbers = 30 degrees per number
     // calculate the coordinates for the number
-    uint8 x = (uint8)(64 + 28 * arm_sin_f32(angle * (3.14159265358979323846 / 180.0)));
-    uint8 y = (uint8)(32 - 28 * arm_cos_f32(angle * (3.14159265358979323846 / 180.0)));
+    uint8 x = (uint8)(64 + 28 * arm_sin_f32(angle * DEG_TO_RAD));
+    uint8 y = (uint8)(32 - 28 * arm_cos_f32(angle * DEG_TO_RAD));
     // draw the number (6x8)
     //char ch[12][5] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
     //char ch[12][3] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
@@ -164,8 +164,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
   // the hour hand is 16 pixels long, starting from the center of the clock
   for (int i = 0; i < 16; i++) 
   {
-      uint8 hour_x = (uint8)(64 + (i + 1) * arm_sin_f32(hour_angle * (3.14159265358979323846 / 180.0)));
-      uint8 hour_y = (uint8)(32 - (i + 1) * arm_cos_f32(hour_angle * (3.14159265358979323846 / 180.0)));
+      uint8 hour_x = (uint8)(64 + (i + 1) * arm_sin_f32(hour_angle * DEG_TO_RAD));
+      uint8 hour_y = (uint8)(32 - (i + 1) * arm_cos_f32(hour_angle * DEG_TO_RAD));
       // create a new coordinate node for the hour hand
       CoordNode* hourNode = (CoordNode*)malloc(sizeof(CoordNode));
       hourNode->x = hour_x;
@@ -181,13 +181,13 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
       }
   }
   // add an arrow for the hour hand
-  uint8 bottomhour_x = 64 + (int)(16 * arm_sin_f32(hour_angle * (3.14159265358979323846 / 180.0)));
-  uint8 bottomhour_y = 32 - (int)(16 * arm_cos_f32(hour_angle * (3.14159265358979323846 / 180.0)));
+  uint8 bottomhour_x = 64 + (int)(16 * arm_sin_f32(hour_angle * DEG_TO_RAD));
+  uint8 bottomhour_y = 32 - (int)(16 * arm_cos_f32(hour_angle * DEG_TO_RAD));
   // the arrow is 3 pixels long, starting from the end of the hour hand
   for (int i = 0; i < 3; i++) 
   {
-      uint8 hour_arrow_x = (uint8)(bottomhour_x - (i + 1) * arm_sin_f32((hour_angle-30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 hour_arrow_y = (uint8)(bottomhour_y + (i + 1) * arm_cos_f32((hour_angle-30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 hour_arrow_x = (uint8)(bottomhour_x - (i + 1) * arm_sin_f32((hour_angle-30.0) * DEG_TO_RAD));
+      uint8 hour_arrow_y = (uint8)(bottomhour_y + (i + 1) * arm_cos_f32((hour_angle-30.0) * DEG_TO_RAD));
       // create a new coordinate node for the hour hand arrow
       CoordNode* hourArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       hourArrowNode->x = hour_arrow_x;
@@ -204,8 +204,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
   }
   for (int i = 0; i < 3; i++) 
   {
-      uint8 hour_arrow_x = (uint8)(bottomhour_x - (i + 1) * arm_sin_f32((hour_angle+30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 hour_arrow_y = (uint8)(bottomhour_y + (i + 1) * arm_cos_f32((hour_angle+30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 hour_arrow_x = (uint8)(bottomhour_x - (i + 1) * arm_sin_f32((hour_angle+30.0) * DEG_TO_RAD));
+      uint8 hour_arrow_y = (uint8)(bottomhour_y + (i + 1) * arm_cos_f32((hour_angle+30.0) * DEG_TO_RAD));
       // create a new coordinate node for the hour hand arrow
       CoordNode* hourArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       hourArrowNode->x = hour_arrow_x;
@@ -224,8 +224,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
   // the minute hand is 20 pixels long, starting from the center of the clock
   for (int i = 0; i < 20; i++) 
   {
-      uint8 minute_x = (uint8)(64 + (i + 1) * arm_sin_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-      uint8 minute_y = (uint8)(32 - (i + 1) * arm_cos_f32(minute_angle * (3.14159265358979323846 / 180.0)));
+      uint8 minute_x = (uint8)(64 + (i + 1) * arm_sin_f32(minute_angle * DEG_TO_RAD));
+      uint8 minute_y = (uint8)(32 - (i + 1) * arm_cos_f32(minute_angle * DEG_TO_RAD));
       // create a new coordinate node for the minute hand
       CoordNode* minuteNode = (CoordNode*)malloc(sizeof(CoordNode));
       minuteNode->x = minute_x;
@@ -241,13 +241,13 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
       }
   }
   // add an arrow for the minute hand
-  uint8 bottomminute_x = 64 + (int)(20 * arm_sin_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-  uint8 bottomminute_y = 32 - (int)(20 * arm_cos_f32(minute_angle * (3.14159265358979323846 / 180.0)));
+  uint8 bottomminute_x = 64 + (int)(20 * arm_sin_f32(minute_angle * DEG_TO_RAD));
+  uint8 bottomminute_y = 32 - (int)(20 * arm_cos_f32(minute_angle * DEG_TO_RAD));
   // the arrow is 4 pixels long, starting from the end of the minute hand
   for (int i = 0; i < 4; i++)
   {
-      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle-30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle-30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle-30.0) * DEG_TO_RAD));
+      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle-30.0) * DEG_TO_RAD));
       // create a new coordinate node for the minute hand arrow
       CoordNode* minuteArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       minuteArrowNode->x = minute_arrow_x;
@@ -264,8 +264,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
   }
   for (int i = 0; i < 4; i++) 
   {
-      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle+30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle+30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle+30.0) * DEG_TO_RAD));
+      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle+30.0) * DEG_TO_RAD));
       // create a new coordinate node for the minute hand arrow
       CoordNode* minuteArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       minuteArrowNode->x = minute_arrow_x;
@@ -284,8 +284,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
   // the second hand is 24 pixels long, starting from the center of the clock
   for (int i = 0; i < 24; i+=2) 
   {
-      uint8 second_x = (uint8)(64 + (i + 1) * arm_sin_f32(second_angle * (3.14159265358979323846 / 180.0)));
-      uint8 second_y = (uint8)(32 - (i + 1) * arm_cos_f32(second_angle * (3.14159265358979323846 / 180.0)));
+      uint8 second_x = (uint8)(64 + (i + 1) * arm_sin_f32(second_angle * DEG_TO_RAD));
+      uint8 second_y = (uint8)(32 - (i + 1) * arm_cos_f32(second_angle * DEG_TO_RAD));
       // create a new coordinate node for the second hand
       CoordNode* secondNode = (CoordNode*)malloc(sizeof(CoordNode));
       secondNode->x = second_x;
@@ -301,13 +301,13 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
       }
   }
   // add an arrow for the second hand
-  uint8 bottomsecond_x = 64 + (int)(24 * arm_sin_f32(second_angle * (3.14159265358979323846 / 180.0)));
-  uint8 bottomsecond_y = 32 - (int)(24 * arm_cos_f32(second_angle * (3.14159265358979323846 / 180.0)));
+  uint8 bottomsecond_x = 64 + (int)(24 * arm_sin_f32(second_angle * DEG_TO_RAD));
+  uint8 bottomsecond_y = 32 - (int)(24 * arm_cos_f32(second_angle * DEG_TO_RAD));
   // the arrow is 5 pixels long, starting from the end of the second hand
   for (int i = 0; i < 5; i++) 
   {
-      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle-30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle-30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle-30.0) * DEG_TO_RAD));
+      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle-30.0) * DEG_TO_RAD));
       // create a new coordinate node for the second hand arrow
       CoordNode* secondArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       secondArrowNode->x = second_arrow_x;
@@ -324,8 +324,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
   }
   for (int i = 0; i < 5; i++) 
   {
-      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle+30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle+30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle+30.0) * DEG_TO_RAD));
+      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle+30.0) * DEG_TO_RAD));
       // create a new coordinate node for the second hand arrow
       CoordNode* secondArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       secondArrowNode->x = second_arrow_x;
@@ -502,8 +502,8 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
   // the minute hand is 20 pixels long, starting from the center of the clock
   for (int i = 0; i < 20; i++) 
   {
-      uint8 minute_x = (uint8)(64 + (i + 1) * arm_sin_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-      uint8 minute_y = (uint8)(36 - (i + 1) * arm_cos_f32(minute_angle * (3.14159265358979323846 / 180.0)));
+      uint8 minute_x = (uint8)(64 + (i + 1) * arm_sin_f32(minute_angle * DEG_TO_RAD));
+      uint8 minute_y = (uint8)(36 - (i + 1) * arm_cos_f32(minute_angle * DEG_TO_RAD));
       // create a new coordinate node for the minute hand
       CoordNode* minuteNode = (CoordNode*)malloc(sizeof(CoordNode));
       minuteNode->x = minute_x;
@@ -519,13 +519,13 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
       }
   }
   // add an arrow for the minute hand
-  uint8 bottomminute_x = 64 + (int)(20 * arm_sin_f32(minute_angle * (3.14159265358979323846 / 180.0)));
-  uint8 bottomminute_y = 36 - (int)(20 * arm_cos_f32(minute_angle * (3.14159265358979323846 / 180.0)));
+  uint8 bottomminute_x = 64 + (int)(20 * arm_sin_f32(minute_angle * DEG_TO_RAD));
+  uint8 bottomminute_y = 36 - (int)(20 * arm_cos_f32(minute_angle * DEG_TO_RAD));
   // the arrow is 4 pixels long, starting from the end of the minute hand
   for (int i = 0; i < 4; i++)
   {
-      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle-30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle-30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle-30.0) * DEG_TO_RAD));
+      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle-30.0) * DEG_TO_RAD));
       // create a new coordinate node for the minute hand arrow
       CoordNode* minuteArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       minuteArrowNode->x = minute_arrow_x;
@@ -542,8 +542,8 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
   }
   for (int i = 0; i < 4; i++) 
   {
-      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle+30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle+30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 minute_arrow_x = (uint8)(bottomminute_x - (i + 1) * arm_sin_f32((minute_angle+30.0) * DEG_TO_RAD));
+      uint8 minute_arrow_y = (uint8)(bottomminute_y + (i + 1) * arm_cos_f32((minute_angle+30.0) * DEG_TO_RAD));
       // create a new coordinate node for the minute hand arrow
       CoordNode* minuteArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       minuteArrowNode->x = minute_arrow_x;
@@ -562,8 +562,8 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
   // the second hand is 24 pixels long, starting from the center of the clock
   for (int i = 0; i < 24; i+=2) 
   {
-      uint8 second_x = (uint8)(64 + (i + 1) * arm_sin_f32(second_angle * (3.14159265358979323846 / 180.0)));
-      uint8 second_y = (uint8)(36 - (i + 1) * arm_cos_f32(second_angle * (3.14159265358979323846 / 180.0)));
+      uint8 second_x = (uint8)(64 + (i + 1) * arm_sin_f32(second_angle * DEG_TO_RAD));
+      uint8 second_y = (uint8)(36 - (i + 1) * arm_cos_f32(second_angle * DEG_TO_RAD));
       // create a new coordinate node for the second hand
       CoordNode* secondNode = (CoordNode*)malloc(sizeof(CoordNode));
       secondNode->x = second_x;
@@ -579,13 +579,13 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
       }
     }
   // add an arrow for the second hand
-  uint8 bottomsecond_x = 64 + (int)(24 * arm_sin_f32(second_angle * (3.14159265358979323846 / 180.0)));
-  uint8 bottomsecond_y = 36 - (int)(24 * arm_cos_f32(second_angle * (3.14159265358979323846 / 180.0)));
+  uint8 bottomsecond_x = 64 + (int)(24 * arm_sin_f32(second_angle * DEG_TO_RAD));
+  uint8 bottomsecond_y = 36 - (int)(24 * arm_cos_f32(second_angle * DEG_TO_RAD));
   // the arrow is 5 pixels long, starting from the end of the second hand
   for (int i = 0; i < 5; i++) 
   {
-      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle-30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle-30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle-30.0) * DEG_TO_RAD));
+      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle-30.0) * DEG_TO_RAD));
       // create a new coordinate node for the second hand arrow
       CoordNode* secondArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       secondArrowNode->x = second_arrow_x;
@@ -602,8 +602,8 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
   }
   for (int i = 0; i < 5; i++) 
   {
-      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle+30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle+30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 second_arrow_x = (uint8)(bottomsecond_x - (i + 1) * arm_sin_f32((second_angle+30.0) * DEG_TO_RAD));
+      uint8 second_arrow_y = (uint8)(bottomsecond_y + (i + 1) * arm_cos_f32((second_angle+30.0) * DEG_TO_RAD));
       // create a new coordinate node for the second hand arrow
       CoordNode* secondArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       secondArrowNode->x = second_arrow_x;
@@ -622,8 +622,8 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
   // the centisecond hand is 28 pixels long, starting from the center of the clock
   for (int i = 0; i < 28; i+=2) 
   {
-    uint8 centisecond_x = (uint8)(64 + (i + 1) * arm_sin_f32(centisecond_angle * (3.14159265358979323846 / 180.0)));
-    uint8 centisecond_y = (uint8)(36 - (i + 1) * arm_cos_f32(centisecond_angle * (3.14159265358979323846 / 180.0)));
+    uint8 centisecond_x = (uint8)(64 + (i + 1) * arm_sin_f32(centisecond_angle * DEG_TO_RAD));
+    uint8 centisecond_y = (uint8)(36 - (i + 1) * arm_cos_f32(centisecond_angle * DEG_TO_RAD));
     // create a new coordinate node for the centisecond hand
     CoordNode* centisecondNode = (CoordNode*)malloc(sizeof(CoordNode));
     centisecondNode->x = centisecond_x;
@@ -639,13 +639,13 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
     }
   }
   // add an arrow for the centisecond hand
-  uint8 bottomcentisecond_x = 64 + (int)(28 * arm_sin_f32(centisecond_angle * (3.14159265358979323846 / 180.0)));
-  uint8 bottomcentisecond_y = 36 - (int)(28 * arm_cos_f32(centisecond_angle * (3.14159265358979323846 / 180.0)));
+  uint8 bottomcentisecond_x = 64 + (int)(28 * arm_sin_f32(centisecond_angle * DEG_TO_RAD));
+  uint8 bottomcentisecond_y = 36 - (int)(28 * arm_cos_f32(centisecond_angle * DEG_TO_RAD));
   // the arrow is 6 pixels long, starting from the end of the centisecond hand
   for (int i = 0; i < 6; i++) 
   {
-      uint8 centisecond_arrow_x = (uint8)(bottomcentisecond_x - (i + 1) * arm_sin_f32((centisecond_angle-30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 centisecond_arrow_y = (uint8)(bottomcentisecond_y + (i + 1) * arm_cos_f32((centisecond_angle-30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 centisecond_arrow_x = (uint8)(bottomcentisecond_x - (i + 1) * arm_sin_f32((centisecond_angle-30.0) * DEG_TO_RAD));
+      uint8 centisecond_arrow_y = (uint8)(bottomcentisecond_y + (i + 1) * arm_cos_f32((centisecond_angle-30.0) * DEG_TO_RAD));
       // create a new coordinate node for the centisecond hand arrow
       CoordNode* centisecondArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       centisecondArrowNode->x = centisecond_arrow_x;
@@ -662,8 +662,8 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
   }
   for (int i = 0; i < 6; i++) 
   {
-      uint8 centisecond_arrow_x = (uint8)(bottomcentisecond_x - (i + 1) * arm_sin_f32((centisecond_angle+30.0) * (3.14159265358979323846 / 180.0)));
-      uint8 centisecond_arrow_y = (uint8)(bottomcentisecond_y + (i + 1) * arm_cos_f32((centisecond_angle+30.0) * (3.14159265358979323846 / 180.0)));
+      uint8 centisecond_arrow_x = (uint8)(bottomcentisecond_x - (i + 1) * arm_sin_f32((centisecond_angle+30.0) * DEG_TO_RAD));
+      uint8 centisecond_arrow_y = (uint8)(bottomcentisecond_y + (i + 1) * arm_cos_f32((centisecond_angle+30.0) * DEG_TO_RAD));
       // create a new coordinate node for the centisecond hand arrow
       CoordNode* centisecondArrowNode = (CoordNode*)malloc(sizeof(CoordNode));
       centisecondArrowNode->x = centisecond_arrow_x;
