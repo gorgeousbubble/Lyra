@@ -69,7 +69,7 @@ const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length = ARRAY_LENGTH(LCM
 */
 uint8 Alarm_Clock_Array[16] = {0};// Alarm clock time array (page: 0, offset: 0-15)
 Alarm_Clock_Time* Alarm_Clock_List = NULL;// Pointer to the head of the alarm clock linked list
-int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
+const int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
 
 /*
 **Configure Adjust tense

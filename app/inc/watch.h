@@ -79,7 +79,7 @@ extern const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time *Alarm_Clock_List;
-extern int Alarm_Clock_Max_Len;
+extern const int Alarm_Clock_Max_Len;
 extern uint8 Configure_Adjust_Tense;
 
 /*
