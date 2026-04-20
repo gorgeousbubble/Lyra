@@ -14,6 +14,7 @@
 #include "conf.h"
 #include "main.h"
 #include "maps_dock_w25q80.h"
+#include "mpu6050.h"
 #include "oled_i2c.h"
 #include "watch.h"
 
@@ -746,7 +747,7 @@ void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const 
           {
             // if the pixel is set, draw it
             // calculate the x and y coordinates for the character
-            uint8 char_x = 40 + i * 6 + j * 6 + k; // 6 pixels per character
+            uint8 char_x = 40 + i * 6 + k; // 6 pixels per character
             uint8 char_y = l + 28;
             // create a new coordinate node for the character pixel
             CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
@@ -1115,7 +1116,7 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
           {
             // if the pixel is set, draw it
             // calculate the x and y coordinates for the character
-            uint8 char_x = 97 + i * 6 + j * 6 + k; // 6 pixels per character
+            uint8 char_x = 97 + i * 6 + k; // 6 pixels per character
             uint8 char_y = l + 24;
             // create a new coordinate node for the character pixel
             CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
@@ -1173,7 +1174,7 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
           {
             // if the pixel is set, draw it
             // calculate the x and y coordinates for the character
-            uint8 char_x = 97 + i * 6 + j * 6 + k; // 6 pixels per character
+            uint8 char_x = 97 + i * 6 + k; // 6 pixels per character
             uint8 char_y = l + 32;
             // create a new coordinate node for the character pixel
             CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
@@ -1305,7 +1306,7 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
           {
             // if the pixel is set, draw it
             // calculate the x and y coordinates for the character
-            uint8 char_x = x_offset + i * 6 + j * 6 + k; // 6 pixels per character
+            uint8 char_x = x_offset + i * 6 + k; // 6 pixels per character
             uint8 char_y = l + 24;
             // create a new coordinate node for the character pixel
             CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
@@ -1432,7 +1433,7 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
           {
             // if the pixel is set, draw it
             // calculate the x and y coordinates for the character
-            uint8 char_x = x_offset + i * 6 + j * 6 + k; // 6 pixels per character
+            uint8 char_x = x_offset + i * 6 + k; // 6 pixels per character
             uint8 char_y = l + 32;
             // create a new coordinate node for the character pixel
             CoordNode* charNode = (CoordNode*)malloc(sizeof(CoordNode));
