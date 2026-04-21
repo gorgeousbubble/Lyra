@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
@@ -183,13 +183,16 @@ void PIT0_IRQHandler(void)
     ADC_Convert_Result[1] = ADC_Once(ADC0_DM0, ADC_12Bit); // ADC convert
     RTC_Count = RTC_Get_Time();
 
-    struct tm time = RTC_Get_Time_Format();
-    RTC_Time_Now.Year = time.tm_year + 1900;
-    RTC_Time_Now.Month = time.tm_mon + 1;
-    RTC_Time_Now.Day = time.tm_mday;
-    RTC_Time_Now.Hour = time.tm_hour;
-    RTC_Time_Now.Minute = time.tm_min;
-    RTC_Time_Now.Second = time.tm_sec;
+    // Use gmtime instead of localtime: no timezone conversion,
+    // safe in single-threaded embedded ISR context
+    time_t rawtime = (time_t)RTC_Count;
+    struct tm *timeinfo = gmtime(&rawtime);
+    RTC_Time_Now.Year   = timeinfo->tm_year + 1900;
+    RTC_Time_Now.Month  = timeinfo->tm_mon + 1;
+    RTC_Time_Now.Day    = timeinfo->tm_mday;
+    RTC_Time_Now.Hour   = timeinfo->tm_hour;
+    RTC_Time_Now.Minute = timeinfo->tm_min;
+    RTC_Time_Now.Second = timeinfo->tm_sec;
   }
 
   PIT_Flag_Clear(PIT0);

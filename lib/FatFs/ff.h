@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------/
+ï»¿/*---------------------------------------------------------------------------/
 /  FatFs - FAT file system module include file  R0.09     (C)ChaN, 2011
 /----------------------------------------------------------------------------/
 / FatFs module is a generic FAT file system module for small embedded systems.
@@ -84,7 +84,7 @@ extern "C" {
         /* The FAT file system consists of a boot sector, two file allocation tables, a root directory area, and a data area */
         uint8   wflag;          /* Mark whether the file has been modified, write back when it is 1 */
         uint8   fsi_flag;       /* Mark whether the file system information has been modified, and write back when it is 1 */
-        uint16  id;             /* ÎÄ¼þÏµÍ³¹ÒÔØID */
+        uint16  id;             /* ï¿½Ä¼ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½ID */
         uint16  n_rootdir;      /* The number of entries (directory entries) in the root directory area (for FAT12/16) */
 #if _MAX_SS != 512
         uint16  ssize;          /* Byte count per sector (for flash with sectors larger than 512 bytes) */

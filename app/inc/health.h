@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.

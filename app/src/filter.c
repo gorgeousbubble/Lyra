@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
@@ -180,6 +180,9 @@ void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int
         ff->pitch.angle = Normalize_Angle(ff->pitch.angle + gyro_pitch * ff->pitch.dt);
         ff->roll.angle  = Normalize_Angle(ff->roll.angle  + gyro_roll  * ff->roll.dt);
         ff->yaw.angle  += gyro_yaw * ff->yaw.dt;
+        // Keep Kalman internal state in sync to avoid output jump when acc recovers
+        ff->kf_pitch.angle_f = ff->pitch.angle;
+        ff->kf_roll.angle_f  = ff->roll.angle;
         return;
     }
 

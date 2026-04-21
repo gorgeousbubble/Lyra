@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------/
+ï»¿/*----------------------------------------------------------------------------/
 /  FatFs - FAT file system module  R0.09                  (C)ChaN, 2011
 /-----------------------------------------------------------------------------/
 / FatFs module is a generic FAT file system module for small embedded systems.
@@ -2522,7 +2522,7 @@ FRESULT f_open (
     {
         uint32 dw, cl;
 
-        if (res != FR_OK)                   /* Ã»ÓÐÎÄ¼þ£¬ÐèÒª´´½¨ÐÂµÄ No file, create new */
+        if (res != FR_OK)                   /* Ã»ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½ No file, create new */
         {
             if (res == FR_NO_FILE)          /* There is no file to open, create a new entry */
 #if _FS_SHARE
@@ -2541,7 +2541,7 @@ FRESULT f_open (
             }
             else
             {
-                if (mode & FA_CREATE_NEW)   /* ÒÑ¾­ÓÐÁË£¬²»ÄÜ´´½¨ÐÂµÄ Cannot create as new file */
+                if (mode & FA_CREATE_NEW)   /* ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½Ë£ï¿½ï¿½ï¿½ï¿½Ü´ï¿½ï¿½ï¿½ï¿½Âµï¿½ Cannot create as new file */
                     res = FR_EXIST;
             }
         }

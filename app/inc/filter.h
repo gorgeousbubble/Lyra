@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
@@ -59,10 +59,10 @@ typedef struct
     uint8 calibrated; // 1 = calibration complete
 } GyroBias;
 
-// Filter mode selection: 0 = complementary filter, 1 = Kalman filter
-#define FILTER_MODE_COMPLEMENTARY 0
-#define FILTER_MODE_KALMAN        1
-#define FILTER_MODE               FILTER_MODE_COMPLEMENTARY
+// Filter mode selection: 0 = complementary fusion filter, 1 = Kalman filter
+#define FILTER_MODE_FUSION  0
+#define FILTER_MODE_KALMAN  1
+#define FILTER_MODE         FILTER_MODE_FUSION
 
 // Full fusion filter: pitch + roll (complementary or Kalman) + yaw (gyro integration)
 typedef struct

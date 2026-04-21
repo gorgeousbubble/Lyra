@@ -1,2 +1,2 @@
-# Lyra
+﻿# Lyra
 The Lyra Project
