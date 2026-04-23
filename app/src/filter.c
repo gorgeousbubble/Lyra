@@ -54,6 +54,7 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
     // Update
     float angle_err = angle_m - kf->angle_f;
     float S  = kf->P[0][0] + kf->R_angle;
+    if (S < 1e-9f) S = 1e-9f; // Guard against division by zero
     float K0 = kf->P[0][0] / S;
     float K1 = kf->P[1][0] / S;
 

@@ -36,7 +36,7 @@ static void RingBuffer_Add(RingBuffer *rb, uint32 data)
 // Read sample at logical index (0 = oldest, count-1 = newest)
 static uint32 RingBuffer_Get(RingBuffer *rb, int index)
 {
-    int pos = (rb->head - rb->count + index + HEALTH_BUFFER_SIZE) % HEALTH_BUFFER_SIZE;
+    int pos = ((rb->head - rb->count + index) % HEALTH_BUFFER_SIZE + HEALTH_BUFFER_SIZE) % HEALTH_BUFFER_SIZE;
     return rb->data[pos];
 }
 

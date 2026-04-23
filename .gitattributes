@@ -5,8 +5,17 @@
 *.c text eol=lf
 *.h text eol=lf
 *.s text eol=lf
+*.md text eol=lf
+
+# IAR IDE generated files - keep CRLF as-is
+prj/IAR/settings/* text eol=crlf
+prj/IAR/*.dep      text eol=crlf
+prj/IAR/*.ewp      text eol=crlf
+prj/IAR/*.ewd      text eol=crlf
+prj/IAR/*.eww      text eol=crlf
+prj/IAR/*.ewt      text eol=crlf
 
 # Binary files - no conversion
-*.a binary
-*.pdf binary
-*.bmp binary
+*.a      binary
+*.pdf    binary
+*.bmp    binary

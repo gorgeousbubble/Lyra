@@ -1731,7 +1731,7 @@ void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const in
   snprintf(ch[1], sizeof(ch[1]), "%d", (year/100)%10);
   snprintf(ch[2], sizeof(ch[2]), "%d", (year/10)%10);
   snprintf(ch[3], sizeof(ch[3]), "%d", year%10);
-  snprintf(ch[4], sizeof(ch[5]), "%d", month/10); // tens place of month
+  snprintf(ch[4], sizeof(ch[4]), "%d", month/10); // tens place of month
   snprintf(ch[5], sizeof(ch[5]), "%d", month%10);
   snprintf(ch[6], sizeof(ch[6]), "%s", "-");
   snprintf(ch[7], sizeof(ch[7]), "%d", day/10); // tens place of day
@@ -2168,6 +2168,7 @@ void Add_Alarm_Clock_Time_To_List(int hour, int minute)
   }
   // save alarm clock edit data to alarm clock list
   Alarm_Clock_Time* newAlarm = (Alarm_Clock_Time*)malloc(sizeof(Alarm_Clock_Time));
+  if (newAlarm == NULL) return;
   newAlarm->hour = hour;
   newAlarm->minute = minute;
   newAlarm->next = NULL;
@@ -2349,6 +2350,7 @@ void Read_Alarm_Clock_E2PROM_To_List()
           break; // end of alarm clock list
       }
       Alarm_Clock_Time* newAlarm = (Alarm_Clock_Time*)malloc(sizeof(Alarm_Clock_Time));
+      if (newAlarm == NULL) break;
       newAlarm->hour = (int)Alarm_Clock_Array[i];
       newAlarm->minute = (int)Alarm_Clock_Array[i+1];
       newAlarm->next = NULL;
