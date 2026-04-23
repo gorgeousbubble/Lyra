@@ -72,6 +72,20 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
 }
 
 /*
+ * Kalman filter reset - reinitialize angle state from a known angle
+ * Call this when the sensor is first powered on or after a long acc-rejection period
+ */
+void Kalman_Reset(KalmanFilter *kf, float initial_angle)
+{
+    kf->angle_f = initial_angle;
+    kf->q_bias  = 0.0f;
+    kf->P[0][0] = 1.0f;
+    kf->P[0][1] = 0.0f;
+    kf->P[1][0] = 0.0f;
+    kf->P[1][1] = 1.0f;
+}
+
+/*
  * Complementary filter initialization
  * alpha : gyro weight (0~1), recommended 0.93~0.98
  * dt    : sample period in seconds
@@ -195,6 +209,12 @@ void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int
     ff->roll.acc_angle  = acc_roll;
 
 #if FILTER_MODE == FILTER_MODE_KALMAN
+    // Initialize Kalman angle from accelerometer on first valid sample
+    if (ff->kf_pitch.angle_f == 0.0f && ff->kf_roll.angle_f == 0.0f)
+    {
+        ff->kf_pitch.angle_f = acc_pitch;
+        ff->kf_roll.angle_f  = acc_roll;
+    }
     ff->pitch.angle = Kalman_Filter(&ff->kf_pitch, acc_pitch, gyro_pitch);
     ff->roll.angle  = Kalman_Filter(&ff->kf_roll,  acc_roll,  gyro_roll);
 #else

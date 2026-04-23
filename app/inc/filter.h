@@ -59,12 +59,12 @@ typedef struct
     uint8 calibrated; // 1 = calibration complete
 } GyroBias;
 
-// Filter mode selection: 0 = complementary fusion filter, 1 = Kalman filter
+// Filter mode selection: 0 = fusion filter, 1 = Kalman filter
 #define FILTER_MODE_FUSION  0
 #define FILTER_MODE_KALMAN  1
-#define FILTER_MODE         FILTER_MODE_FUSION
+#define FILTER_MODE         FILTER_MODE_KALMAN
 
-// Full fusion filter: pitch + roll (complementary or Kalman) + yaw (gyro integration)
+// Full fusion filter: pitch + roll (fusion or Kalman) + yaw (gyro integration)
 typedef struct
 {
     ComplementaryFilter pitch;
@@ -76,6 +76,7 @@ typedef struct
 } FusionFilter;
 
 extern void  Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float q_gyro, float r_angle);
+extern void  Kalman_Reset(KalmanFilter *kf, float initial_angle);
 extern float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m);
 extern void  Fusion_Init(FusionFilter *ff, float alpha, float dt);
 extern void  Fusion_Calibrate(FusionFilter *ff, int16 gx, int16 gy, int16 gz);
