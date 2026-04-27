@@ -111,10 +111,13 @@ void Fusion_Init(FusionFilter *ff, float alpha, float dt)
     ff->gyro_bias.count      = 0;
     ff->gyro_bias.calibrated = 0;
 
-    // Kalman filter initialization (Q_angle=0.001, Q_gyro=0.003, R_angle=0.03)
+    // Kalman filter initialization
+    // Q_angle: process noise for angle  - larger = faster response to acc, more noise
+    // Q_gyro:  process noise for bias   - larger = faster bias tracking
+    // R_angle: measurement noise        - smaller = more trust in accelerometer
     float p_init[2][2] = {{1.0f, 0.0f}, {0.0f, 1.0f}};
-    Kalman_Init(&ff->kf_pitch, p_init, dt, 0.001f, 0.003f, 0.03f);
-    Kalman_Init(&ff->kf_roll,  p_init, dt, 0.001f, 0.003f, 0.03f);
+    Kalman_Init(&ff->kf_pitch, p_init, dt, 0.01f, 0.003f, 0.01f);
+    Kalman_Init(&ff->kf_roll,  p_init, dt, 0.01f, 0.003f, 0.01f);
 }
 
 /*
