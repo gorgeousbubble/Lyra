@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "conf.h": "c"
-    }
+    },
+    "kiroAgent.modelSelection": "qwen3-coder-next"
 }
