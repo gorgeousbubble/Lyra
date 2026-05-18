@@ -69,10 +69,10 @@ typedef struct
 extern volatile int            PIT0_Count;          // 1ms tick, resets every 100ms
 extern volatile int            PIT1_Count;          // 1ms tick, resets every 100ms
 extern          uint16         ADC_Convert_Result[2];
-extern volatile MPU6050_Sensor MPU6050;
+extern          MPU6050_Sensor MPU6050;             // Written in main loop (no longer in ISR)
 extern          MPU6050_Sensor_Norm MPU6050_Norm;   // Reserved
 extern          Angle          MPU6050_Angle;        // Reserved
-extern          FusionFilter   FF;                   // Complementary filter state
+extern          FusionFilter   FF;                   // Complementary filter state (written in main loop)
 extern volatile uint32         RTC_Count;
 extern volatile RTC_Time       RTC_Time_Now;
 extern volatile uint32         MAX30102_RED;
@@ -81,6 +81,9 @@ extern volatile Stop_Watch_Time Stop_Watch_Now;
 extern volatile int            Stop_Watch_Count;
 extern volatile int            Stop_Watch_State;    // 0=stopped, 1=running
 extern volatile uint8          UART_Send_Flag;       // Set by PIT1, cleared by main
+extern volatile uint8          MPU6050_Read_Flag;    // Set by PIT1 every 10ms, cleared by main
+extern volatile uint8          MAX30102_Read_Flag;   // Set by PIT1 every 10ms (5ms offset), cleared by main
+extern volatile uint8          RTC_Update_Flag;      // Set by PIT0 every 100ms, cleared by main
 
 // ISR function declarations
 extern void PORTC_PTC19_IRQHandler(void);

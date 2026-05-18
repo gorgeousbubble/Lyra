@@ -15,14 +15,11 @@
 #include "health.h"
 #include "it.h"
 #include "filter.h"
-#include "max30102.h"
 #include "maps_dock_led.h"
 #include "misc.h"
-#include "mpu6050.h"
 #include "pit.h"
 #include "port.h"
 #include "rtc.h"
-#include <time.h>
 
 /*
 **PIT0: 1ms tick counter, resets every 100ms
@@ -45,9 +42,9 @@ char PIT1_Flag = 0; // 100ms cycle flag (0~3 rolling)
 uint16 ADC_Convert_Result[2] = {0};
 
 /*
-**MPU6050 sensor
+**MPU6050 sensor (no longer volatile: read/write both in main loop)
 */
-volatile MPU6050_Sensor MPU6050 = {
+MPU6050_Sensor MPU6050 = {
     .Acc = {0, 0, 0},
     .Gyro = {0, 0, 0}};
 
@@ -99,6 +96,9 @@ volatile Stop_Watch_Time Stop_Watch_Now = {
 volatile int Stop_Watch_Count = 0; // Stop Watch count
 volatile int Stop_Watch_State = 0; // Stop Watch state (0: stop, 1: start)
 volatile uint8 UART_Send_Flag = 0; // UART send flag (set in PIT1, cleared in main)
+volatile uint8 MPU6050_Read_Flag = 0;  // Set by PIT1 every 10ms, cleared by main
+volatile uint8 MAX30102_Read_Flag = 0; // Set by PIT1 every 10ms (5ms offset), cleared by main
+volatile uint8 RTC_Update_Flag = 0;    // Set by PIT0 every 100ms, cleared by main
 
 /*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
@@ -166,7 +166,7 @@ void PIT0_IRQHandler(void)
 
   PIT0_Count++;
 
-  // 100ms periodic tasks: LED blink, ADC, RTC update
+  // 100ms periodic tasks: LED blink, set RTC update flag
   if (PIT0_Count >= 100)
   {
     PIT0_Count = 0;
@@ -178,21 +178,8 @@ void PIT0_IRQHandler(void)
       PIT0_Flag = 0;
     }
 
-    MAPS_Dock_LED_Turn();                                  // LED turnover
-    ADC_Convert_Result[0] = ADC_Once(ADC0_DP0, ADC_12Bit); // ADC convert
-    ADC_Convert_Result[1] = ADC_Once(ADC0_DM0, ADC_12Bit); // ADC convert
-    RTC_Count = RTC_Get_Time();
-
-    // Use gmtime instead of localtime: no timezone conversion,
-    // safe in single-threaded embedded ISR context
-    time_t rawtime = (time_t)RTC_Count;
-    struct tm *timeinfo = gmtime(&rawtime);
-    RTC_Time_Now.Year   = timeinfo->tm_year + 1900;
-    RTC_Time_Now.Month  = timeinfo->tm_mon + 1;
-    RTC_Time_Now.Day    = timeinfo->tm_mday;
-    RTC_Time_Now.Hour   = timeinfo->tm_hour;
-    RTC_Time_Now.Minute = timeinfo->tm_min;
-    RTC_Time_Now.Second = timeinfo->tm_sec;
+    MAPS_Dock_LED_Turn();                                  // LED turnover (fast GPIO, OK in ISR)
+    RTC_Update_Flag = 1;                                   // Signal main loop to do ADC + RTC update
   }
 
   PIT_Flag_Clear(PIT0);
@@ -210,46 +197,16 @@ void PIT1_IRQHandler(void)
 
   PIT1_Count++;
 
-  // Sample period of 10ms: MPU6050 read + filter
+  // Every 10ms: signal main loop to read MPU6050 + run filter
   if (PIT1_Count % 10 == 0)
   {
-    // MPU6050 sensor data read
-    MPU6050.Acc.X = MPU_Get_Acc_X();
-    MPU6050.Acc.Y = MPU_Get_Acc_Y();
-    MPU6050.Acc.Z = MPU_Get_Acc_Z();
-    MPU6050.Gyro.X = MPU_Get_Gyro_X();
-    MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
-    MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
-
-    // Gyro calibration (first 2 seconds after power-on, sensor must be stationary)
-    if (!FF.gyro_bias.calibrated)
-    {
-      int16 gx = MPU6050.Gyro.X;
-      int16 gy = MPU6050.Gyro.Y;
-      int16 gz = MPU6050.Gyro.Z;
-      Fusion_Calibrate(&FF, gx, gy, gz);
-    }
-    else
-    {
-      int16 ax = MPU6050.Acc.X;
-      int16 ay = MPU6050.Acc.Y;
-      int16 az = MPU6050.Acc.Z;
-      int16 gx = MPU6050.Gyro.X;
-      int16 gy = MPU6050.Gyro.Y;
-      int16 gz = MPU6050.Gyro.Z;
-      Fusion_Filter(&FF, ax, ay, az, gx, gy, gz);
-    }
-    UART_Send_Flag = 1; // Signal main loop to send data
+    MPU6050_Read_Flag = 1;
   }
 
-  // MAX30102 read on odd 10ms ticks (5ms offset from MPU6050)
+  // Every 10ms (5ms offset): signal main loop to read MAX30102
   if (PIT1_Count % 10 == 5)
   {
-    uint32 red = 0, ir = 0;
-    MAX30102_ReadFIFO(&red, &ir);
-    MAX30102_RED = red;
-    MAX30102_IR  = ir;
-    Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(red, ir);
+    MAX30102_Read_Flag = 1;
   }
 
   // Sample period of 100ms
