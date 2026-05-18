@@ -137,7 +137,6 @@ void PORTD_PTD15_IRQHandler(void)
 void PIT0_IRQHandler(void)
 {
   PIT_Flag_Clear(PIT0);
-  disable_irq(PIT0_IRQn);
 
   // Stopwatch centisecond tick (called every 1ms, increments every 10ms)
   if (Stop_Watch_State)
@@ -181,9 +180,6 @@ void PIT0_IRQHandler(void)
     MAPS_Dock_LED_Turn();                                  // LED turnover (fast GPIO, OK in ISR)
     RTC_Update_Flag = 1;                                   // Signal main loop to do ADC + RTC update
   }
-
-  PIT_Flag_Clear(PIT0);
-  enable_irq(PIT0_IRQn);
 }
 
 /*
@@ -193,7 +189,6 @@ void PIT0_IRQHandler(void)
 void PIT1_IRQHandler(void)
 {
   PIT_Flag_Clear(PIT1);
-  disable_irq(PIT1_IRQn);
 
   PIT1_Count++;
 
@@ -220,9 +215,7 @@ void PIT1_IRQHandler(void)
       PIT1_Flag = 0;
     }
   }
-
-  PIT_Flag_Clear(PIT1);
-  enable_irq(PIT1_IRQn);
+}
 }
 
 /*

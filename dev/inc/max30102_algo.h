@@ -22,7 +22,14 @@
 #define HR_FIFO_SIZE 7
 #define MA4_SIZE 4     // DO NOT CHANGE
 #define HAMMING_SIZE 5 // DO NOT CHANGE
+
+// Safe min macro: evaluates arguments only once using GCC statement expression
+// Falls back to standard double-evaluation macro for non-GCC compilers
+#ifdef __GNUC__
+#define min(x, y) ({ __typeof__(x) _x = (x); __typeof__(y) _y = (y); _x < _y ? _x : _y; })
+#else
 #define min(x, y) ((x) < (y) ? (x) : (y))
+#endif
 
 extern void maxim_heart_rate_and_oxygen_saturation(uint32 *pun_ir_buffer, int32 n_ir_buffer_length, uint32 *pun_red_buffer, int32 *pn_spo2, int8 *pch_spo2_valid, int32 *pn_heart_rate, int8 *pch_hr_valid);
 extern void maxim_find_peaks(int32 *pn_locs, int32 *pn_npks, int32 *pn_x, int32 n_size, int32 n_min_height, int32 n_min_distance, int32 n_max_num);

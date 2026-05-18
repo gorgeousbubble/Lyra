@@ -12,7 +12,7 @@
 
 #include "max30102_algo.h"
 
-const uint16 auw_hamm[31] = {41, 276, 512, 276, 41}; // Hamm=  long16(512* hamming(5)');
+const uint16 auw_hamm[HAMMING_SIZE] = {41, 276, 512, 276, 41}; // Hamm = long16(512 * hamming(5)')
 // uch_spo2_table is computed as  -45.060*ratioAverage* ratioAverage + 30.354 *ratioAverage + 94.845 ;
 const uint8 uch_spo2_table[184] = {95, 95, 95, 96, 96, 96, 97, 97, 97, 97, 97, 98, 98, 98, 98, 98, 99, 99, 99, 99,
                                    99, 99, 99, 99, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,

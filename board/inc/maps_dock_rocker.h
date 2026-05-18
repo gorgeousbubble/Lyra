@@ -23,7 +23,7 @@
 typedef enum
 {
   Rocker_Up,     // UP key
-  Rocker_Donw,   // DOWN key
+  Rocker_Down,   // DOWN key
   Rocker_Left,   // LEFT key
   Rocker_Right,  // RIGHT key
   Rocker_Select, // SELECT key

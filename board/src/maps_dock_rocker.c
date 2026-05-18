@@ -39,7 +39,7 @@ PTXn Rocker_Key_PTXn[Rocker_MAX] = {PTA27, PTA26, PTA25, PTA24, PTA4}; // PTA4(N
 void MAPS_Dock_Rocker_Key_Init(void)
 {
   GPIO_Init(Rocker_Key_PTXn[Rocker_Up], GPI, 0);     // Rocker_Up button initialization
-  GPIO_Init(Rocker_Key_PTXn[Rocker_Donw], GPI, 0);   // Rocker_Donw button initialization
+  GPIO_Init(Rocker_Key_PTXn[Rocker_Down], GPI, 0);   // Rocker_Down button initialization
   GPIO_Init(Rocker_Key_PTXn[Rocker_Left], GPI, 0);   // Rocker_Left button initialization
   GPIO_Init(Rocker_Key_PTXn[Rocker_Right], GPI, 0);  // Rocker_Right button initialization
   GPIO_Init(Rocker_Key_PTXn[Rocker_Select], GPI, 0); // Rocker_Select button initialization
@@ -102,7 +102,7 @@ void MAPS_Dock_Rocker_Key_LCM_Control(void)
       Rocker_Key_Delay(500); // Button delay
     }
     // Press the down key on the joystick
-    else if (GPIO_GET(Rocker_Key_PTXn[Rocker_Donw]) == Rocker_Key_On)
+    else if (GPIO_GET(Rocker_Key_PTXn[Rocker_Down]) == Rocker_Key_On)
     {
       Rocker_Key_Delay(500); // Button delay
     }

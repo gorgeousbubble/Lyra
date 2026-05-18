@@ -41,7 +41,7 @@
 #define MAX30102_GET_INT_IN GPIO_GET(PTA10)
 #endif
 
-// Power-of-two ring buffer for sensor samples (no dynamic allocation)
+// Ring buffer for sensor samples (no dynamic allocation)
 typedef struct
 {
     uint32 data[HEALTH_BUFFER_SIZE];

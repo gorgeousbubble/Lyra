@@ -70,7 +70,7 @@
 #define RGB565_TO_GRAY(rgb565) ((uint8)(((RGB565_RED(rgb565) * 235 + RGB565_GREEN(rgb565) * 613 + RGB565_BLUE(rgb565) * 625) + 1) >> 8))
 
 #define RGB565_H(rgb565) ((uint8)(((uint16)(rgb565)) >> 8))
-#define RGB565_L(rgb565)        (uint8)(rgb565))
+#define RGB565_L(rgb565)        ((uint8)(rgb565))
 
 #define RGB24_RGB565(R, G, B) ((uint16)((((uint8)(R) >> 3) << 11) | (((uint8)(G) >> 2) << 5) | ((uint8)(B) >> 3)))
 #define RGB555_RGB565(rgb555) (((((uint16)(rgb555)) & (uint16)(~0x1F)) << 1) | (((uint16)(rgb555)) & 0x1F))
