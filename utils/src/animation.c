@@ -45,6 +45,11 @@ const int LCM_Configure_Adjust_icon_coordinate_length = ARRAY_LENGTH(LCM_Configu
                 if (k & (1 << bit)) {
                     // Create a new coordinate node for the pixel
                     CoordNode* newNode = (CoordNode*)malloc(sizeof(CoordNode));
+                    if (newNode == NULL) {
+                        // Out of memory: return what we have so far
+                        *dst = head;
+                        return;
+                    }
                     newNode->x = j * 8 + bit; // Calculate x coordinate
                     newNode->y = i; // y coordinate is the row index
                     newNode->next = NULL;
@@ -62,7 +67,6 @@ const int LCM_Configure_Adjust_icon_coordinate_length = ARRAY_LENGTH(LCM_Configu
     }
     // Set the destination linked list to the head
     *dst = head;
-    // Note: The caller should handle freeing the linked list memory when done
  }
 
 /*
@@ -87,7 +91,7 @@ const int LCM_Configure_Adjust_icon_coordinate_length = ARRAY_LENGTH(LCM_Configu
 
     if (direction == 0) { // Left to right
         // Implement left to right scroll logic
-        uint8 x_offset = 0; // Starting offset for the scroll
+        int16 x_offset = 0; // Starting offset for the scroll (int16 to avoid uint8 overflow)
         while (x_offset < 128) {
             // Clear the animation array
             memset(animation, 0x00, sizeof(animation));
@@ -125,7 +129,7 @@ const int LCM_Configure_Adjust_icon_coordinate_length = ARRAY_LENGTH(LCM_Configu
     }
     else if (direction == 1) { // Right to left
         // Implement right to left scroll logic
-        uint8 x_offset = 128; // Starting offset for the scroll
+        int16 x_offset = 128; // Starting offset for the scroll (int16 to avoid uint8 underflow)
         while (x_offset > 0) {
             // Clear the animation array
             memset(animation, 0x00, sizeof(animation));
