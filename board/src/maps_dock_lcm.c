@@ -1,4 +1,4 @@
-﻿/*
+/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
@@ -480,53 +480,53 @@ void MAPS_Dock_LCM_Draw_Picture_128x64(const uint8 *Picture, LCM_Color_e LCM_Col
 void MAPS_Dock_LCM_Put_Para_6x8(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Color_e LCM_Color_x)
 {
   uint8 c = 0, i = 0, j = 0;
-  int LCM_Num[5] = {0};
+  int LCM_Num[6] = {0};  // Extra slot for negative sign
+  int num_start = 0;      // Index where digits start (1 if negative)
+  int abs_val = Value;
 
-  LCM_TenThousand = Value / 10000;
-  LCM_Thousand = (Value % 10000) / 1000;
-  LCM_Hundred = (Value % 1000) / 100;
-  LCM_Ten = (Value % 100) / 10;
-  LCM_Single = Value % 10;
+  // Handle negative numbers
+  if (Value < 0)
+  {
+    LCM_Num[0] = 13;     // '-' character is at index 13 in font (ASCII 45 - 32 = 13)
+    num_start = 1;
+    abs_val = -Value;
+  }
+
+  LCM_TenThousand = abs_val / 10000;
+  LCM_Thousand = (abs_val % 10000) / 1000;
+  LCM_Hundred = (abs_val % 1000) / 100;
+  LCM_Ten = (abs_val % 100) / 10;
+  LCM_Single = abs_val % 10;
 
   if (LCM_TenThousand != 0)
   {
-    LCM_Num[0] = LCM_TenThousand + 16;
-    LCM_Num[1] = LCM_Thousand + 16;
-    LCM_Num[2] = LCM_Hundred + 16;
-    LCM_Num[3] = LCM_Ten + 16;
-    LCM_Num[4] = LCM_Single + 16;
+    LCM_Num[num_start + 0] = LCM_TenThousand + 16;
+    LCM_Num[num_start + 1] = LCM_Thousand + 16;
+    LCM_Num[num_start + 2] = LCM_Hundred + 16;
+    LCM_Num[num_start + 3] = LCM_Ten + 16;
+    LCM_Num[num_start + 4] = LCM_Single + 16;
   }
   else if (LCM_Thousand != 0)
   {
-    LCM_Num[0] = LCM_Thousand + 16;
-    LCM_Num[1] = LCM_Hundred + 16;
-    LCM_Num[2] = LCM_Ten + 16;
-    LCM_Num[3] = LCM_Single + 16;
-    LCM_Num[4] = 0;
+    LCM_Num[num_start + 0] = LCM_Thousand + 16;
+    LCM_Num[num_start + 1] = LCM_Hundred + 16;
+    LCM_Num[num_start + 2] = LCM_Ten + 16;
+    LCM_Num[num_start + 3] = LCM_Single + 16;
   }
   else if (LCM_Hundred != 0)
   {
-    LCM_Num[0] = LCM_Hundred + 16;
-    LCM_Num[1] = LCM_Ten + 16;
-    LCM_Num[2] = LCM_Single + 16;
-    LCM_Num[3] = 0;
-    LCM_Num[4] = 0;
+    LCM_Num[num_start + 0] = LCM_Hundred + 16;
+    LCM_Num[num_start + 1] = LCM_Ten + 16;
+    LCM_Num[num_start + 2] = LCM_Single + 16;
   }
   else if (LCM_Ten != 0)
   {
-    LCM_Num[0] = LCM_Ten + 16;
-    LCM_Num[1] = LCM_Single + 16;
-    LCM_Num[2] = 0;
-    LCM_Num[3] = 0;
-    LCM_Num[4] = 0;
+    LCM_Num[num_start + 0] = LCM_Ten + 16;
+    LCM_Num[num_start + 1] = LCM_Single + 16;
   }
-  else if (LCM_Single != 0)
+  else
   {
-    LCM_Num[0] = LCM_Single + 16;
-    LCM_Num[1] = 0;
-    LCM_Num[2] = 0;
-    LCM_Num[3] = 0;
-    LCM_Num[4] = 0;
+    LCM_Num[num_start + 0] = LCM_Single + 16;
   }
   else
   {
@@ -557,7 +557,7 @@ void MAPS_Dock_LCM_Put_Para_6x8(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Colo
       }
     }
 
-    for (c = 0, i = 0, j = 0; j < 5; x += 6, j++)
+    for (c = 0, i = 0, j = 0; j < 6; x += 6, j++)
     {
       c = LCM_Num[j];
 
@@ -595,7 +595,7 @@ void MAPS_Dock_LCM_Put_Para_6x8(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Colo
       }
     }
 
-    for (c = 0, i = 0, j = 0; j < 5; x += 6, j++)
+    for (c = 0, i = 0, j = 0; j < 6; x += 6, j++)
     {
       c = LCM_Num[j];
 
@@ -627,7 +627,7 @@ void MAPS_Dock_LCM_Put_Para_6x8(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Colo
 void MAPS_Dock_LCM_Put_Para_Pot_6x8(uint8 x, uint8 y, uint8 *ch, float Value, LCM_Color_e LCM_Color_x)
 {
   uint8 c = 0, i = 0, j = 0;
-  int LCM_Num[5] = {0};
+  int LCM_Num[6] = {0};
 
   LCM_Ten = ((int)Value % 100) / 10;
   LCM_Single = (int)Value % 10;
@@ -679,7 +679,7 @@ void MAPS_Dock_LCM_Put_Para_Pot_6x8(uint8 x, uint8 y, uint8 *ch, float Value, LC
       }
     }
 
-    for (c = 0, i = 0, j = 0; j < 5; x += 6, j++)
+    for (c = 0, i = 0, j = 0; j < 6; x += 6, j++)
     {
       c = LCM_Num[j];
 
@@ -717,7 +717,7 @@ void MAPS_Dock_LCM_Put_Para_Pot_6x8(uint8 x, uint8 y, uint8 *ch, float Value, LC
       }
     }
 
-    for (c = 0, i = 0, j = 0; j < 5; x += 6, j++)
+    for (c = 0, i = 0, j = 0; j < 6; x += 6, j++)
     {
       c = LCM_Num[j];
 
@@ -749,7 +749,7 @@ void MAPS_Dock_LCM_Put_Para_Pot_6x8(uint8 x, uint8 y, uint8 *ch, float Value, LC
 void MAPS_Dock_LCM_Put_Para_8x16(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Color_e LCM_Color_x)
 {
   uint8 c = 0, i = 0, j = 0;
-  int LCM_Num[5] = {0};
+  int LCM_Num[6] = {0};
 
   LCM_TenThousand = Value / 10000;
   LCM_Thousand = (Value % 10000) / 1000;
@@ -924,7 +924,7 @@ void MAPS_Dock_LCM_Put_Para_8x16(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Col
 void MAPS_Dock_LCM_Put_Para_Pot_8x16(uint8 x, uint8 y, uint8 *ch, float Value, LCM_Color_e LCM_Color_x)
 {
   uint8 c = 0, i = 0, j = 0;
-  int LCM_Num[5] = {0};
+  int LCM_Num[6] = {0};
 
   LCM_Ten = ((int)Value % 100) / 10;
   LCM_Single = (int)Value % 10;

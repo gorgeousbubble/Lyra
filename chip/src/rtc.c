@@ -11,6 +11,7 @@
  */
 
 #include "rtc.h"
+#include <string.h>
 #include <time.h>
 
 /*
@@ -97,10 +98,20 @@ uint32 RTC_Get_Time(void)
  */
 struct tm RTC_Get_Time_Format(void)
 {
-  struct tm *timeinfo;
+  struct tm timeinfo;
   time_t rawtime = RTC_Get_Time(); // Get the current time in seconds
-  timeinfo = localtime(&rawtime);  // Convert to local time structure
-  return *timeinfo;                // Return the time structure
+  // Use gmtime and copy immediately to avoid static buffer issues
+  struct tm *tmp = gmtime(&rawtime);
+  if (tmp != NULL)
+  {
+    timeinfo = *tmp;
+  }
+  else
+  {
+    // Zero-initialize on failure
+    memset(&timeinfo, 0, sizeof(timeinfo));
+  }
+  return timeinfo;
 }
 
 /*

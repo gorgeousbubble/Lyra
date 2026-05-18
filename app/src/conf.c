@@ -39,10 +39,18 @@ void default_isr(void)
 {
 #ifdef DEBUG
 #define VECTORNUM (*(volatile uint8_t *)(0xE000ED04))
+#define VECTOR_STR_COUNT 116
   uint8 vtr = VECTORNUM;
 
   MAPS_Dock_LCM_Init();
-  MAPS_Dock_LCM_Put_Str_6x8(0, 0, Vector_Str[vtr], LCM_Pure_Color);
+  if (vtr < VECTOR_STR_COUNT)
+  {
+    MAPS_Dock_LCM_Put_Str_6x8(0, 0, Vector_Str[vtr], LCM_Pure_Color);
+  }
+  else
+  {
+    MAPS_Dock_LCM_Put_Str_6x8(0, 0, "UnknownIRQ", LCM_Pure_Color);
+  }
 
   MAPS_Dock_LEDx_Init(MAPS_Dock_LED1, LED_ON);
   MAPS_Dock_LEDx_Init(MAPS_Dock_LED2, LED_ON);

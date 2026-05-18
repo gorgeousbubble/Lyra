@@ -340,6 +340,9 @@ void SPI_MOSI(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_Data, uint8 *S
 {
   uint32 i = 0;
 
+  // Guard against zero-length transfer (would cause uint32 underflow in loop)
+  if (SPI_Len == 0) return;
+
   SPI_MCR_REG(SPIN[SPI_SPIx]) |= SPI_MCR_PCSIS(SPI_PCSx); // Select the film and signal
 
   // Clear the transmission flag bit
@@ -499,6 +502,9 @@ void SPI_MOSI(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_Data, uint8 *S
 void SPI_MOSI_CMD(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_CMD, uint8 *SPI_MI_CMD, uint8 *SPI_MO_Data, uint8 *SPI_MI_Data, uint32 SPI_CMD_Len, uint32 SPI_Len)
 {
   uint32 i = 0;
+
+  // Guard against zero-length transfers (would cause uint32 underflow in loop)
+  if (SPI_CMD_Len == 0 && SPI_Len == 0) return;
 
   SPI_MCR_REG(SPIN[SPI_SPIx]) |= SPI_MCR_PCSIS(SPI_PCSx); // Select the film and signal
 
