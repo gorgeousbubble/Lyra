@@ -132,6 +132,6 @@ extern MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust
 /*
 **function declaration
 */
-extern void main(void);
+extern int main(void);
 
 #endif

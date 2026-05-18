@@ -21,6 +21,13 @@
 #include "port.h"
 #include "rtc.h"
 
+// --- ISR timing constants ---
+#define PIT_PERIOD_MS           1     // PIT tick period (ms)
+#define SENSOR_SAMPLE_PERIOD   10     // MPU6050/MAX30102 sample interval (ms)
+#define SENSOR_PHASE_OFFSET     5     // MAX30102 offset from MPU6050 (ms)
+#define PERIODIC_TASK_PERIOD  100     // LED/ADC/RTC update interval (ms)
+#define STOPWATCH_TICK_MS      10     // Stopwatch centisecond increment interval (ms)
+
 /*
 **PIT0: 1ms tick counter, resets every 100ms
 */
@@ -142,7 +149,7 @@ void PIT0_IRQHandler(void)
   if (Stop_Watch_State)
   {
     Stop_Watch_Count++;
-    if (Stop_Watch_Count >= 10)
+    if (Stop_Watch_Count >= STOPWATCH_TICK_MS)
     {
       Stop_Watch_Count = 0;
       Stop_Watch_Now.Centisecond++;
@@ -166,7 +173,7 @@ void PIT0_IRQHandler(void)
   PIT0_Count++;
 
   // 100ms periodic tasks: LED blink, set RTC update flag
-  if (PIT0_Count >= 100)
+  if (PIT0_Count >= PERIODIC_TASK_PERIOD)
   {
     PIT0_Count = 0;
 
@@ -193,19 +200,19 @@ void PIT1_IRQHandler(void)
   PIT1_Count++;
 
   // Every 10ms: signal main loop to read MPU6050 + run filter
-  if (PIT1_Count % 10 == 0)
+  if (PIT1_Count % SENSOR_SAMPLE_PERIOD == 0)
   {
     MPU6050_Read_Flag = 1;
   }
 
   // Every 10ms (5ms offset): signal main loop to read MAX30102
-  if (PIT1_Count % 10 == 5)
+  if (PIT1_Count % SENSOR_SAMPLE_PERIOD == SENSOR_PHASE_OFFSET)
   {
     MAX30102_Read_Flag = 1;
   }
 
   // Sample period of 100ms
-  if (PIT1_Count >= 100)
+  if (PIT1_Count >= PERIODIC_TASK_PERIOD)
   {
     PIT1_Count = 0;
 

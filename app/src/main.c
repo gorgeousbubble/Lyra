@@ -117,7 +117,7 @@ MAPS_ConfigureAdjust_Tense_Format MAPS_ConfigureAdjust_Tense_FormatN[2] = {
  *  @since              v1.0
  *  Sample usage:       void main(void)
  */
-void main(void)
+int main(void)
 {
         Site_t Site = {0, 0};
 
