@@ -1099,9 +1099,9 @@ void MAPS_Dock_KEY_Incident(void)
             index[1] = Lyra_AlarmClock_List_Cursor;
           }
           // if cursor exceeds maximum length
-          if (Lyra_AlarmClock_List_Cursor >= Alarm_Clock_Max_Len)
+          if (Lyra_AlarmClock_List_Cursor >= ALARM_CLOCK_MAX_LEN)
           {
-            Lyra_AlarmClock_List_Cursor = Alarm_Clock_Max_Len - 1; // Reset to maximum alarm clock list cursor position
+            Lyra_AlarmClock_List_Cursor = ALARM_CLOCK_MAX_LEN - 1; // Reset to maximum alarm clock list cursor position
             index[0] = Lyra_AlarmClock_List_Cursor;
             index[1] = Lyra_AlarmClock_List_Cursor;
           }

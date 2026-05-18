@@ -65,11 +65,11 @@ const int LCM_ConfigureAdjust_Tense_24_icon_coordinate_length = ARRAY_LENGTH(LCM
 const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length = ARRAY_LENGTH(LCM_ConfigureAdjust_Tense_12_icon_coordinate);
 
 /*
-**Alarm Clock timer
+**Alarm Clock timer (static array, no dynamic allocation)
 */
-uint8 Alarm_Clock_Array[16] = {0};// Alarm clock time array (page: 0, offset: 0-15)
-Alarm_Clock_Time* Alarm_Clock_List = NULL;// Pointer to the head of the alarm clock linked list
-const int Alarm_Clock_Max_Len = 8; // Maximum number of alarm clocks
+uint8 Alarm_Clock_Array[16] = {0};                          // E2PROM serialization buffer
+Alarm_Clock_Time Alarm_Clock_List[ALARM_CLOCK_MAX_LEN] = {0}; // Static alarm storage
+int Alarm_Clock_List_Len = 0;                                // Current number of active alarms
 
 /*
 **Configure Adjust tense
@@ -2163,26 +2163,13 @@ void Render_Configure_Adjust_Tense_Digit(const Coord *digit, const int digitLen)
 void Add_Alarm_Clock_Time_To_List(int hour, int minute)
 {
   // check alarm clock list not full
-  if (Get_Alarm_Clock_List_Len() >= Alarm_Clock_Max_Len) {
+  if (Alarm_Clock_List_Len >= ALARM_CLOCK_MAX_LEN) {
       return; // alarm clock list full, do not save
   }
-  // save alarm clock edit data to alarm clock list
-  Alarm_Clock_Time* newAlarm = (Alarm_Clock_Time*)malloc(sizeof(Alarm_Clock_Time));
-  if (newAlarm == NULL) return;
-  newAlarm->hour = hour;
-  newAlarm->minute = minute;
-  newAlarm->next = NULL;
-  // add new alarm clock to the end of the list
-  if (Alarm_Clock_List == NULL) {
-      Alarm_Clock_List = newAlarm;
-  } else {
-      Alarm_Clock_Time* current = Alarm_Clock_List;
-      while (current->next != NULL) {
-          current = current->next;
-      }
-      current->next = newAlarm;
-  }
-  return;
+  // add new alarm to the end of the array
+  Alarm_Clock_List[Alarm_Clock_List_Len].hour = hour;
+  Alarm_Clock_List[Alarm_Clock_List_Len].minute = minute;
+  Alarm_Clock_List_Len++;
 }
 
 /*
@@ -2196,19 +2183,9 @@ void Add_Alarm_Clock_Time_To_List(int hour, int minute)
 */
 void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute)
 {
-  // modify index specifc alarm clock time in list
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  int count = 0;
-  while (current != NULL) {
-      if (count == index) {
-          // found the alarm clock time to modify
-          current->hour = hour;
-          current->minute = minute;
-          return; // modified the alarm clock time
-      }
-      current = current->next;
-      count++;
-  }
+  if (index < 0 || index >= Alarm_Clock_List_Len) return;
+  Alarm_Clock_List[index].hour = hour;
+  Alarm_Clock_List[index].minute = minute;
 }
 
 /*
@@ -2220,26 +2197,12 @@ void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute)
 */
 void Del_Alarm_Clock_Time_From_List(int index)
 {
-  // delete index specifc alarm clock time from list
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  Alarm_Clock_Time* previous = NULL;
-  int count = 0;
-  while (current != NULL) {
-      if (count == index) {
-          // found the alarm clock time to delete
-          if (previous == NULL) {
-              // deleting the head of the list
-              Alarm_Clock_List = current->next;
-          } else {
-              previous->next = current->next;
-          }
-          free(current);
-          return; // deleted the alarm clock time
-      }
-      previous = current;
-      current = current->next;
-      count++;
+  if (index < 0 || index >= Alarm_Clock_List_Len) return;
+  // Shift remaining elements left to fill the gap
+  for (int i = index; i < Alarm_Clock_List_Len - 1; i++) {
+      Alarm_Clock_List[i] = Alarm_Clock_List[i + 1];
   }
+  Alarm_Clock_List_Len--;
 }
 
 /*
@@ -2253,21 +2216,13 @@ void Del_Alarm_Clock_Time_From_List(int index)
 */
 void Get_Alarm_Clock_Time_From_List(int index, int* hour, int* minute)
 {
-  // get alarm clock time from list by index
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  int count = 0;
-  while (current != NULL) {
-      if (count == index) {
-          *hour = current->hour;
-          *minute = current->minute;
-          return; // found the alarm clock time
-      }
-      count++;
-      current = current->next;
+  if (index < 0 || index >= Alarm_Clock_List_Len) {
+      *hour = 0;
+      *minute = 0;
+      return;
   }
-  // if not found, set hour and minute to 0
-  *hour = 0;
-  *minute = 0;
+  *hour = Alarm_Clock_List[index].hour;
+  *minute = Alarm_Clock_List[index].minute;
 }
 
 /*
@@ -2276,16 +2231,9 @@ void Get_Alarm_Clock_Time_From_List(int index, int* hour, int* minute)
  *  @since      v1.0
  *  Sample usage:       int len = Get_Alarm_Clock_List_Len();
 */
-int Get_Alarm_Clock_List_Len()
+int Get_Alarm_Clock_List_Len(void)
 {
-  // get alarm clock list length
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  int count = 0;
-  while (current != NULL) {
-      count++;
-      current = current->next;
-  }
-  return count;
+  return Alarm_Clock_List_Len;
 }
 
 /*
@@ -2294,16 +2242,9 @@ int Get_Alarm_Clock_List_Len()
  *  @since      v1.0
  *  Sample usage:       Clean_Alarm_Clock_List();
 */
-void Clean_Alarm_Clock_List()
+void Clean_Alarm_Clock_List(void)
 {
-  // free alarm clock list
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  while (current != NULL) {
-      Alarm_Clock_Time* temp = current;
-      current = current->next;
-      free(temp);
-  }
-  Alarm_Clock_List = NULL;
+  Alarm_Clock_List_Len = 0;
 }
 
 /*
@@ -2312,22 +2253,17 @@ void Clean_Alarm_Clock_List()
  *  @since      v1.0
  *  Sample usage:       Write_Alarm_Clock_List_To_E2PROM();
 */
-void Write_Alarm_Clock_List_To_E2PROM()
+void Write_Alarm_Clock_List_To_E2PROM(void)
 {
-  // save alarm clock list to array
-  Alarm_Clock_Time* current = Alarm_Clock_List;
-  int count = 0;
-  int i = 0;
-  // fill the alarm clock array with 0xFF
-  for (int j = 0; j < Alarm_Clock_Max_Len * 2; j++) {
-      Alarm_Clock_Array[j] = 0xFF;
+  int i;
+  // fill the alarm clock array with 0xFF (empty marker)
+  for (i = 0; i < ALARM_CLOCK_MAX_LEN * 2; i++) {
+      Alarm_Clock_Array[i] = 0xFF;
   }
-  // write alarm clock list to array
-  while (current != NULL && count < Alarm_Clock_Max_Len) {
-      Alarm_Clock_Array[i] = (uint8)current->hour;
-      Alarm_Clock_Array[i+1] = (uint8)current->minute;
-      current = current->next;
-      i += 2;
+  // serialize alarm list to array
+  for (i = 0; i < Alarm_Clock_List_Len; i++) {
+      Alarm_Clock_Array[i * 2]     = (uint8)Alarm_Clock_List[i].hour;
+      Alarm_Clock_Array[i * 2 + 1] = (uint8)Alarm_Clock_List[i].minute;
   }
   // write alarm clock array to e2prom
   MAPS_Dock_W25Q80_Erase_Block(0x00000000, ERASE_SECTOR_SIZE); // erase first block
@@ -2340,30 +2276,19 @@ void Write_Alarm_Clock_List_To_E2PROM()
  *  @since      v1.0
  *  Sample usage:       Read_Alarm_Clock_E2PROM_To_List();
 */
-void Read_Alarm_Clock_E2PROM_To_List()
+void Read_Alarm_Clock_E2PROM_To_List(void)
 {
   // read alarm clock from e2prom to array
   MAPS_Dock_W25Q80_Read_Page(0, 0, Alarm_Clock_Array, 16);
-  // read alarm clock array to list
-  for (int i = 0; i < 16; i += 2) {
+  // deserialize array to alarm list
+  Alarm_Clock_List_Len = 0;
+  for (int i = 0; i < ALARM_CLOCK_MAX_LEN * 2; i += 2) {
       if (Alarm_Clock_Array[i] == 0xFF && Alarm_Clock_Array[i+1] == 0xFF) {
           break; // end of alarm clock list
       }
-      Alarm_Clock_Time* newAlarm = (Alarm_Clock_Time*)malloc(sizeof(Alarm_Clock_Time));
-      if (newAlarm == NULL) break;
-      newAlarm->hour = (int)Alarm_Clock_Array[i];
-      newAlarm->minute = (int)Alarm_Clock_Array[i+1];
-      newAlarm->next = NULL;
-      // add new alarm clock to the end of the list
-      if (Alarm_Clock_List == NULL) {
-          Alarm_Clock_List = newAlarm;
-      } else {
-          Alarm_Clock_Time* current = Alarm_Clock_List;
-          while (current->next != NULL) {
-              current = current->next;
-          }
-          current->next = newAlarm;
-      }
+      Alarm_Clock_List[Alarm_Clock_List_Len].hour = (int)Alarm_Clock_Array[i];
+      Alarm_Clock_List[Alarm_Clock_List_Len].minute = (int)Alarm_Clock_Array[i+1];
+      Alarm_Clock_List_Len++;
   }
 }
 

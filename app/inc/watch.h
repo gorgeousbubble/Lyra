@@ -18,15 +18,14 @@
 /*
 **structure definition
 */
-// alarm clock time
-struct Alarm_Clock_Time
+// alarm clock time (static array element, no dynamic allocation)
+typedef struct
 {
   int hour;
   int minute;
-  struct Alarm_Clock_Time *next;
-};
+} Alarm_Clock_Time;
 
-typedef struct Alarm_Clock_Time Alarm_Clock_Time;
+#define ALARM_CLOCK_MAX_LEN 8
 
 /*
 **variate declaration
@@ -78,8 +77,8 @@ extern const int LCM_ConfigureAdjust_Tense_24_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
-extern Alarm_Clock_Time *Alarm_Clock_List;
-extern const int Alarm_Clock_Max_Len;
+extern Alarm_Clock_Time Alarm_Clock_List[ALARM_CLOCK_MAX_LEN]; // Static array (no malloc)
+extern int Alarm_Clock_List_Len;                                // Current number of alarms
 extern uint8 Configure_Adjust_Tense;
 
 /*
@@ -112,10 +111,10 @@ extern void Add_Alarm_Clock_Time_To_List(int hour, int minute);
 extern void Mod_Alarm_Clock_Time_To_List(int index, int hour, int minute);
 extern void Del_Alarm_Clock_Time_From_List(int index);
 extern void Get_Alarm_Clock_Time_From_List(int index, int *hour, int *minute);
-extern int Get_Alarm_Clock_List_Len();
-extern void Clean_Alarm_Clock_List();
-extern void Write_Alarm_Clock_List_To_E2PROM();
-extern void Read_Alarm_Clock_E2PROM_To_List();
+extern int Get_Alarm_Clock_List_Len(void);
+extern void Clean_Alarm_Clock_List(void);
+extern void Write_Alarm_Clock_List_To_E2PROM(void);
+extern void Read_Alarm_Clock_E2PROM_To_List(void);
 extern void Write_Configure_Adjust_Tense_Value_To_E2PROM();
 extern void Read_Configure_Adjust_Tense_E2PROM_To_Value();
 
