@@ -96,7 +96,7 @@ extern void  I2C_GPIO_Send_Ack(int Ack);
 extern uint8 I2C_GPIO_Recv_Ack(void);
 extern uint8 I2C_GPIO_Send_Byte(uint8 I2C_Data);
 extern uint8 I2C_GPIO_Recv_Byte(void);
-extern void  I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 I2C_Data);
+extern uint8 I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 I2C_Data);
 extern uint8 I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr);
 extern int16 I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr);
 extern int16 MPU_Get_Acc_X(void);

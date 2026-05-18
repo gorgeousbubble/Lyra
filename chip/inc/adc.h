@@ -150,6 +150,6 @@ extern void ADC_Init(ADCn_CHn ADCn_CHx);
 extern void ADC_Stop(ADC_ADCn ADC_ADCx);
 extern uint16 ADC_Once(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit);
 extern uint16 ADC_Average(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint8 ADC_Samp_Num);
-extern void ADC_Samp_Array(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint16 *ADC_Array);
+extern void ADC_Samp_Array(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint16 *ADC_Array, uint8 ADC_Array_Size);
 
 #endif

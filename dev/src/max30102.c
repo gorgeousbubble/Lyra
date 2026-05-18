@@ -108,24 +108,27 @@ uint8 MAX30102_I2C_GPIO_Recv_Byte(void)
   return Data;
 }
 
-void MAX30102_I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 I2C_Data)
+// Write one byte to a register. Returns 1 on success, 0 if NACKed.
+uint8 MAX30102_I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 I2C_Data)
 {
   MAX30102_I2C_GPIO_Start();
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr);
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr);
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Data);
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr))  { MAX30102_I2C_GPIO_Stop(); return 0; }
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr))  { MAX30102_I2C_GPIO_Stop(); return 0; }
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Data))      { MAX30102_I2C_GPIO_Stop(); return 0; }
   MAX30102_I2C_GPIO_Stop();
+  return 1;
 }
 
+// Read one byte from a register. Returns 0xFF on NACK (bus error).
 uint8 MAX30102_I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
   uint8 I2C_Data = 0;
 
   MAX30102_I2C_GPIO_Start();
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr);
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr);
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr))      { MAX30102_I2C_GPIO_Stop(); return 0xFF; }
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr))      { MAX30102_I2C_GPIO_Stop(); return 0xFF; }
   MAX30102_I2C_GPIO_Start();
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr + 1);
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr + 1))  { MAX30102_I2C_GPIO_Stop(); return 0xFF; }
   I2C_Data = MAX30102_I2C_GPIO_Recv_Byte();
   MAX30102_I2C_GPIO_Send_Ack(1);
   MAX30102_I2C_GPIO_Stop();
@@ -142,19 +145,21 @@ int MAX30102_I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 }
 
 // Read 6 consecutive bytes in a single I2C transaction (used for FIFO read)
-void MAX30102_I2C_GPIO_Read_Reg_Six_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 *data)
+// Returns 1 on success, 0 on NACK.
+uint8 MAX30102_I2C_GPIO_Read_Reg_Six_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 *data)
 {
   MAX30102_I2C_GPIO_Start();
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr);
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr);
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr))      { MAX30102_I2C_GPIO_Stop(); return 0; }
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr))      { MAX30102_I2C_GPIO_Stop(); return 0; }
   MAX30102_I2C_GPIO_Start();
-  MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr + 1);
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr + 1))  { MAX30102_I2C_GPIO_Stop(); return 0; }
   for (uint8 i = 0; i < 6; i++)
   {
     data[i] = MAX30102_I2C_GPIO_Recv_Byte();
     MAX30102_I2C_GPIO_Send_Ack(i < 5 ? 0 : 1); // ACK all but last byte
   }
   MAX30102_I2C_GPIO_Stop();
+  return 1;
 }
 
 /*

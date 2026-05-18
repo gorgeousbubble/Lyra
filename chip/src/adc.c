@@ -268,16 +268,14 @@ uint16 ADC_Average(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint8 ADC_Samp_Num)
  *  @param      ADCn_CHn        ADCn_CHx        ADC channel
  *  @param      ADC_nBit        ADC_xbit        ADC sample(ADC_8Bit,ADC_10Bit,ADC_12Bit,ADC_16Bit)
  *  @param      uint16          ADC_Array[]     ADC array
+ *  @param      uint8           ADC_Array_Size  Number of samples to collect
  *  @return     Sample value
  *  @since      v1.0
- *  Sample usage:               ADC_Samp_Array(ADC0_SE10,ADC_12Bit,&ADC_Array[0])
+ *  Sample usage:               ADC_Samp_Array(ADC0_SE10,ADC_12Bit,&ADC_Array[0],10)
  */
-void ADC_Samp_Array(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint16 *ADC_Array)
+void ADC_Samp_Array(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint16 *ADC_Array, uint8 ADC_Array_Size)
 {
   uint8 i = 0;
-  uint8 ADC_Array_Size = 0;
-
-  ADC_Array_Size = (sizeof(ADC_Array) / sizeof(uint16));
 
   for (i = 0; i < ADC_Array_Size; i++)
   {

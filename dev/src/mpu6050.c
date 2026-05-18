@@ -112,26 +112,27 @@ uint8 I2C_GPIO_Recv_Byte(void)
   return Data;
 }
 
-// Write one byte to a register
-void I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 I2C_Data)
+// Write one byte to a register. Returns 1 on success, 0 if any byte was NACKed.
+uint8 I2C_GPIO_Write_Reg(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 I2C_Data)
 {
   I2C_GPIO_Start();
-  I2C_GPIO_Send_Byte(I2C_Div_Adr);
-  I2C_GPIO_Send_Byte(I2C_Reg_Adr);
-  I2C_GPIO_Send_Byte(I2C_Data);
+  if (!I2C_GPIO_Send_Byte(I2C_Div_Adr))  { I2C_GPIO_Stop(); return 0; }
+  if (!I2C_GPIO_Send_Byte(I2C_Reg_Adr))  { I2C_GPIO_Stop(); return 0; }
+  if (!I2C_GPIO_Send_Byte(I2C_Data))      { I2C_GPIO_Stop(); return 0; }
   I2C_GPIO_Stop();
+  return 1;
 }
 
-// Read one byte from a register
+// Read one byte from a register. Returns 0xFF on NACK (bus error).
 uint8 I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
   uint8 I2C_Data = 0;
 
   I2C_GPIO_Start();
-  I2C_GPIO_Send_Byte(I2C_Div_Adr);
-  I2C_GPIO_Send_Byte(I2C_Reg_Adr);
+  if (!I2C_GPIO_Send_Byte(I2C_Div_Adr))      { I2C_GPIO_Stop(); return 0xFF; }
+  if (!I2C_GPIO_Send_Byte(I2C_Reg_Adr))      { I2C_GPIO_Stop(); return 0xFF; }
   I2C_GPIO_Start();                    // Repeated START for read
-  I2C_GPIO_Send_Byte(I2C_Div_Adr + 1);
+  if (!I2C_GPIO_Send_Byte(I2C_Div_Adr + 1))  { I2C_GPIO_Stop(); return 0xFF; }
   I2C_Data = I2C_GPIO_Recv_Byte();
   I2C_GPIO_Send_Ack(1);                // NACK to end read
   I2C_GPIO_Stop();
@@ -142,6 +143,7 @@ uint8 I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 /*
  * Read a 16-bit register atomically in a single I2C transaction.
  * Uses repeated START to avoid data tearing between high and low bytes.
+ * Returns 0 on NACK (bus error).
  */
 int16 I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
@@ -149,10 +151,10 @@ int16 I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
   uint8 I2C_Reg_L = 0;
 
   I2C_GPIO_Start();
-  I2C_GPIO_Send_Byte(I2C_Div_Adr);
-  I2C_GPIO_Send_Byte(I2C_Reg_Adr);
+  if (!I2C_GPIO_Send_Byte(I2C_Div_Adr))      { I2C_GPIO_Stop(); return 0; }
+  if (!I2C_GPIO_Send_Byte(I2C_Reg_Adr))      { I2C_GPIO_Stop(); return 0; }
   I2C_GPIO_Start();                    // Repeated START
-  I2C_GPIO_Send_Byte(I2C_Div_Adr + 1);
+  if (!I2C_GPIO_Send_Byte(I2C_Div_Adr + 1))  { I2C_GPIO_Stop(); return 0; }
   I2C_Reg_H = I2C_GPIO_Recv_Byte();
   I2C_GPIO_Send_Ack(0);                // ACK: more bytes to read
   I2C_Reg_L = I2C_GPIO_Recv_Byte();
