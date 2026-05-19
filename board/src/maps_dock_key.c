@@ -1307,6 +1307,9 @@ void MAPS_Dock_KEY_Incident(void)
         Render_World_Clock_Time(LCM_WorldClock_newyork_coordinate, LCM_WorldClock_newyork_coordinate_length, MAPS_WorldClock_Timezone_Array[9], (rtc_hour - 13 + 24) % 24, rtc_minute, Lyra_ConfigureAdjust_Tense_Format);
       }
       break;
+    case MAPS_Menu_SpiritLevel:
+      Render_Spirit_Level(FF.pitch.angle, FF.roll.angle);
+      break;
     case MAPS_Menu_Configure_Adjust:
       if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_List)
       {

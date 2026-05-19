@@ -117,5 +117,6 @@ extern void Write_Alarm_Clock_List_To_E2PROM(void);
 extern void Read_Alarm_Clock_E2PROM_To_List(void);
 extern void Write_Configure_Adjust_Tense_Value_To_E2PROM();
 extern void Read_Configure_Adjust_Tense_E2PROM_To_Value();
+extern void Render_Spirit_Level(float pitch, float roll);
 
 #endif
