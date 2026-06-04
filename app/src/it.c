@@ -223,7 +223,6 @@ void PIT1_IRQHandler(void)
     }
   }
 }
-}
 
 /*
  *  @brief      RTC_IRQHandler     RTC timed interrupt service function

@@ -528,14 +528,6 @@ void MAPS_Dock_LCM_Put_Para_6x8(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Colo
   {
     LCM_Num[num_start + 0] = LCM_Single + 16;
   }
-  else
-  {
-    LCM_Num[0] = 16;
-    LCM_Num[1] = 0;
-    LCM_Num[2] = 0;
-    LCM_Num[3] = 0;
-    LCM_Num[4] = 0;
-  }
 
   if (LCM_Color_x == LCM_Pure_Color)
   {
