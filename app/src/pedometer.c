@@ -31,15 +31,15 @@ void Pedometer_Update(int16 ax, int16 ay, int16 az, uint32 elapsed_ms)
 {
     s_elapsed_total_ms += elapsed_ms;
 
-    // Compute magnitude squared (avoid sqrt for performance)
-    // Cast to int32 first to prevent overflow in multiplication
-    int32 ax32 = (int32)ax;
-    int32 ay32 = (int32)ay;
-    int32 az32 = (int32)az;
-    uint32 mag_sq = (uint32)(ax32 * ax32 + ay32 * ay32 + az32 * az32);
+    // Compute magnitude squared using int64 to prevent overflow.
+    // int16 max = 32767; 32767^2 * 3 = ~3.2e9 which exceeds int32 max (2.1e9).
+    int64 ax64 = (int64)ax;
+    int64 ay64 = (int64)ay;
+    int64 az64 = (int64)az;
+    uint64 mag_sq = (uint64)(ax64 * ax64 + ay64 * ay64 + az64 * az64);
 
     // Rising-edge detection: cross threshold from below
-    if (mag_sq >= STEP_THRESHOLD_SQ)
+    if (mag_sq >= (uint64)STEP_THRESHOLD_SQ)
     {
         if (!Pedometer.above_threshold)
         {

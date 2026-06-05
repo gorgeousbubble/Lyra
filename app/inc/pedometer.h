@@ -33,8 +33,10 @@
 
 // Accelerometer full-scale = ±2g → 16384 LSB/g
 // A walking step peak is typically 1.3~2.0g total; we set the threshold at ~1.2g
-#define STEP_THRESHOLD        19660   // ~1.2g in 16384 LSB/g units (sqrt threshold applied to sum-of-squares)
-#define STEP_THRESHOLD_SQ     (19660UL * 19660UL)  // Pre-squared for integer math
+// static rest:  az ≈ 16384  → mag_sq ≈ 16384² = 268,435,456
+// 1.2g motion:  mag ≈ 19660 → mag_sq ≈ 386,516,0 (above rest, triggered by step)
+#define STEP_THRESHOLD        19660UL   // ~1.2g in LSB (sqrt threshold)
+#define STEP_THRESHOLD_SQ     (19660ULL * 19660ULL)  // Pre-squared, use uint64 comparison
 #define STEP_MIN_INTERVAL_MS  300     // Minimum ms between two steps (max ~200 steps/min)
 
 // Average stride length (cm) – tunable

@@ -15,6 +15,7 @@
 #include "main.h"
 #include "maps_dock_w25q80.h"
 #include "mpu6050.h"
+#include "oled.h"
 #include "oled_i2c.h"
 #include "watch.h"
 #include <stdio.h>
