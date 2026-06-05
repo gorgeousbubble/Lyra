@@ -42,8 +42,9 @@ typedef enum
   MAPS_Menu_AlarmClock = 2,       // Menu Alarm Clock
   MAPS_Menu_WorldClock = 3,       // Menu World Clock
   MAPS_Menu_SpiritLevel = 4,      // Menu Spirit Level
-  MAPS_Menu_Configure_Adjust = 5, // Menu Configure Adjust
-  MAPS_Menu_Selection_Max = 6,    // Maximum menu selection
+  MAPS_Menu_Pedometer = 5,        // Menu Pedometer (Step Counter)
+  MAPS_Menu_Configure_Adjust = 6, // Menu Configure Adjust
+  MAPS_Menu_Selection_Max = 7,    // Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum

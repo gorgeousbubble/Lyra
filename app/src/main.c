@@ -22,6 +22,7 @@
 #include "maps_dock_rocker.h"
 #include "max30102.h"
 #include "mpu6050.h"
+#include "pedometer.h"
 #include "rtc.h"
 
 /*
@@ -42,6 +43,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_AlarmClock,
     MAPS_Menu_WorldClock,
     MAPS_Menu_SpiritLevel,
+    MAPS_Menu_Pedometer,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -151,6 +153,9 @@ int main(void)
                         Fusion_Filter(&FF, MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z,
                                            MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
                     }
+
+                    // Step detection (runs every 10ms regardless of calibration state)
+                    Pedometer_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, 10);
 
                     UART_Send_Flag = 1; // Signal UART send after filter update
                 }
