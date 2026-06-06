@@ -12,7 +12,6 @@
 
 #include "pedometer.h"
 #include "oled_i2c.h"
-#include "oled.h"
 #include <stdio.h>
 
 /* Global pedometer state */
@@ -76,146 +75,55 @@ void Pedometer_Reset(void)
 /*
  * Render_Pedometer
  * ----------------
- * Draws the pedometer UI on the 128x64 OLED.
+ * Draws the pedometer UI on the 128x64 OLED using built-in string APIs.
  *
  * Layout:
- *   Row 0 (y=0..7)   : "STEPS"  label (centered, 6x8)
- *   Row 1 (y=10..25) : step count, up to 5 digits (12x24 large font, centered)
- *   Row 2 (y=28..35) : horizontal separator line
- *   Row 3 (y=38..45) : "DIST"  label (centered, 6x8)
- *   Row 4 (y=48..55) : distance in meters (6x8), e.g. "123.4 m"
- *   Row 5 (y=57..63) : "KEY0:RESET" hint (6x8, small)
+ *   y=0  page 0: "STEPS" label (centered, 6x8)
+ *   y=1  page 1: step count in 12x24 large font (centered, 3 pages tall)
+ *   y=4  page 4: horizontal separator line
+ *   y=5  page 5: "DIST" label + distance value
+ *   y=7  page 7: "KEY0:RESET" hint
  */
 void Render_Pedometer(void)
 {
-    uint8 screen[64][16] = {0};
+    // Clear screen first
+    Oled_I2C_Clean();
 
-    // Helper: draw a single 6x8 character at pixel (px, py)
-    #define DRAW_CHAR6x8(px, py, ch) do {                                    \
-        uint8 _c = (uint8)(ch) - 32;                                         \
-        if (_c < 96) {                                                        \
-            for (int _col = 0; _col < 6; _col++) {                           \
-                uint8 _fb = Oled_FontLib_6x8[_c][_col];                      \
-                for (int _bit = 0; _bit < 8; _bit++) {                       \
-                    if (_fb & (1 << _bit)) {                                  \
-                        int _x = (px) + _col;                                \
-                        int _y = (py) + _bit;                                \
-                        if (_x >= 0 && _x < 128 && _y >= 0 && _y < 64)      \
-                            screen[_y][_x >> 3] |= 0x01 << (7 - (_x & 7));  \
-                    }                                                          \
-                }                                                              \
-            }                                                                  \
-        }                                                                      \
-    } while(0)
+    // --- "STEPS" label centered at page 0 ---
+    // 5 chars * 6px = 30px wide; center x = (128 - 30) / 2 = 49
+    Oled_I2C_Put_Str_6x8(49, 0, "STEPS");
 
-    // Helper: draw a string at pixel (px, py) with 6x8 font
-    #define DRAW_STR6x8(px, py, str) do {                   \
-        const char *_s = (str);                             \
-        int _x = (px);                                      \
-        while (*_s) { DRAW_CHAR6x8(_x, py, *_s); _x += 6; _s++; } \
-    } while(0)
-
-    // --- "STEPS" label (centered: 5 chars * 6px = 30px, center at 64) ---
-    DRAW_STR6x8(49, 0, "STEPS");
-
-    // --- Step count (large, using 12x24 font, up to 5 digits) ---
-    // Format step count as zero-padded 5-digit string for simplicity
+    // --- Step count in 12x24 font, centered ---
     char steps_str[8];
-    snprintf(steps_str, sizeof(steps_str), "%5lu", (unsigned long)Pedometer.step_count);
-    // Remove leading spaces – find first non-space
-    const char *steps_disp = steps_str;
-    while (*steps_disp == ' ' && *(steps_disp + 1) != '\0') steps_disp++;
+    snprintf(steps_str, sizeof(steps_str), "%lu", (unsigned long)Pedometer.step_count);
 
-    // Calculate width to center: each char is 12px wide
+    // Center: count chars, each 12px wide
     int steps_len = 0;
-    const char *tmp = steps_disp;
-    while (*tmp++) steps_len++;
-    int steps_x = (128 - steps_len * 12) / 2;
-    if (steps_x < 0) steps_x = 0;
+    const char *p = steps_str;
+    while (*p++) steps_len++;
+    uint8 steps_x = (uint8)((128 - steps_len * 12) / 2);
 
-    // Draw using 12x24 font (3 rows of 8 bits each)
-    for (int i = 0; steps_disp[i] != '\0' && i < 6; i++)
-    {
-        uint8 c = steps_disp[i] - 32;
-        if (c >= 96) continue;
-        int char_x = steps_x + i * 12;
-        // Row 0 of 12x24 character (y = 10..17)
-        for (int col = 0; col < 12; col++)
-        {
-            uint8 fb = Oled_FontLib_12x24[c * 36 + col];
-            for (int bit = 0; bit < 8; bit++)
-            {
-                if (fb & (1 << bit))
-                {
-                    int x = char_x + col;
-                    int y = 10 + bit;
-                    if (x >= 0 && x < 128 && y >= 0 && y < 64)
-                        screen[y][x >> 3] |= 0x01 << (7 - (x & 7));
-                }
-            }
-        }
-        // Row 1 (y = 18..25)
-        for (int col = 0; col < 12; col++)
-        {
-            uint8 fb = Oled_FontLib_12x24[c * 36 + 12 + col];
-            for (int bit = 0; bit < 8; bit++)
-            {
-                if (fb & (1 << bit))
-                {
-                    int x = char_x + col;
-                    int y = 18 + bit;
-                    if (x >= 0 && x < 128 && y >= 0 && y < 64)
-                        screen[y][x >> 3] |= 0x01 << (7 - (x & 7));
-                }
-            }
-        }
-        // Row 2 (y = 26..33)
-        for (int col = 0; col < 12; col++)
-        {
-            uint8 fb = Oled_FontLib_12x24[c * 36 + 24 + col];
-            for (int bit = 0; bit < 8; bit++)
-            {
-                if (fb & (1 << bit))
-                {
-                    int x = char_x + col;
-                    int y = 26 + bit;
-                    if (x >= 0 && x < 128 && y >= 0 && y < 64)
-                        screen[y][x >> 3] |= 0x01 << (7 - (x & 7));
-                }
-            }
-        }
-    }
+    Oled_I2C_Put_Str_12x24(steps_x, 1, (uint8 *)steps_str);
 
-    // --- Separator line at y=36 ---
-    for (int x = 4; x < 124; x++)
-        screen[36][x >> 3] |= 0x01 << (7 - (x & 7));
+    // --- Separator line at page 4 (y=32..39): draw using a full-width string of dashes ---
+    Oled_I2C_Put_Str_6x8(0, 4, "----------------");
 
-    // --- Distance calculation ---
-    // distance_cm = step_count * STEP_STRIDE_CM
+    // --- Distance ---
     uint32 dist_cm = Pedometer.step_count * STEP_STRIDE_CM;
     uint32 dist_m  = dist_cm / 100;
-    uint32 dist_dm = (dist_cm % 100) / 10; // one decimal
+    uint32 dist_dm = (dist_cm % 100) / 10;
 
-    char dist_str[16];
-    snprintf(dist_str, sizeof(dist_str), "%lu.%lu m", (unsigned long)dist_m, (unsigned long)dist_dm);
+    char dist_str[20];
+    snprintf(dist_str, sizeof(dist_str), "DIST:%lu.%lum", (unsigned long)dist_m, (unsigned long)dist_dm);
 
-    // "DIST" label at y=39
-    DRAW_STR6x8(49, 39, "DIST");
-
-    // Distance value centered at y=49
+    // Center the distance string
     int dist_len = 0;
-    tmp = dist_str;
-    while (*tmp++) dist_len++;
-    int dist_x = (128 - dist_len * 6) / 2;
-    if (dist_x < 0) dist_x = 0;
-    DRAW_STR6x8(dist_x, 49, dist_str);
+    p = dist_str;
+    while (*p++) dist_len++;
+    uint8 dist_x = (uint8)((128 - dist_len * 6) / 2);
 
-    // --- "KEY0:RST" hint at bottom y=57 ---
-    DRAW_STR6x8(28, 57, "KEY0:RESET");
+    Oled_I2C_Put_Str_6x8(dist_x, 5, (uint8 *)dist_str);
 
-    #undef DRAW_CHAR6x8
-    #undef DRAW_STR6x8
-
-    // Output to OLED
-    Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+    // --- "KEY0:RESET" hint at bottom ---
+    Oled_I2C_Put_Str_6x8(28, 7, "KEY0:RESET");
 }

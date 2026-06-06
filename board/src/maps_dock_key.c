@@ -1,4 +1,4 @@
-﻿/*
+/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
@@ -255,7 +255,7 @@ void MAPS_Dock_KEY_Incident(void)
         }
         break;
       case MAPS_Menu_Configure_Adjust:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, 0, 0, 5);
         Lyra_Menu_Selection--;
         if (Lyra_Menu_Selection < 0)
         {
@@ -313,7 +313,7 @@ void MAPS_Dock_KEY_Incident(void)
         }
         break;
       case MAPS_Menu_Pedometer:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
         Lyra_Menu_Selection++;
         if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
         {
@@ -352,7 +352,7 @@ void MAPS_Dock_KEY_Incident(void)
       Oled_I2C_Draw_BMP_128x64(LCM_Spirit_Level_icon, OLED_Invert_Color);
       break;
     case MAPS_Menu_Pedometer:
-      Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color); // Reuse icon placeholder
+      Oled_I2C_Draw_BMP_128x64(LCM_Pedometer_icon, OLED_Invert_Color);
       break;
     case MAPS_Menu_Configure_Adjust:
       Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);

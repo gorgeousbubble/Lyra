@@ -56,6 +56,7 @@ extern const uint8 LCM_Stop_Watch_icon[];
 extern const uint8 LCM_Alarm_Clock_icon[];
 extern const uint8 LCM_World_Clock_icon[];
 extern const uint8 LCM_Spirit_Level_icon[];
+extern const uint8 LCM_Pedometer_icon[];
 extern const uint8 LCM_Configure_Adjust_icon[];
 extern const uint8 LCM_Wait_icon[];
 extern const uint8 LCM_Clock_Dial[];
