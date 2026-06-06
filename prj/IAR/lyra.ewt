@@ -11389,6 +11389,9 @@
             <name>$PROJ_DIR$\..\..\app\src\conf.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\filter.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\func.c</name>
         </file>
         <file>
@@ -11401,10 +11404,10 @@
             <name>$PROJ_DIR$\..\..\app\src\it.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\app\src\filter.c</name>
+            <name>$PROJ_DIR$\..\..\app\src\main.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\app\src\main.c</name>
+            <name>$PROJ_DIR$\..\..\app\src\pedometer.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\src\watch.c</name>
@@ -11572,6 +11575,9 @@
             <name>$PROJ_DIR$\..\..\chip\inc\dwt.h</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\inc\filter.h</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\chip\inc\flash.h</name>
         </file>
         <file>
@@ -11600,9 +11606,6 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\inc\it.h</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\app\inc\filter.h</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\chip\inc\lptmr.h</name>
