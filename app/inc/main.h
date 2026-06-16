@@ -44,8 +44,9 @@ typedef enum
   MAPS_Menu_SpiritLevel = 4,      // Menu Spirit Level
   MAPS_Menu_Pedometer = 5,        // Menu Pedometer (Step Counter)
   MAPS_Menu_Attitude3D = 6,       // Menu 3D Attitude Indicator
-  MAPS_Menu_Configure_Adjust = 7, // Menu Configure Adjust
-  MAPS_Menu_Selection_Max = 8,    // Maximum menu selection
+  MAPS_Menu_TiltAlarm = 7,        // Menu Tilt Alarm
+  MAPS_Menu_Configure_Adjust = 8, // Menu Configure Adjust
+  MAPS_Menu_Selection_Max = 9,    // Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum

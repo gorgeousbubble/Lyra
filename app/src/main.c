@@ -25,6 +25,7 @@
 #include "mpu6050.h"
 #include "pedometer.h"
 #include "rtc.h"
+#include "tilt_alarm.h"
 
 /*
 ** MAPS Screen Status
@@ -46,6 +47,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_SpiritLevel,
     MAPS_Menu_Pedometer,
     MAPS_Menu_Attitude3D,
+    MAPS_Menu_TiltAlarm,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -158,6 +160,9 @@ int main(void)
 
                     // Step detection (runs every 10ms regardless of calibration state)
                     Pedometer_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, 10);
+
+                    // Tilt alarm check (runs every 10ms, after filter is updated)
+                    TiltAlarm_Update(FF.pitch.angle, FF.roll.angle);
 
                     UART_Send_Flag = 1; // Signal UART send after filter update
                 }

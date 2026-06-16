@@ -13,6 +13,7 @@
 #include "animation.h"
 #include "attitude3d.h"
 #include "conf.h"
+#include "tilt_alarm.h"
 #include "dwt.h"
 #include "gpio.h"
 #include "it.h"
@@ -263,6 +264,14 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
         }
         break;
+      case MAPS_Menu_TiltAlarm:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
+        Lyra_Menu_Selection--;
+        if (Lyra_Menu_Selection < 0)
+        {
+          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
+        }
+        break;
       case MAPS_Menu_Configure_Adjust:
         Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
         Lyra_Menu_Selection--;
@@ -337,6 +346,14 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Menu_Selection = 0;
         }
         break;
+      case MAPS_Menu_TiltAlarm:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
+        Lyra_Menu_Selection++;
+        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
+        {
+          Lyra_Menu_Selection = 0;
+        }
+        break;
       case MAPS_Menu_Configure_Adjust:
         Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 1, 0, 5);
         Lyra_Menu_Selection++;
@@ -373,6 +390,9 @@ void MAPS_Dock_KEY_Incident(void)
       break;
     case MAPS_Menu_Attitude3D:
       Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);
+      break;
+    case MAPS_Menu_TiltAlarm:
+      Oled_I2C_Draw_BMP_128x64(LCM_Spirit_Level_icon, OLED_Invert_Color);
       break;
     case MAPS_Menu_Configure_Adjust:
       Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);
@@ -451,6 +471,11 @@ void MAPS_Dock_KEY_Incident(void)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Pedometer)
       {
         Pedometer_Reset();
+      }
+      // Check current menu selection is tilt alarm (KEY0 = toggle on/off)
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_TiltAlarm)
+      {
+        TiltAlarm_Toggle();
       }
       // Check current menu selection is configure adjust
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Configure_Adjust)
@@ -792,6 +817,11 @@ void MAPS_Dock_KEY_Incident(void)
         }
         Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
         Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 0, 0, 5);
+      }
+      // Check current menu selection is tilt alarm (KEY2 = decrease threshold)
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_TiltAlarm)
+      {
+        TiltAlarm_Threshold_Dec();
       }
       // Check current menu selection is configure adjust
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Configure_Adjust)
@@ -1224,6 +1254,11 @@ void MAPS_Dock_KEY_Incident(void)
         Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
         Animation_Screen_Switch_Horizontal_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
       }
+      // Check current menu selection is tilt alarm (KEY3 = increase threshold)
+      if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_TiltAlarm)
+      {
+        TiltAlarm_Threshold_Inc();
+      }
       // Check current menu selection is configure adjust
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_Configure_Adjust)
       {
@@ -1360,6 +1395,9 @@ void MAPS_Dock_KEY_Incident(void)
       break;
     case MAPS_Menu_Attitude3D:
       Render_Attitude3D(FF.pitch.angle, FF.roll.angle, FF.yaw.angle);
+      break;
+    case MAPS_Menu_TiltAlarm:
+      Render_TiltAlarm(FF.pitch.angle, FF.roll.angle);
       break;
     case MAPS_Menu_Configure_Adjust:
       if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_List)
