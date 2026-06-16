@@ -16,6 +16,7 @@
 #include "func.h"
 #include "gyro_dash.h"
 #include "health.h"
+#include "health_monitor.h"
 #include "init.h"
 #include "it.h"
 #include "filter.h"
@@ -52,6 +53,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_TiltAlarm,
     MAPS_Menu_GyroDash,
     MAPS_Menu_FreeFall,
+    MAPS_Menu_HealthMonitor,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -187,6 +189,9 @@ int main(void)
                     MAX30102_RED = red;
                     MAX30102_IR  = ir;
                     Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(red, ir);
+
+                    // Feed IR sample to waveform display (downsampled to ~10Hz inside)
+                    HealthMonitor_Update(ir);
                 }
 
                 // --- 100ms periodic: ADC + RTC calendar update (moved from PIT0 ISR) ---
