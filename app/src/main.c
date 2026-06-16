@@ -12,6 +12,7 @@
 
 #include "adc.h"
 #include "attitude3d.h"
+#include "freefall.h"
 #include "func.h"
 #include "gyro_dash.h"
 #include "health.h"
@@ -50,6 +51,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_Attitude3D,
     MAPS_Menu_TiltAlarm,
     MAPS_Menu_GyroDash,
+    MAPS_Menu_FreeFall,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -168,6 +170,9 @@ int main(void)
 
                     // Gyro dashboard: push latest raw gyro sample into ring buffer
                     GyroDash_Update(MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
+
+                    // Free-fall / impact detection
+                    FreeFall_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
 
                     UART_Send_Flag = 1; // Signal UART send after filter update
                 }
