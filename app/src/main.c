@@ -11,6 +11,7 @@
  */
 
 #include "adc.h"
+#include "attitude3d.h"
 #include "func.h"
 #include "health.h"
 #include "init.h"
@@ -44,6 +45,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_WorldClock,
     MAPS_Menu_SpiritLevel,
     MAPS_Menu_Pedometer,
+    MAPS_Menu_Attitude3D,
     MAPS_Menu_Configure_Adjust,
 };
 
