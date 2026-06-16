@@ -13,6 +13,7 @@
 #include "adc.h"
 #include "attitude3d.h"
 #include "func.h"
+#include "gyro_dash.h"
 #include "health.h"
 #include "init.h"
 #include "it.h"
@@ -48,6 +49,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_Pedometer,
     MAPS_Menu_Attitude3D,
     MAPS_Menu_TiltAlarm,
+    MAPS_Menu_GyroDash,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -163,6 +165,9 @@ int main(void)
 
                     // Tilt alarm check (runs every 10ms, after filter is updated)
                     TiltAlarm_Update(FF.pitch.angle, FF.roll.angle);
+
+                    // Gyro dashboard: push latest raw gyro sample into ring buffer
+                    GyroDash_Update(MPU6050.Gyro.X, MPU6050.Gyro.Y, MPU6050.Gyro.Z);
 
                     UART_Send_Flag = 1; // Signal UART send after filter update
                 }
