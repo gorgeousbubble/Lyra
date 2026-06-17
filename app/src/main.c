@@ -11,6 +11,7 @@
  */
 
 #include "adc.h"
+#include "activity_history.h"
 #include "attitude3d.h"
 #include "freefall.h"
 #include "func.h"
@@ -54,6 +55,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_GyroDash,
     MAPS_Menu_FreeFall,
     MAPS_Menu_HealthMonitor,
+    MAPS_Menu_ActivityHistory,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -135,6 +137,7 @@ int main(void)
 
         AllInit();  // initialization
         ReadConf(); // read configuration from e2prom
+        Activity_Load(); // load 7-day step history from Flash
 
         MAPS_LCDC_BMP_From_SD("0:/Mitsuha.bmp", Site); // load image
 
@@ -202,7 +205,6 @@ int main(void)
                     ADC_Convert_Result[0] = ADC_Once(ADC0_DP0, ADC_12Bit);
                     ADC_Convert_Result[1] = ADC_Once(ADC0_DM0, ADC_12Bit);
                     RTC_Count = RTC_Get_Time();
-
                     // Simple seconds-to-calendar conversion (replaces gmtime in ISR)
                     uint32 t = RTC_Count;
                     uint32 sec = t % 60; t /= 60;
@@ -233,6 +235,9 @@ int main(void)
                     }
                     RTC_Time_Now.Month = (int)(m + 1);
                     RTC_Time_Now.Day   = (int)(days + 1);
+
+                    // Activity history: check for date rollover every 100ms
+                    Activity_Tick(RTC_Time_Now.Year, RTC_Time_Now.Month, RTC_Time_Now.Day);
                 }
 
                 // --- UART telemetry ---
