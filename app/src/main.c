@@ -12,6 +12,7 @@
 
 #include "adc.h"
 #include "activity_history.h"
+#include "adc_scope.h"
 #include "attitude3d.h"
 #include "freefall.h"
 #include "func.h"
@@ -58,6 +59,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_HealthMonitor,
     MAPS_Menu_ActivityHistory,
     MAPS_Menu_SleepMonitor,
+    MAPS_Menu_AdcScope,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -184,6 +186,16 @@ int main(void)
                     // Sleep monitoring (30-second RMS window, called at 100Hz)
                     SleepMonitor_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
 
+                    // ADC scope: sample both channels at 100Hz for oscilloscope display
+                    {
+                        uint16 adc0 = ADC_Once(ADC0_DP0, ADC_12Bit);
+                        uint16 adc1 = ADC_Once(ADC0_DM0, ADC_12Bit);
+                        AdcScope_Update(adc0, adc1);
+                        /* Keep ADC_Convert_Result in sync for rocker display */
+                        ADC_Convert_Result[0] = adc0;
+                        ADC_Convert_Result[1] = adc1;
+                    }
+
                     UART_Send_Flag = 1; // Signal UART send after filter update
                 }
 
@@ -207,8 +219,7 @@ int main(void)
                 {
                     RTC_Update_Flag = 0;
 
-                    ADC_Convert_Result[0] = ADC_Once(ADC0_DP0, ADC_12Bit);
-                    ADC_Convert_Result[1] = ADC_Once(ADC0_DM0, ADC_12Bit);
+                    // ADC now sampled at 100Hz in MPU6050 block — just update RTC here
                     RTC_Count = RTC_Get_Time();
                     // Simple seconds-to-calendar conversion (replaces gmtime in ISR)
                     uint32 t = RTC_Count;
