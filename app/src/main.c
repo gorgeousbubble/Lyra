@@ -29,6 +29,7 @@
 #include "mpu6050.h"
 #include "pedometer.h"
 #include "rtc.h"
+#include "sleep_monitor.h"
 #include "tilt_alarm.h"
 
 /*
@@ -56,6 +57,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_FreeFall,
     MAPS_Menu_HealthMonitor,
     MAPS_Menu_ActivityHistory,
+    MAPS_Menu_SleepMonitor,
     MAPS_Menu_Configure_Adjust,
 };
 
@@ -178,6 +180,9 @@ int main(void)
 
                     // Free-fall / impact detection
                     FreeFall_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
+
+                    // Sleep monitoring (30-second RMS window, called at 100Hz)
+                    SleepMonitor_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
 
                     UART_Send_Flag = 1; // Signal UART send after filter update
                 }

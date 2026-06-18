@@ -49,8 +49,9 @@ typedef enum
   MAPS_Menu_FreeFall = 9,          // Menu Free-Fall & Impact Detection
   MAPS_Menu_HealthMonitor = 10,    // Menu Heart Rate & SpO2 Monitor
   MAPS_Menu_ActivityHistory = 11,  // Menu Activity History (7-day step chart)
-  MAPS_Menu_Configure_Adjust = 12, // Menu Configure Adjust
-  MAPS_Menu_Selection_Max = 13,    // Maximum menu selection
+  MAPS_Menu_SleepMonitor = 12,     // Menu Sleep Monitor
+  MAPS_Menu_Configure_Adjust = 13, // Menu Configure Adjust
+  MAPS_Menu_Selection_Max = 14,    // Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum
