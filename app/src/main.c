@@ -19,6 +19,7 @@
 #include "gyro_dash.h"
 #include "health.h"
 #include "health_monitor.h"
+#include "health_score.h"
 #include "init.h"
 #include "it.h"
 #include "filter.h"
@@ -60,6 +61,7 @@ MAPS_Menu_Selection MAPS_Menu_SelectionN[MAPS_Menu_Selection_Max] = {
     MAPS_Menu_ActivityHistory,
     MAPS_Menu_SleepMonitor,
     MAPS_Menu_AdcScope,
+    MAPS_Menu_HealthScore,
     MAPS_Menu_Configure_Adjust,
 };
 

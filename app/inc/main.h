@@ -51,8 +51,9 @@ typedef enum
   MAPS_Menu_ActivityHistory = 11,  // Menu Activity History (7-day step chart)
   MAPS_Menu_SleepMonitor = 12,     // Menu Sleep Monitor
   MAPS_Menu_AdcScope = 13,         // Menu ADC Dual-Channel Oscilloscope
-  MAPS_Menu_Configure_Adjust = 14, // Menu Configure Adjust
-  MAPS_Menu_Selection_Max = 15,    // Maximum menu selection
+  MAPS_Menu_HealthScore = 14,      // Menu Health Comprehensive Score
+  MAPS_Menu_Configure_Adjust = 15, // Menu Configure Adjust
+  MAPS_Menu_Selection_Max = 16,    // Maximum menu selection
 } MAPS_Menu_Selection;
 
 typedef enum

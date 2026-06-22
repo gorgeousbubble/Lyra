@@ -18,6 +18,7 @@
 #include "freefall.h"
 #include "gyro_dash.h"
 #include "health_monitor.h"
+#include "health_score.h"
 #include "sleep_monitor.h"
 #include "tilt_alarm.h"
 #include "dwt.h"
@@ -326,6 +327,14 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
         }
         break;
+      case MAPS_Menu_HealthScore:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
+        Lyra_Menu_Selection--;
+        if (Lyra_Menu_Selection < 0)
+        {
+          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
+        }
+        break;
       case MAPS_Menu_Configure_Adjust:
         Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
         Lyra_Menu_Selection--;
@@ -456,6 +465,14 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_Menu_Selection = 0;
         }
         break;
+      case MAPS_Menu_HealthScore:
+        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
+        Lyra_Menu_Selection++;
+        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
+        {
+          Lyra_Menu_Selection = 0;
+        }
+        break;
       case MAPS_Menu_Configure_Adjust:
         Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 1, 0, 5);
         Lyra_Menu_Selection++;
@@ -513,6 +530,9 @@ void MAPS_Dock_KEY_Incident(void)
       break;
     case MAPS_Menu_AdcScope:
       Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);
+      break;
+    case MAPS_Menu_HealthScore:
+      Oled_I2C_Draw_BMP_128x64(LCM_Watch_icon, OLED_Invert_Color);
       break;
     case MAPS_Menu_Configure_Adjust:
       Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);
@@ -1581,6 +1601,9 @@ void MAPS_Dock_KEY_Incident(void)
       break;
     case MAPS_Menu_AdcScope:
       Render_AdcScope();
+      break;
+    case MAPS_Menu_HealthScore:
+      Render_HealthScore();
       break;
     case MAPS_Menu_Configure_Adjust:
       if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_List)
