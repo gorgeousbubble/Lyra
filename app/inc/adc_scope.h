@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       adc_scope.h
- * @brief      Dual-channel ADC oscilloscope (ADC0_DP0 / ADC0_DM0, 12-bit, 100Hz)
+ * @brief      Dual-channel ADC oscilloscope with auto-measurement (Vpp / Freq / Avg)
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -22,48 +22,67 @@
 #define ADC_SCOPE_DEC_MIN  1   /* ×1 : 128 samples = 1.28s  @100Hz */
 #define ADC_SCOPE_DEC_MAX  8   /* ×8 : 128 samples = 10.24s @100Hz */
 
-/* CH layout on 128×64 OLED:
-   CH0: y = 0..30  (31px, baseline y=15)
-   CH1: y = 33..63 (31px, baseline y=48)
-   Separator: y=31..32
+/* Vref for mV conversion (3300mV, 12-bit: 4095 steps) */
+#define ADC_VREF_MV  3300
+#define ADC_FULL_SCALE 4095
+
+/* Frequency detection: zero-crossing threshold (midpoint of range) */
+#define ADC_ZC_THRESHOLD  2048   /* 12-bit midpoint */
+
+/* CH layout on 128×64 OLED — waveform only (narrower, no right margin):
+   CH0: y = 0..25  (26px, centre y=12)
+   Separator: y=26..27
+   CH1: y = 28..52 (25px, centre y=40)
+   Status bar: y=53..63
 */
 #define ADC_CH0_TOP  0
-#define ADC_CH0_BOT  30
-#define ADC_CH1_TOP  33
-#define ADC_CH1_BOT  63
-#define ADC_CH0_CY   15   /* centre row of CH0 */
-#define ADC_CH1_CY   48   /* centre row of CH1 */
-#define ADC_WAVE_H   15   /* half-height: ±15 px from centre */
+#define ADC_CH0_BOT  25
+#define ADC_CH1_TOP  28
+#define ADC_CH1_BOT  52
+#define ADC_CH0_CY   12
+#define ADC_CH1_CY   40
+#define ADC_WAVE_H   12   /* half-height per channel */
+
+/* Waveform x range (leave right 44px for measurements) */
+#define ADC_WAVE_X0   12  /* start (after "C0" label) */
+#define ADC_WAVE_X1   82  /* end */
+#define ADC_WAVE_W    (ADC_WAVE_X1 - ADC_WAVE_X0 + 1)  /* 71 pixels */
+
+/* -----------------------------------------------------------------------
+ * Auto-measurement results for one channel
+ * ----------------------------------------------------------------------- */
+typedef struct
+{
+    uint32 vpp_mv;      /* Peak-to-peak voltage in mV           */
+    uint32 avg_mv;      /* Average voltage in mV                */
+    uint32 freq_hz;     /* Estimated frequency in Hz (0=no sig) */
+    uint16 v_min;       /* Min raw ADC value in buffer           */
+    uint16 v_max;       /* Max raw ADC value in buffer           */
+    uint8  freq_valid;  /* 1 = frequency measurement valid       */
+} AdcMeasure;
 
 typedef struct
 {
-    uint16 ch0_buf[ADC_SCOPE_BUF];  /* ADC0_DP0 ring buffer (12-bit, 0..4095) */
-    uint16 ch1_buf[ADC_SCOPE_BUF];  /* ADC0_DM0 ring buffer                    */
-    int    head;                    /* Next write index                         */
-    int    count;                   /* Samples filled (0..ADC_SCOPE_BUF)        */
-    uint8  paused;                  /* 1 = freeze display (KEY0)                */
-    uint8  decimation;              /* Display every Nth sample (1/2/4/8)       */
-    uint32 sample_tick;             /* Counter for decimation                   */
+    uint16 ch0_buf[ADC_SCOPE_BUF];
+    uint16 ch1_buf[ADC_SCOPE_BUF];
+    int    head;
+    int    count;
+    uint8  paused;
+    uint8  decimation;
+    uint32 sample_tick;
+    AdcMeasure meas[2];   /* [0]=CH0, [1]=CH1 auto-measurements */
 } AdcScopeState;
 
 extern AdcScopeState AdcScope;
 
-/*
- * Push one ADC sample pair (call every 10ms from main loop, after ADC read).
- * ch0, ch1: raw 12-bit ADC values (0..4095).
- */
 extern void AdcScope_Update(uint16 ch0, uint16 ch1);
-
-/* Toggle pause (KEY0) */
 extern void AdcScope_Toggle_Pause(void);
-
-/* Increase decimation factor (KEY3: slower / zoom out) */
 extern void AdcScope_Dec_Inc(void);
-
-/* Decrease decimation factor (KEY2: faster / zoom in) */
 extern void AdcScope_Dec_Dec(void);
 
-/* Render the oscilloscope screen to OLED */
+/* Compute auto-measurements from current buffer contents */
+extern void AdcScope_Measure(void);
+
 extern void Render_AdcScope(void);
 
 #endif

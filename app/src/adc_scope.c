@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       adc_scope.c
- * @brief      Dual-channel ADC oscilloscope display
+ * @brief      Dual-channel ADC oscilloscope with auto-measurement (Vpp/Freq/Avg)
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -18,11 +18,10 @@
 /* -----------------------------------------------------------------------
  * Global state
  * ----------------------------------------------------------------------- */
-AdcScopeState AdcScope = {{0}, {0}, 0, 0, 0, 1, 0};
+AdcScopeState AdcScope = {{0}, {0}, 0, 0, 0, 1, 0, {{0,0,0,0,0,0},{0,0,0,0,0,0}}};
 
 /* -----------------------------------------------------------------------
  * AdcScope_Update
- * Push one sample pair, obeying the decimation factor.
  * ----------------------------------------------------------------------- */
 void AdcScope_Update(uint16 ch0, uint16 ch1)
 {
@@ -41,7 +40,7 @@ void AdcScope_Update(uint16 ch0, uint16 ch1)
 }
 
 /* -----------------------------------------------------------------------
- * Control
+ * AdcScope_Toggle_Pause / Dec_Inc / Dec_Dec
  * ----------------------------------------------------------------------- */
 void AdcScope_Toggle_Pause(void)
 {
@@ -51,13 +50,97 @@ void AdcScope_Toggle_Pause(void)
 void AdcScope_Dec_Inc(void)
 {
     if (AdcScope.decimation < ADC_SCOPE_DEC_MAX)
-        AdcScope.decimation <<= 1;   /* ×1 → ×2 → ×4 → ×8 */
+        AdcScope.decimation <<= 1;
 }
 
 void AdcScope_Dec_Dec(void)
 {
     if (AdcScope.decimation > ADC_SCOPE_DEC_MIN)
-        AdcScope.decimation >>= 1;   /* ×8 → ×4 → ×2 → ×1 */
+        AdcScope.decimation >>= 1;
+}
+
+/* -----------------------------------------------------------------------
+ * AdcScope_Measure
+ *
+ * Computes for each channel over the entire ring buffer:
+ *   Vpp  = (max - min) converted to mV
+ *   Avg  = arithmetic mean converted to mV
+ *   Freq = zero-crossing count method
+ *          Crossing threshold = ADC_ZC_THRESHOLD (midpoint)
+ *          Count rising crossings in the buffer window.
+ *          Period = window_time / crossings
+ *          Freq = 1 / Period
+ *
+ * Window time = count × decimation × 10ms
+ * ----------------------------------------------------------------------- */
+void AdcScope_Measure(void)
+{
+    int n = AdcScope.count;
+    if (n < 4) return;   /* Not enough samples yet */
+
+    const uint16 *bufs[2] = { AdcScope.ch0_buf, AdcScope.ch1_buf };
+
+    for (int ch = 0; ch < 2; ch++)
+    {
+        const uint16 *buf = bufs[ch];
+        int head  = AdcScope.head;
+
+        uint32 sum   = 0;
+        uint16 vmin  = 4095;
+        uint16 vmax  = 0;
+        uint32 crossings = 0;
+        int prev_above = -1;   /* -1 = unknown, 0 = below, 1 = above threshold */
+
+        for (int i = 0; i < n; i++)
+        {
+            int idx = (head - n + i + ADC_SCOPE_BUF) % ADC_SCOPE_BUF;
+            uint16 v = buf[idx];
+
+            /* Min / Max / Sum */
+            if (v < vmin) vmin = v;
+            if (v > vmax) vmax = v;
+            sum += v;
+
+            /* Rising zero-crossing detection (crosses threshold upward) */
+            int above = (v >= ADC_ZC_THRESHOLD) ? 1 : 0;
+            if (prev_above == 0 && above == 1)
+                crossings++;
+            prev_above = above;
+        }
+
+        /* Vpp in mV */
+        uint32 vpp_raw = (uint32)(vmax - vmin);
+        uint32 vpp_mv  = (vpp_raw * (uint32)ADC_VREF_MV) / ADC_FULL_SCALE;
+
+        /* Avg in mV */
+        uint32 avg_raw = sum / (uint32)n;
+        uint32 avg_mv  = (avg_raw * (uint32)ADC_VREF_MV) / ADC_FULL_SCALE;
+
+        /* Frequency: window_ms = n × decimation × 10 */
+        uint32 freq_hz = 0;
+        uint8  freq_valid = 0;
+        if (crossings >= 2)
+        {
+            /* window_ms in units of 1ms */
+            uint32 window_ms = (uint32)n * (uint32)AdcScope.decimation * 10;
+            /* freq = crossings / window_s = crossings × 1000 / window_ms */
+            freq_hz   = (crossings * 1000UL) / window_ms;
+            freq_valid = 1;
+        }
+        else if (crossings == 1 && n == ADC_SCOPE_BUF)
+        {
+            /* Signal is too slow for this window — show "<1Hz" */
+            freq_hz   = 0;
+            freq_valid = 1;
+        }
+
+        AdcScope.meas[ch].vpp_mv     = vpp_mv;
+        AdcScope.meas[ch].avg_mv     = avg_mv;
+        AdcScope.meas[ch].freq_hz    = freq_hz;
+        AdcScope.meas[ch].v_min      = vmin;
+        AdcScope.meas[ch].v_max      = vmax;
+        AdcScope.meas[ch].freq_valid = freq_valid;
+    }
 }
 
 /* -----------------------------------------------------------------------
@@ -98,14 +181,7 @@ static void ds6(uint8 screen[64][16], int px, int py, const char *s)
 }
 
 /* -----------------------------------------------------------------------
- * Draw one waveform channel into the frame buffer.
- *
- * buf[]:   ring buffer of 12-bit ADC samples
- * head:    next-write index
- * count:   valid sample count
- * cy:      centre pixel row
- * half_h:  half-height in pixels (ADC_WAVE_H)
- * top/bot: clamping bounds
+ * Draw one channel waveform (x = ADC_WAVE_X0..ADC_WAVE_X1)
  * ----------------------------------------------------------------------- */
 static void draw_channel(uint8 screen[64][16],
                          const uint16 *buf, int head, int count,
@@ -114,30 +190,27 @@ static void draw_channel(uint8 screen[64][16],
     if (count < 2) return;
 
     int n = count;
-    if (n > ADC_SCOPE_BUF) n = ADC_SCOPE_BUF;
+    if (n > ADC_WAVE_W) n = ADC_WAVE_W;   /* Clip to visible width */
 
-    /* We display last n samples right-aligned in x = (128-n)..127 */
-    int prev_y = -1;
+    int x_start = ADC_WAVE_X0 + (ADC_WAVE_W - n); /* right-aligned */
+    int prev_y  = -1;
 
     for (int i = 0; i < n; i++)
     {
-        int x = (128 - n) + i;
-        if (x < 0 || x > 127) continue;
+        int x = x_start + i;
+        if (x < ADC_WAVE_X0 || x > ADC_WAVE_X1) continue;
 
+        /* Get sample from ring buffer (newest at right) */
         int ring_idx = (head - n + i + ADC_SCOPE_BUF) % ADC_SCOPE_BUF;
         uint16 v = buf[ring_idx];
 
-        /* Map 0..4095 → cy+half_h..cy-half_h (invert: higher V = higher pixel) */
-        int pix = cy + half_h - (int)((uint32)v * (2 * half_h) / 4095);
-        if (pix < top)  pix = top;
-        if (pix > bot)  pix = bot;
+        int pix = cy + half_h - (int)((uint32)v * (2 * half_h) / ADC_FULL_SCALE);
+        if (pix < top) pix = top;
+        if (pix > bot) pix = bot;
 
         dp(screen, x, pix);
-
-        /* Connect to previous sample */
         if (prev_y >= 0 && prev_y != pix)
             dline_v(screen, x, pix, prev_y);
-
         prev_y = pix;
     }
 }
@@ -147,87 +220,151 @@ static void draw_channel(uint8 screen[64][16],
  *
  * Layout (128×64):
  *
- *   y= 0..30  CH0 waveform area (ADC0_DP0)
- *             Left edge: "C0" label (6px) + centre dashed line
- *   y=31..32  separator
- *   y=33..63  CH1 waveform area (ADC0_DM0)
- *             Left edge: "C1" label
+ *  x=0..11 : labels ("C0", "C1")
+ *  x=12..82: waveforms (71px wide)
+ *  x=83    : vertical separator
+ *  x=84..127: measurement readout (44px = 7 chars × 6px + 2px margin)
  *
- * Right margin (x=118..127): current voltage readout
- *   CH0 value at y=0, CH1 value at y=33
+ *  y=0..25  : CH0 area
+ *  y=26..27 : separator
+ *  y=28..52 : CH1 area
+ *  y=53..63 : status bar
  *
- * Bottom right: pause indicator + decimation
+ * Measurement area per channel (3 rows × 8px):
+ *   Row 0 (y=0 / y=28):  Vpp: X.XXV
+ *   Row 1 (y=8 / y=36):  Avg: X.XXV
+ *   Row 2 (y=16/ y=44):  Frq: XXXHz
  * ----------------------------------------------------------------------- */
 void Render_AdcScope(void)
 {
+    /* Run measurements every frame (fast, pure math on buffer) */
+    AdcScope_Measure();
+
     uint8 screen[64][16];
     for (int i = 0; i < 64; i++)
         for (int c = 0; c < 16; c++)
             screen[i][c] = 0x00;
 
-    char buf[10];
+    char buf[12];
 
-    /* ---- CH0 area ---- */
-    /* Centre dashed line */
-    for (int x = 12; x < 118; x += 4)
-        dp(screen, x, ADC_CH0_CY);
+    /* ---- Vertical separator between waveform and measurements ---- */
+    for (int y = 0; y < 53; y++) dp(screen, 83, y);
 
-    /* Label */
+    /* ====== CH0 ====== */
     ds6(screen, 0, 0, "C0");
+
+    /* Centre dashed line */
+    for (int x = ADC_WAVE_X0; x <= ADC_WAVE_X1; x += 4)
+        dp(screen, x, ADC_CH0_CY);
 
     /* Waveform */
     draw_channel(screen, AdcScope.ch0_buf, AdcScope.head, AdcScope.count,
                  ADC_CH0_CY, ADC_WAVE_H, ADC_CH0_TOP, ADC_CH0_BOT);
 
-    /* Current value (last sample) as raw code */
-    if (AdcScope.count > 0)
+    /* Measurements CH0 (x=85) */
+    if (AdcScope.count >= 4)
     {
-        int last0 = (AdcScope.head - 1 + ADC_SCOPE_BUF) % ADC_SCOPE_BUF;
-        uint16 v0 = AdcScope.ch0_buf[last0];
-        /* Convert 12-bit → millivolts: Vref=3300mV, 4095 steps */
-        uint32 mv0 = ((uint32)v0 * 3300) / 4095;
-        snprintf(buf, sizeof(buf), "%lumV", (unsigned long)mv0);
-        ds6(screen, 118 - (int)(6 * (buf[0] ? 1:0) * 5), 0, buf);
+        /* Vpp */
+        uint32 vpp0 = AdcScope.meas[0].vpp_mv;
+        if (vpp0 < 1000)
+            snprintf(buf, sizeof(buf), "P%lumV", (unsigned long)vpp0);
+        else
+            snprintf(buf, sizeof(buf), "P%.2fV", (float)vpp0 / 1000.0f);
+        ds6(screen, 85, 0, buf);
+
+        /* Avg */
+        uint32 avg0 = AdcScope.meas[0].avg_mv;
+        if (avg0 < 1000)
+            snprintf(buf, sizeof(buf), "A%lumV", (unsigned long)avg0);
+        else
+            snprintf(buf, sizeof(buf), "A%.2fV", (float)avg0 / 1000.0f);
+        ds6(screen, 85, 9, buf);
+
+        /* Freq */
+        if (AdcScope.meas[0].freq_valid)
+        {
+            uint32 f = AdcScope.meas[0].freq_hz;
+            if (f == 0)
+                snprintf(buf, sizeof(buf), "F<1Hz");
+            else if (f < 1000)
+                snprintf(buf, sizeof(buf), "F%luHz", (unsigned long)f);
+            else
+                snprintf(buf, sizeof(buf), "F%.1fk", (float)f / 1000.0f);
+        }
+        else
+            snprintf(buf, sizeof(buf), "F:---");
+        ds6(screen, 85, 18, buf);
+    }
+    else
+    {
+        ds6(screen, 85, 0, "wait");
     }
 
     /* ---- Separator ---- */
-    dline_h(screen, 31, 0, 127);
-    dline_h(screen, 32, 0, 127);
+    dline_h(screen, 26, 0, 127);
+    dline_h(screen, 27, 0, 127);
 
-    /* ---- CH1 area ---- */
-    /* Centre dashed line */
-    for (int x = 12; x < 118; x += 4)
+    /* ====== CH1 ====== */
+    ds6(screen, 0, 28, "C1");
+
+    for (int x = ADC_WAVE_X0; x <= ADC_WAVE_X1; x += 4)
         dp(screen, x, ADC_CH1_CY);
-
-    ds6(screen, 0, 33, "C1");
 
     draw_channel(screen, AdcScope.ch1_buf, AdcScope.head, AdcScope.count,
                  ADC_CH1_CY, ADC_WAVE_H, ADC_CH1_TOP, ADC_CH1_BOT);
 
-    if (AdcScope.count > 0)
+    /* Measurements CH1 */
+    if (AdcScope.count >= 4)
     {
-        int last1 = (AdcScope.head - 1 + ADC_SCOPE_BUF) % ADC_SCOPE_BUF;
-        uint16 v1 = AdcScope.ch1_buf[last1];
-        uint32 mv1 = ((uint32)v1 * 3300) / 4095;
-        snprintf(buf, sizeof(buf), "%lumV", (unsigned long)mv1);
-        ds6(screen, 118 - (int)(6 * (buf[0] ? 1:0) * 5), 33, buf);
+        uint32 vpp1 = AdcScope.meas[1].vpp_mv;
+        if (vpp1 < 1000)
+            snprintf(buf, sizeof(buf), "P%lumV", (unsigned long)vpp1);
+        else
+            snprintf(buf, sizeof(buf), "P%.2fV", (float)vpp1 / 1000.0f);
+        ds6(screen, 85, 28, buf);
+
+        uint32 avg1 = AdcScope.meas[1].avg_mv;
+        if (avg1 < 1000)
+            snprintf(buf, sizeof(buf), "A%lumV", (unsigned long)avg1);
+        else
+            snprintf(buf, sizeof(buf), "A%.2fV", (float)avg1 / 1000.0f);
+        ds6(screen, 85, 37, buf);
+
+        if (AdcScope.meas[1].freq_valid)
+        {
+            uint32 f = AdcScope.meas[1].freq_hz;
+            if (f == 0)
+                snprintf(buf, sizeof(buf), "F<1Hz");
+            else if (f < 1000)
+                snprintf(buf, sizeof(buf), "F%luHz", (unsigned long)f);
+            else
+                snprintf(buf, sizeof(buf), "F%.1fk", (float)f / 1000.0f);
+        }
+        else
+            snprintf(buf, sizeof(buf), "F:---");
+        ds6(screen, 85, 46, buf);
+    }
+    else
+    {
+        ds6(screen, 85, 28, "wait");
     }
 
-    /* ---- Status overlay (bottom-right of CH1 area) ---- */
-    /* Pause indicator */
-    if (AdcScope.paused)
-        ds6(screen, 0, 56, "PAUSE");
+    /* ---- Status bar (y=53..63) ---- */
+    dline_h(screen, 53, 0, 127);
 
-    /* Time scale: each pixel = decimation × 10ms */
-    uint32 span_ms = (uint32)ADC_SCOPE_BUF * AdcScope.decimation * 10;
+    if (AdcScope.paused)
+        ds6(screen, 0, 55, "PSE");
+
+    /* Time scale */
+    uint32 span_ms = (uint32)AdcScope.count * (uint32)AdcScope.decimation * 10;
+    if (span_ms == 0) span_ms = (uint32)ADC_SCOPE_BUF * AdcScope.decimation * 10;
     if (span_ms < 1000)
         snprintf(buf, sizeof(buf), "x%u %lums", AdcScope.decimation, (unsigned long)span_ms);
     else
         snprintf(buf, sizeof(buf), "x%u %.1fs", AdcScope.decimation, (float)span_ms / 1000.0f);
-    ds6(screen, 60, 56, buf);
+    ds6(screen, 22, 55, buf);
 
-    /* Hint */
-    ds6(screen, 0, 57, "K0:PSE K2:- K3:+");
+    ds6(screen, 82, 55, "K0:P");
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
 }
