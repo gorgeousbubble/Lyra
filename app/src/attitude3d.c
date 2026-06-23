@@ -201,14 +201,14 @@ void Render_Attitude3D(float pitch, float roll, float yaw)
     int wx_z = -sp;   /* already Q8 */
 
     /* World coords for body Y axis */
-    int wy_x = (((int32)cy*sp*sr>>8) - ((int32)sy_v*cr>>8));  /* ÷256 each mul */
-    int wy_y = (((int32)sy_v*sp*sr>>8) + ((int32)cy*cr>>8));
-    int wy_z = ((int32)cp*sr) >> 8;
+    int wy_x = ((((int32)cy * sp * sr) >> 8) - (((int32)sy_v * cr) >> 8));
+    int wy_y = ((((int32)sy_v * sp * sr) >> 8) + (((int32)cy * cr) >> 8));
+    int wy_z = ((int32)cp * sr) >> 8;
 
     /* World coords for body Z axis */
-    int wz_x = (((int32)cy*sp*cr>>8) + ((int32)sy_v*sr>>8));
-    int wz_y = (((int32)sy_v*sp*cr>>8) - ((int32)cy*sr>>8));
-    int wz_z = ((int32)cp*cr) >> 8;
+    int wz_x = ((((int32)cy * sp * cr) >> 8) + (((int32)sy_v * sr) >> 8));
+    int wz_y = ((((int32)sy_v * sp * cr) >> 8) - (((int32)cy * sr) >> 8));
+    int wz_z = ((int32)cp * cr) >> 8;
 
     /*
      * Isometric 2D projection (Q8 → pixels):
@@ -221,7 +221,7 @@ void Render_Attitude3D(float pitch, float roll, float yaw)
      *                screen_dy = -(wz*L - (wx+wy)*L/2)/256
      */
     #define PROJ_X(wx_, wy_) ( ((int32)((wx_) - (wy_)) * L * 221) >> 16 )
-    #define PROJ_Y(wx_, wy_, wz_) ( -(int32)((wz_)*L - ((wx_)+(wy_))*L/2) >> 8 )
+    #define PROJ_Y(wx_, wy_, wz_) ( (-(int32)((wz_)*L - ((wx_)+(wy_))*L/2)) >> 8 )
 
     /* Endpoints in screen pixels */
     int ex = OX + (int)PROJ_X(wx_x, wx_y);
