@@ -230,7 +230,6 @@ static void render_bar(uint8 screen[64][16], int16 gx, int16 gy, int16 gz)
         }
 
         /* Label */
-        char lbuf[2] = {labels[b], '\0'};
         dc6(screen, cx[b] - 3, cy + half_h + 2, labels[b]);
 
         /* Numeric value below label */
@@ -239,7 +238,6 @@ static void render_bar(uint8 screen[64][16], int16 gx, int16 gy, int16 gz)
         int vw = 0;
         for (const char *p = vbuf; *p; p++) vw += 6;
         ds6(screen, cx[b] - vw / 2, 0, vbuf);
-        (void)lbuf;
     }
 }
 
