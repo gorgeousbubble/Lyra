@@ -36,7 +36,7 @@ static uint32 isqrt32(uint32 n)
 FreeFallDetector FFDet = {
     FF_STATE_IDLE, 0, 0, 0, 0,
     {{0}}, 0, 0,
-    0, 0, 0.0f, 0
+    0, 0, 0.0f, 0, 0   /* elapsed_ms=0, beep_ms=0 */
 };
 
 /* ------------------------------------------------------------------
@@ -90,7 +90,8 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
                 if (FFDet.event_count < FF_MAX_EVENTS)
                     FFDet.event_count++;
 
-                /* Short beep to indicate detected fall */
+                /* Non-blocking beep: set counter; beep will run for FF_BEEP_DURATION_MS */
+                FFDet.beep_ms = FF_BEEP_DURATION_MS;
                 Beep_On();
 
                 FFDet.state           = FF_STATE_IMPACT;
@@ -107,7 +108,13 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
 
     /* ---- IMPACT: watch for high-g impact within 500ms of fall end ---- */
     case FF_STATE_IMPACT:
-        Beep_Off(); /* Ensure beep is silenced after brief pulse */
+        /* Non-blocking beep: count down and turn off when expired */
+        if (FFDet.beep_ms > 0)
+        {
+            FFDet.beep_ms = (FFDet.beep_ms > 10) ? (FFDet.beep_ms - 10) : 0;
+            if (FFDet.beep_ms == 0)
+                Beep_Off();
+        }
 
         FFDet.impact_window_ms += 10;
 
@@ -159,6 +166,8 @@ void FreeFall_Clear(void)
     FFDet.total_impacts = 0;
     FFDet.max_impact_g  = 0.0f;
     FFDet.state         = FF_STATE_IDLE;
+    FFDet.beep_ms       = 0;
+    Beep_Off();
 }
 
 /* ------------------------------------------------------------------

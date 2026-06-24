@@ -29,6 +29,9 @@
 /* Impact: |a|² > (2.5g)² = (2.5 × 16384)² ≈ 1677721600 */
 #define FF_IMPACT_THRESHOLD_SQ     1677721600UL  /* (2.5 × 16384)² */
 
+/* Beep duration after confirmed free-fall (ms) */
+#define FF_BEEP_DURATION_MS        300
+
 /* Maximum events stored */
 #define FF_MAX_EVENTS              8
 
@@ -76,6 +79,7 @@ typedef struct
     float  max_impact_g;        // Maximum impact force ever seen (g)
 
     uint32 elapsed_ms;          // Internal ms counter
+    uint32 beep_ms;             // Non-blocking beep duration counter (ms remaining)
 } FreeFallDetector;
 
 extern FreeFallDetector FFDet;
