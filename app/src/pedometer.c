@@ -107,9 +107,12 @@ void Render_Pedometer(void)
     int steps_len = 0;
     const char *p = steps_str;
     while (*p++) steps_len++;
-    uint8 steps_x = (uint8)((128 - steps_len * 12) / 2);
+    /* Keep as int; clamp to [0, 127] to guard against any overflow edge case */
+    int steps_x = (128 - steps_len * 12) / 2;
+    if (steps_x < 0)   steps_x = 0;
+    if (steps_x > 127) steps_x = 0;
 
-    Oled_I2C_Put_Str_12x24(steps_x, 1, (uint8 *)steps_str);
+    Oled_I2C_Put_Str_12x24((uint8)steps_x, 1, (uint8 *)steps_str);
 
     // --- Separator at page 4 ---
     Oled_I2C_Put_Str_6x8(0, 4, "----------------");
@@ -125,9 +128,12 @@ void Render_Pedometer(void)
     int dist_len = 0;
     p = dist_str;
     while (*p++) dist_len++;
-    uint8 dist_x = (uint8)((128 - dist_len * 6) / 2);
+    /* Keep as int; clamp to [0, 127] to guard against overflow */
+    int dist_x = (128 - dist_len * 6) / 2;
+    if (dist_x < 0)   dist_x = 0;
+    if (dist_x > 127) dist_x = 0;
 
-    Oled_I2C_Put_Str_6x8(dist_x, 5, (uint8 *)dist_str);
+    Oled_I2C_Put_Str_6x8((uint8)dist_x, 5, (uint8 *)dist_str);
 
     // --- "KEY0:RESET" hint at page 7 ---
     Oled_I2C_Put_Str_6x8(28, 7, "KEY0:RESET");
