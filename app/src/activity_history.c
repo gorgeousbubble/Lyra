@@ -150,6 +150,16 @@ void Activity_Tick(int year, int month, int day)
     uint8 m = (uint8)month;
     uint8 d = (uint8)day;
 
+    /* First boot or fresh Flash: just record today's date silently without
+     * shifting history or writing Flash (nothing to save yet). */
+    if (Activity.last_saved_day == 0)
+    {
+        Activity.last_saved_year  = y;
+        Activity.last_saved_month = m;
+        Activity.last_saved_day   = d;
+        return;
+    }
+
     if (y == Activity.last_saved_year &&
         m == Activity.last_saved_month &&
         d == Activity.last_saved_day)
