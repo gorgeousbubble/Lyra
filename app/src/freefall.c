@@ -239,11 +239,15 @@ void Render_FreeFall(void)
         ds6(screen, 4, 31, ">> IMPACT WIN");
     else
     {
-        /* Show last 3 events (newest first) */
+        /* Show last 3 events (newest first).
+         * Ring buffer: events[event_head-1] is newest, events[event_head-2] is second newest, etc.
+         * Only walk back as far as event_count entries (don't read uninitialised slots). */
         int shown = 0;
-        for (int i = FFDet.event_count - 1; i >= 0 && shown < 3; i--)
+        int available = (FFDet.event_count < 3) ? FFDet.event_count : 3;
+        for (int i = 0; i < available; i++)
         {
-            int idx = (FFDet.event_head - 1 - i + FF_MAX_EVENTS * 2) % FF_MAX_EVENTS;
+            /* i=0 → newest, i=1 → second newest, ... */
+            int idx = (FFDet.event_head - 1 - i + FF_MAX_EVENTS) % FF_MAX_EVENTS;
             FreeFall_Event *ev = &FFDet.events[idx];
             int y = 31 + shown * 10;
 
