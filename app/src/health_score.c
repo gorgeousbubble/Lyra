@@ -270,15 +270,13 @@ void Render_HealthScore(void)
     dline_h(screen, 26, 0, 127);
     dline_h(screen, 27, 0, 127);
 
-    /* ---- Score bars (x=0, each row 8px tall) ---- */
+    /* ---- Score bars, 5 rows at 7px pitch (y=28..60) ---- */
+    /* Each draw_bar uses y..y+7 for box + label; 7px pitch gives 1px gap */
     draw_bar(screen, "ACT ", HealthScore.score_activity,  HS_WEIGHT_ACTIVITY,  0, 28);
-    draw_bar(screen, "SDUR", HealthScore.score_sleep_dur, HS_WEIGHT_SLEEP_DUR, 0, 37);
-    draw_bar(screen, "SQUA", HealthScore.score_sleep_qua, HS_WEIGHT_SLEEP_QUA, 0, 46);
-    draw_bar(screen, "HR  ", HealthScore.score_heart,     HS_WEIGHT_HEART,     0, 55);
-
-    /* SpO2 abbreviated at bottom row */
-    snprintf(buf, sizeof(buf), "SPO2:%d", HealthScore.score_spo2);
-    ds6(screen, 80, 57, buf);
+    draw_bar(screen, "SDUR", HealthScore.score_sleep_dur, HS_WEIGHT_SLEEP_DUR, 0, 35);
+    draw_bar(screen, "SQUA", HealthScore.score_sleep_qua, HS_WEIGHT_SLEEP_QUA, 0, 42);
+    draw_bar(screen, "HR  ", HealthScore.score_heart,     HS_WEIGHT_HEART,     0, 49);
+    draw_bar(screen, "SPO2", HealthScore.score_spo2,      HS_WEIGHT_SPO2,      0, 56);
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
 }
