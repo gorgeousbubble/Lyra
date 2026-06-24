@@ -28,8 +28,8 @@ typedef struct
     uint32 ir_wave[HEALTH_WAVE_BUF]; /* raw IR values */
     int    head;                     /* next write position */
     int    count;                    /* samples filled */
-    uint32 min_val;                  /* min in buffer (for scaling) */
-    uint32 max_val;                  /* max in buffer (for scaling) */
+    uint32 min_val;                  /* min in buffer — updated in HealthMonitor_Update */
+    uint32 max_val;                  /* max in buffer — updated in HealthMonitor_Update */
     uint32 downsample_cnt;           /* counter for downsampling */
 } HealthWave;
 

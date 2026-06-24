@@ -19,7 +19,7 @@
 /* -----------------------------------------------------------------------
  * Globals
  * ----------------------------------------------------------------------- */
-HealthWave HWave = {{0}, 0, 0, 0xFFFFFFFF, 0, 0};
+HealthWave HWave = {{0}, 0, 0, 0, 0, 0};
 
 /* -----------------------------------------------------------------------
  * HealthMonitor_Update
@@ -140,15 +140,29 @@ static void draw_str8x16(uint8 screen[64][16], int px, int py, const char *s)
 /* -----------------------------------------------------------------------
  * Waveform renderer
  * Draws HEALTH_WAVE_BUF samples in an (x:0..63, y:top..top+H-1) window.
- * Auto-scales to min/max in buffer.
+ * Auto-scales to local min/max computed fresh from the buffer to avoid
+ * the uint32 underflow risk from the global min_val state.
  * ----------------------------------------------------------------------- */
 static void draw_wave(uint8 screen[64][16], int x_off, int y_top)
 {
     int n = HWave.count;
     if (n < 2) return;
 
-    uint32 span = HWave.max_val - HWave.min_val;
-    if (span < 1000) span = 1000; /* avoid division by near-zero */
+    /* Compute local min/max from the ring buffer instead of relying on
+     * the global HWave.min_val which could be 0xFFFFFFFF if never updated */
+    uint32 local_min = 0xFFFFFFFFUL;
+    uint32 local_max = 0;
+    for (int i = 0; i < n; i++)
+    {
+        int idx = (HWave.head - n + i + HEALTH_WAVE_BUF) % HEALTH_WAVE_BUF;
+        uint32 v = HWave.ir_wave[idx];
+        if (v < local_min) local_min = v;
+        if (v > local_max) local_max = v;
+    }
+
+    /* Clamp span to avoid division by near-zero */
+    uint32 span = (local_max > local_min) ? (local_max - local_min) : 0;
+    if (span < 1000) span = 1000;
 
     int prev_y = -1;
     for (int i = 0; i < n; i++)
@@ -159,8 +173,11 @@ static void draw_wave(uint8 screen[64][16], int x_off, int y_top)
         int idx = (HWave.head - n + i + HEALTH_WAVE_BUF) % HEALTH_WAVE_BUF;
         uint32 v = HWave.ir_wave[idx];
 
+        /* Safe subtraction: v is always >= local_min by construction */
+        uint32 v_off = (v >= local_min) ? (v - local_min) : 0;
+
         /* Scale to pixel (invert: higher value = higher on screen) */
-        int pix = (int)(((uint64)(v - HWave.min_val) * (HEALTH_WAVE_H - 1)) / span);
+        int pix = (int)(((uint64)v_off * (HEALTH_WAVE_H - 1)) / span);
         int y = y_top + (HEALTH_WAVE_H - 1) - pix;
         if (y < y_top) y = y_top;
         if (y > y_top + HEALTH_WAVE_H - 1) y = y_top + HEALTH_WAVE_H - 1;
