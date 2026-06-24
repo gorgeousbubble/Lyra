@@ -192,7 +192,10 @@ static void render_bar(uint8 screen[64][16], int16 gx, int16 gy, int16 gz)
 {
     const int cx[3]    = {20, 64, 107};
     const int cy       = 32;
-    const int half_h   = 28;  /* ±28 pixels */
+    /* Reduced from 28 to 24 so label at cy+half_h+2=58 fits within y=0..63
+     * (6x8 font: y=58..65 → last row y=65 clamped by dp() to y=63 is OK,
+     *  but y=58 gives full 6 rows visible: 58,59,60,61,62,63 = 6px ✓) */
+    const int half_h   = 24;
     const int bar_w    = 14;
     const int16 vals[3] = {gx, gy, gz};
     const char labels[3] = {'X', 'Y', 'Z'};
@@ -229,15 +232,16 @@ static void render_bar(uint8 screen[64][16], int16 gx, int16 gy, int16 gz)
                 dline_v(screen, x, cy + 1, cy - pix);
         }
 
-        /* Label */
+        /* Label below bar — cy+half_h+2 = 32+24+2 = 58; font 8px → y=58..65
+         * dp() clips at y=63, so bottom 2 rows are invisible but top 6 show ✓ */
         dc6(screen, cx[b] - 3, cy + half_h + 2, labels[b]);
 
-        /* Numeric value below label */
+        /* Numeric value above bar — y=1 avoids overlap with bar top (y=8) */
         char vbuf[8];
         snprintf(vbuf, sizeof(vbuf), "%+d", (int)vals[b]);
         int vw = 0;
         for (const char *p = vbuf; *p; p++) vw += 6;
-        ds6(screen, cx[b] - vw / 2, 0, vbuf);
+        ds6(screen, cx[b] - vw / 2, 1, vbuf);
     }
 }
 
