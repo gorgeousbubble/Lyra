@@ -28,8 +28,10 @@ SleepMonitorState SleepMon = {
 
 /* -----------------------------------------------------------------------
  * Integer square root (Newton's method)
+ * Input and working variables are uint64 to handle the large mag_sq values
+ * computed from 16-bit accelerometer samples (max ~3.2e9 before sqrt).
  * ----------------------------------------------------------------------- */
-static uint32 isqrt32(uint64 n)
+static uint32 isqrt64(uint64 n)
 {
     if (n == 0) return 0;
     uint64 x = n;
@@ -49,7 +51,7 @@ void SleepMonitor_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
     /* ---- Compute |a| in LSB ---- */
     int64 ax64 = (int64)ax, ay64 = (int64)ay, az64 = (int64)az;
     uint64 mag_sq = (uint64)(ax64*ax64 + ay64*ay64 + az64*az64);
-    uint32 mag = isqrt32(mag_sq);       /* |a| in LSB              */
+    uint32 mag = isqrt64(mag_sq);       /* |a| in LSB              */
 
     /* Remove gravity component: motion = ||a| - 1g| */
     uint32 motion;
@@ -68,7 +70,7 @@ void SleepMonitor_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
         return;
 
     /* Compute RMS over the window */
-    uint32 rms = isqrt32(SleepMon.sum_sq / SleepMon.sample_count);
+    uint32 rms = isqrt64(SleepMon.sum_sq / SleepMon.sample_count);
     SleepMon.sum_sq      = 0;
     SleepMon.sample_count = 0;
 
