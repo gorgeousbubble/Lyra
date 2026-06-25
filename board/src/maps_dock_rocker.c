@@ -140,12 +140,26 @@ void MAPS_Dock_Rocker_Key_LCM_Control(void)
     case 3:
       MAPS_Dock_LCM_Put_Str_6x8(37, 0, "MAPS_MK64", LCM_Pure_Color);
       MAPS_Dock_LCM_Put_Str_6x8(49, 1, "List3", LCM_Pure_Color);
-      MAPS_Dock_LCM_Put_Para_6x8(0, 2, "Year:", RTC_Time_Now.Year, LCM_Pure_Color);
-      MAPS_Dock_LCM_Put_Para_6x8(0, 3, "Mon:", RTC_Time_Now.Month, LCM_Pure_Color);
-      MAPS_Dock_LCM_Put_Para_6x8(0, 4, "Day:", RTC_Time_Now.Day, LCM_Pure_Color);
-      MAPS_Dock_LCM_Put_Para_6x8(0, 5, "Hour:", RTC_Time_Now.Hour, LCM_Pure_Color);
-      MAPS_Dock_LCM_Put_Para_6x8(0, 6, "Min:", RTC_Time_Now.Minute, LCM_Pure_Color);
-      MAPS_Dock_LCM_Put_Para_6x8(0, 7, "Sec:", RTC_Time_Now.Second, LCM_Pure_Color);
+      {
+        /* Atomically snapshot RTC_Time_Now — it is written non-atomically
+         * in main loop (6 fields, 6 STR instructions) and can be torn by
+         * any interrupt firing between them. */
+        int snap_year, snap_month, snap_day, snap_hour, snap_min, snap_sec;
+        DisableInterrupts;
+        snap_year  = RTC_Time_Now.Year;
+        snap_month = RTC_Time_Now.Month;
+        snap_day   = RTC_Time_Now.Day;
+        snap_hour  = RTC_Time_Now.Hour;
+        snap_min   = RTC_Time_Now.Minute;
+        snap_sec   = RTC_Time_Now.Second;
+        EnableInterrupts;
+        MAPS_Dock_LCM_Put_Para_6x8(0, 2, "Year:", snap_year,  LCM_Pure_Color);
+        MAPS_Dock_LCM_Put_Para_6x8(0, 3, "Mon:",  snap_month, LCM_Pure_Color);
+        MAPS_Dock_LCM_Put_Para_6x8(0, 4, "Day:",  snap_day,   LCM_Pure_Color);
+        MAPS_Dock_LCM_Put_Para_6x8(0, 5, "Hour:", snap_hour,  LCM_Pure_Color);
+        MAPS_Dock_LCM_Put_Para_6x8(0, 6, "Min:",  snap_min,   LCM_Pure_Color);
+        MAPS_Dock_LCM_Put_Para_6x8(0, 7, "Sec:",  snap_sec,   LCM_Pure_Color);
+      }
       break;
     case 4:
       MAPS_Dock_LCM_Put_Str_6x8(37, 0, "MAPS_MK64", LCM_Pure_Color);

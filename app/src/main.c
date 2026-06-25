@@ -222,26 +222,33 @@ int main(void)
                     RTC_Update_Flag = 0;
 
                     // ADC now sampled at 100Hz in MPU6050 block — just update RTC here
-                    RTC_Count = RTC_Get_Time();
-                    // Simple seconds-to-calendar conversion (replaces gmtime in ISR)
-                    uint32 t = RTC_Count;
-                    uint32 sec = t % 60; t /= 60;
-                    uint32 min = t % 60; t /= 60;
-                    uint32 hour = t % 24;
-                    RTC_Time_Now.Hour   = (int)hour;
-                    RTC_Time_Now.Minute = (int)min;
-                    RTC_Time_Now.Second = (int)sec;
+                    uint32 rtc_snap = RTC_Get_Time();
 
-                    // Full date calculation using days since epoch
-                    uint32 days = RTC_Count / 86400;
-                    uint32 y = 1970;
+                    // ----------------------------------------------------------------
+                    // Compute all calendar fields into LOCAL variables first.
+                    // Only then write to RTC_Time_Now under a critical section.
+                    // This prevents a torn-read: PIT0 ISR fires every 1ms and UI
+                    // code reads RTC_Time_Now; if we wrote fields one-by-one without
+                    // protection the ISR could observe a half-updated struct (e.g.
+                    // Hour/Minute already flipped to 00:00 but Month/Day still showing
+                    // the previous day's values).
+                    // ----------------------------------------------------------------
+
+                    // --- Time-of-day ---
+                    uint32 t    = rtc_snap;
+                    uint32 sec  = t % 60; t /= 60;
+                    uint32 min  = t % 60; t /= 60;
+                    uint32 hour = t % 24;
+
+                    // --- Date: days since Unix epoch → year/month/day ---
+                    uint32 days = rtc_snap / 86400UL;
+                    uint32 y    = 1970;
                     while (1) {
                         uint32 diy = ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) ? 366 : 365;
                         if (days < diy) break;
                         days -= diy;
                         y++;
                     }
-                    RTC_Time_Now.Year = (int)y;
 
                     static const uint16 mdays[12] = {31,28,31,30,31,30,31,31,30,31,30,31};
                     uint32 leap = ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) ? 1 : 0;
@@ -251,11 +258,21 @@ int main(void)
                         if (days < dm) break;
                         days -= dm;
                     }
-                    RTC_Time_Now.Month = (int)(m + 1);
-                    RTC_Time_Now.Day   = (int)(days + 1);
+
+                    // --- Atomic commit: disable interrupts while writing the struct ---
+                    // Critical section is ~6 STR instructions (~50 ns @ 120 MHz).
+                    DisableInterrupts;
+                    RTC_Count           = rtc_snap;
+                    RTC_Time_Now.Hour   = (int)hour;
+                    RTC_Time_Now.Minute = (int)min;
+                    RTC_Time_Now.Second = (int)sec;
+                    RTC_Time_Now.Year   = (int)y;
+                    RTC_Time_Now.Month  = (int)(m + 1);
+                    RTC_Time_Now.Day    = (int)(days + 1);
+                    EnableInterrupts;
 
                     // Activity history: check for date rollover every 100ms
-                    Activity_Tick(RTC_Time_Now.Year, RTC_Time_Now.Month, RTC_Time_Now.Day);
+                    Activity_Tick((int)y, (int)(m + 1), (int)(days + 1));
                 }
 
                 // --- UART telemetry ---

@@ -165,13 +165,23 @@ MAPS_Dock_KEY_Status MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEYn MAPS_Dock_KEYx)
  */
 void MAPS_Dock_KEY_Incident(void)
 {
-  // Snapshot volatile variables once to avoid Pa082 (undefined volatile access order)
-  int rtc_hour          = RTC_Time_Now.Hour;
-  int rtc_minute        = RTC_Time_Now.Minute;
-  int rtc_second        = RTC_Time_Now.Second;
-  int sw_minute         = Stop_Watch_Now.Minute;
-  int sw_second         = Stop_Watch_Now.Second;
-  int sw_centisecond    = Stop_Watch_Now.Centisecond;
+  // Atomically snapshot all volatile shared structs.
+  // RTC_Time_Now is written in main loop (6 fields, non-atomic).
+  // Stop_Watch_Now is written in PIT0 ISR (carry chain, non-atomic).
+  // Reading field-by-field without a critical section can observe a
+  // "torn" struct — e.g. Hour already rolled to 00 but Month still shows
+  // the previous day, or Second reset to 0 but Minute not yet incremented.
+  // Disabling interrupts for ~6 LDR instructions (~50 ns @ 120 MHz) is safe.
+  int rtc_hour, rtc_minute, rtc_second;
+  int sw_minute, sw_second, sw_centisecond;
+  DisableInterrupts;
+  rtc_hour       = RTC_Time_Now.Hour;
+  rtc_minute     = RTC_Time_Now.Minute;
+  rtc_second     = RTC_Time_Now.Second;
+  sw_minute      = Stop_Watch_Now.Minute;
+  sw_second      = Stop_Watch_Now.Second;
+  sw_centisecond = Stop_Watch_Now.Centisecond;
+  EnableInterrupts;
   // render screen saver
   if (Lyra_Status == MAPS_Screen_Saver)
   {
@@ -759,9 +769,15 @@ void MAPS_Dock_KEY_Incident(void)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_StopWatch)
       {
         Stop_Watch_State = 0;           // Stop the stopwatch
-        Stop_Watch_Now.Minute = 0;      // Reset minute
-        Stop_Watch_Now.Second = 0;      // Reset second
-        Stop_Watch_Now.Centisecond = 0; // Reset centisecond
+        // Atomically zero all three fields.  PIT0 ISR writes Stop_Watch_Now
+        // via a carry chain (Centisecond → Second → Minute); if we reset
+        // field-by-field without a critical section the ISR could observe
+        // Second = 0 and Minute = 0 mid-carry and produce a corrupt display.
+        DisableInterrupts;
+        Stop_Watch_Now.Minute      = 0;
+        Stop_Watch_Now.Second      = 0;
+        Stop_Watch_Now.Centisecond = 0;
+        EnableInterrupts;
       }
       // Check current menu selection is alarm clock
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AlarmClock)
@@ -1711,13 +1727,18 @@ void Release_Dynamic_Animation_Cache(CoordCache *array, int len)
  */
 void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int index[2])
 {
-  // Snapshot volatile variables once to avoid Pa082 (undefined volatile access order)
-  int rtc_hour          = RTC_Time_Now.Hour;
-  int rtc_minute        = RTC_Time_Now.Minute;
-  int rtc_second        = RTC_Time_Now.Second;
-  int sw_minute         = Stop_Watch_Now.Minute;
-  int sw_second         = Stop_Watch_Now.Second;
-  int sw_centisecond    = Stop_Watch_Now.Centisecond;
+  // Atomically snapshot all volatile shared structs (same reason as in
+  // MAPS_Dock_KEY_Incident — see comment there).
+  int rtc_hour, rtc_minute, rtc_second;
+  int sw_minute, sw_second, sw_centisecond;
+  DisableInterrupts;
+  rtc_hour       = RTC_Time_Now.Hour;
+  rtc_minute     = RTC_Time_Now.Minute;
+  rtc_second     = RTC_Time_Now.Second;
+  sw_minute      = Stop_Watch_Now.Minute;
+  sw_second      = Stop_Watch_Now.Second;
+  sw_centisecond = Stop_Watch_Now.Centisecond;
+  EnableInterrupts;
   uint8 cache[64][16] = {0x00}; // 64 rows, 128 columns
   // release dynamic animation cache
   Release_Dynamic_Animation_Cache(array, len);
