@@ -51,6 +51,7 @@ typedef enum
 typedef struct
 {
     SleepState state;
+    uint32     timestamp_s; /* RTC seconds at the end of this window */
 } SleepSlot;
 
 typedef struct
@@ -87,11 +88,13 @@ extern SleepMonitorState SleepMon;
  */
 extern void SleepMonitor_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds);
 
-/* Toggle monitoring on/off (KEY0) */
-extern void SleepMonitor_Toggle(void);
+/* Toggle monitoring on/off (KEY0).
+ * rtc_now: current RTC_Count — recorded as session_start_s when turning ON. */
+extern void SleepMonitor_Toggle(uint32 rtc_now);
 
-/* Clear session statistics (KEY2) */
-extern void SleepMonitor_Clear(void);
+/* Clear session statistics (KEY2).
+ * rtc_now: current RTC_Count — recorded as new session_start_s. */
+extern void SleepMonitor_Clear(uint32 rtc_now);
 
 /* Render the sleep monitor screen to OLED */
 extern void Render_SleepMonitor(void);

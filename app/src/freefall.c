@@ -34,26 +34,49 @@ static uint32 isqrt32(uint32 n)
 
 /* Global detector state */
 FreeFallDetector FFDet = {
-    FF_STATE_IDLE, 0, 0, 0, 0,
-    {{0}}, 0, 0,
-    0, 0, 0.0f, 0, 0   /* elapsed_ms=0, beep_ms=0 */
+    FF_STATE_IDLE,
+    0,          /* fall_duration_ms  */
+    0,          /* impact_window_ms  */
+    0,          /* impact_peak_sq    */
+    {{0}},      /* events            */
+    0,          /* event_head        */
+    0,          /* event_count       */
+    0,          /* total_falls       */
+    0,          /* total_impacts     */
+    0.0f,       /* max_impact_g      */
+    0           /* beep_ms           */
 };
 
 /* ------------------------------------------------------------------
  * FreeFall_Update
+ *
+ * Call every 10 ms from the main loop.
+ *
+ * Timing design — wrap-safe relative counters:
+ *
+ *   fall_duration_ms  accumulates how long we have been continuously
+ *   below the free-fall threshold in the current FALLING phase.
+ *   It is reset to 0 when we enter FALLING and incremented by
+ *   FF_CALL_INTERVAL_MS (10) each call while the condition holds.
+ *   It never wraps: the maximum meaningful value is FF_FREEFALL_MIN_MS
+ *   (80 ms) + one interval = 90 ms — far below uint32 range.
+ *
+ *   impact_window_ms uses the same pattern for the IMPACT timeout.
+ *
+ *   Old code used a single global `elapsed_ms` that incremented
+ *   forever and computed durations as (elapsed_ms - fall_start_ms).
+ *   After ~49.7 days the uint32 wrapped, producing a huge positive
+ *   delta and triggering a phantom free-fall from IDLE.
  * ------------------------------------------------------------------ */
+#define FF_CALL_INTERVAL_MS  10   /* fixed 10 ms call period */
+
 void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
 {
-    FFDet.elapsed_ms += 10;
-
-    /* Compute magnitude squared (use int64 to avoid overflow) */
-    int64 ax64 = (int64)ax;
-    int64 ay64 = (int64)ay;
-    int64 az64 = (int64)az;
+    /* Compute magnitude squared (use int64 to avoid overflow on int16 inputs) */
+    int64  ax64    = (int64)ax;
+    int64  ay64    = (int64)ay;
+    int64  az64    = (int64)az;
     uint64 mag_sq64 = (uint64)(ax64*ax64 + ay64*ay64 + az64*az64);
-
-    /* Clamp to uint32 for thresholds — max useful value is ~(3g)² = 7.2e9,
-       which overflows uint32 (4.3e9). Keep as uint64 for comparisons. */
 
     switch (FFDet.state)
     {
@@ -61,62 +84,67 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
     case FF_STATE_IDLE:
         if (mag_sq64 < (uint64)FF_FREEFALL_THRESHOLD_SQ)
         {
-            FFDet.state        = FF_STATE_FALLING;
-            FFDet.fall_start_ms = FFDet.elapsed_ms;
+            /* Enter FALLING: start a fresh relative duration counter.
+             * No absolute timestamp needed — avoids uint32 wrap-around. */
+            FFDet.state           = FF_STATE_FALLING;
+            FFDet.fall_duration_ms = FF_CALL_INTERVAL_MS; /* count this sample */
         }
         break;
 
-    /* ---- FALLING: confirm duration then log event ---- */
+    /* ---- FALLING: confirm minimum duration then log event ---- */
     case FF_STATE_FALLING:
         if (mag_sq64 < (uint64)FF_FREEFALL_THRESHOLD_SQ)
         {
-            /* Still below threshold — check if we've passed minimum duration */
-            uint32 dur = FFDet.elapsed_ms - FFDet.fall_start_ms;
-            if (dur >= FF_FREEFALL_MIN_MS)
+            /* Still below threshold — accumulate duration */
+            FFDet.fall_duration_ms += FF_CALL_INTERVAL_MS;
+
+            if (FFDet.fall_duration_ms >= FF_FREEFALL_MIN_MS)
             {
                 /* Confirmed free-fall: log event and open impact window */
-                FFDet.fall_duration_ms = dur;
                 FFDet.total_falls++;
 
                 FreeFall_Event ev;
-                ev.type                = FF_EVENT_FREEFALL;
-                ev.timestamp_s         = rtc_seconds;
-                ev.freefall_duration_ms = dur;
-                ev.peak_mag_sq         = 0;
-                ev.peak_g              = 0.0f;
+                ev.type                 = FF_EVENT_FREEFALL;
+                ev.timestamp_s          = rtc_seconds;
+                ev.freefall_duration_ms = FFDet.fall_duration_ms;
+                ev.peak_mag_sq          = 0;
+                ev.peak_g               = 0.0f;
 
                 FFDet.events[FFDet.event_head] = ev;
                 FFDet.event_head = (FFDet.event_head + 1) % FF_MAX_EVENTS;
                 if (FFDet.event_count < FF_MAX_EVENTS)
                     FFDet.event_count++;
 
-                /* Non-blocking beep: set counter; beep will run for FF_BEEP_DURATION_MS */
+                /* Non-blocking beep */
                 FFDet.beep_ms = FF_BEEP_DURATION_MS;
                 Beep_On();
 
-                FFDet.state           = FF_STATE_IMPACT;
+                /* Transition: reset IMPACT phase counter */
+                FFDet.state            = FF_STATE_IMPACT;
                 FFDet.impact_window_ms = 0;
                 FFDet.impact_peak_sq   = 0;
             }
         }
         else
         {
-            /* Recovered without reaching minimum duration — false alarm */
-            FFDet.state = FF_STATE_IDLE;
+            /* Recovered before minimum duration — false alarm, return to IDLE */
+            FFDet.state            = FF_STATE_IDLE;
+            FFDet.fall_duration_ms = 0;
         }
         break;
 
-    /* ---- IMPACT: watch for high-g impact within 500ms of fall end ---- */
+    /* ---- IMPACT: watch for high-g impact within 500 ms of fall end ---- */
     case FF_STATE_IMPACT:
-        /* Non-blocking beep: count down and turn off when expired */
+        /* Non-blocking beep countdown */
         if (FFDet.beep_ms > 0)
         {
-            FFDet.beep_ms = (FFDet.beep_ms > 10) ? (FFDet.beep_ms - 10) : 0;
+            FFDet.beep_ms = (FFDet.beep_ms > FF_CALL_INTERVAL_MS)
+                            ? (FFDet.beep_ms - FF_CALL_INTERVAL_MS) : 0;
             if (FFDet.beep_ms == 0)
                 Beep_Off();
         }
 
-        FFDet.impact_window_ms += 10;
+        FFDet.impact_window_ms += FF_CALL_INTERVAL_MS;
 
         /* Track peak impact force */
         if (mag_sq64 > (uint64)FFDet.impact_peak_sq)
@@ -130,7 +158,6 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
         if (mag_sq64 >= (uint64)FF_IMPACT_THRESHOLD_SQ)
         {
             /* Impact detected: compute peak in g */
-            /* |a| = sqrt(impact_peak_sq); g = |a| / 16384 */
             uint32 peak_lsb = isqrt32(FFDet.impact_peak_sq);
             float  peak_g   = (float)peak_lsb / 16384.0f;
 
@@ -138,9 +165,9 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
             if (peak_g > FFDet.max_impact_g)
                 FFDet.max_impact_g = peak_g;
 
-            /* Update the most recent free-fall event with impact info */
+            /* Annotate the most recent free-fall event with impact data */
             int last = (FFDet.event_head - 1 + FF_MAX_EVENTS) % FF_MAX_EVENTS;
-            FFDet.events[last].type       = FF_EVENT_IMPACT;
+            FFDet.events[last].type        = FF_EVENT_IMPACT;
             FFDet.events[last].peak_mag_sq = FFDet.impact_peak_sq;
             FFDet.events[last].peak_g      = peak_g;
 
@@ -148,7 +175,7 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
         }
         else if (FFDet.impact_window_ms >= 500)
         {
-            /* Impact window expired: no significant impact detected */
+            /* Impact window expired without a significant hit */
             FFDet.state = FF_STATE_IDLE;
         }
         break;
@@ -160,46 +187,27 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
  * ------------------------------------------------------------------ */
 void FreeFall_Clear(void)
 {
-    FFDet.event_count   = 0;
-    FFDet.event_head    = 0;
-    FFDet.total_falls   = 0;
-    FFDet.total_impacts = 0;
-    FFDet.max_impact_g  = 0.0f;
-    FFDet.state         = FF_STATE_IDLE;
-    FFDet.beep_ms       = 0;
+    FFDet.event_count      = 0;
+    FFDet.event_head       = 0;
+    FFDet.total_falls      = 0;
+    FFDet.total_impacts    = 0;
+    FFDet.max_impact_g     = 0.0f;
+    FFDet.state            = FF_STATE_IDLE;
+    FFDet.fall_duration_ms = 0;
+    FFDet.impact_window_ms = 0;
+    FFDet.impact_peak_sq   = 0;
+    FFDet.beep_ms          = 0;
     Beep_Off();
 }
 
 /* ------------------------------------------------------------------
- * Render helpers
+ * Render helpers — thin aliases onto the shared framebuf module
  * ------------------------------------------------------------------ */
-static void dp(uint8 screen[64][16], int x, int y)
-{
-    if ((unsigned)x < 128 && (unsigned)y < 64)
-        screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
-}
-
-static void dline_h(uint8 screen[64][16], int y, int x0, int x1)
-{
-    for (int x = x0; x <= x1; x++) dp(screen, x, y);
-}
-
-static void dc6(uint8 screen[64][16], int px, int py, char ch)
-{
-    uint8 c = (uint8)ch - 32;
-    if (c >= 96) return;
-    for (int col = 0; col < 6; col++)
-    {
-        uint8 fb = Oled_FontLib_6x8[c][col];
-        for (int bit = 0; bit < 8; bit++)
-            if (fb & (1 << bit)) dp(screen, px + col, py + bit);
-    }
-}
-
-static void ds6(uint8 screen[64][16], int px, int py, const char *s)
-{
-    while (*s) { dc6(screen, px, py, *s++); px += 6; }
-}
+#include "framebuf.h"
+#define dp(s,x,y)        fb_pixel((s),(x),(y))
+#define dline_h(s,y,x0,x1) fb_hline((s),(y),(x0),(x1))
+#define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
+#define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
 
 /* ------------------------------------------------------------------
  * Render_FreeFall
@@ -218,10 +226,9 @@ static void ds6(uint8 screen[64][16], int px, int py, const char *s)
  * ------------------------------------------------------------------ */
 void Render_FreeFall(void)
 {
-    uint8 screen[64][16];
-    for (int i = 0; i < 64; i++)
-        for (int c = 0; c < 16; c++)
-            screen[i][c] = 0x00;
+    /* Use the shared global framebuffer (saves 1 KB of stack per call). */
+    #define screen g_fb
+    fb_clear(g_fb);
 
     char buf[24];
 

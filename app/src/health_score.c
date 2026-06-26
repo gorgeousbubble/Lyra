@@ -86,26 +86,62 @@ void HealthScore_Calculate(void)
         hr_score = (s > 0) ? (uint8)s : 0;
     }
 
-    /* --- 5. SpO2 score (0-15) --- */
+    /* --- 5. SpO2 score (0-15) ---
+     *
+     * Scoring tiers:
+     *   SPO2 < 80        : invalid / sensor not worn → half credit (7)
+     *   80 ≤ SPO2 ≤ 89   : dangerously low → linear 0..9 over 10-pt range
+     *                      Formula: (SPO2 - 80) * HS_WEIGHT_SPO2 / (2 * 10)
+     *                        80% → 0,  89% → 6  (≈ 40% of max)
+     *   90 ≤ SPO2 ≤ 94   : borderline low → linear 0..12 over 5-pt range
+     *                      Formula: (SPO2 - 90) * HS_WEIGHT_SPO2 / 5
+     *                        90% → 0,  94% → 12
+     *   SPO2 ≥ 95        : normal → full marks (15)
+     *
+     * OLD bug: the 90-94% formula was
+     *   HS_WEIGHT_SPO2 * (SPO2-90) / 5 + HS_WEIGHT_SPO2 / 3
+     *   = 3*(SPO2-90) + 5
+     * At SPO2=94 this gives 17, exceeding the cap of 15.
+     * The clamp caught it, but SPO2=94 and SPO2≥95 ended up equal (15),
+     * losing all differentiation within the range.
+     *
+     * The new formula keeps the result strictly within [0, HS_WEIGHT_SPO2)
+     * for values below 95% so the jump from 94% to 95% is always visible.
+     */
     uint8 spo2_valid = (SPO2 >= 80 && SPO2 <= 100) ? 1 : 0;
     uint8 spo2_score;
     if (!spo2_valid)
     {
+        /* No valid reading: half credit (sensor likely not worn) */
         spo2_score = HS_WEIGHT_SPO2 / 2;
     }
     else if (SPO2 >= 95)
     {
+        /* Normal range: full marks */
         spo2_score = HS_WEIGHT_SPO2;
     }
     else if (SPO2 >= 90)
     {
-        /* 90-94%: partial */
-        spo2_score = (uint8)(HS_WEIGHT_SPO2 * (SPO2 - 90) / 5 + HS_WEIGHT_SPO2 / 3);
-        if (spo2_score > HS_WEIGHT_SPO2) spo2_score = HS_WEIGHT_SPO2;
+        /* 90-94%: linear interpolation across 5-point range.
+         * Result is in [0, 12] — always strictly less than HS_WEIGHT_SPO2 (15)
+         * so the jump to full marks at 95% is always preserved.
+         *   SPO2=90 → 0*15/5 =  0
+         *   SPO2=91 → 1*15/5 =  3
+         *   SPO2=92 → 2*15/5 =  6
+         *   SPO2=93 → 3*15/5 =  9
+         *   SPO2=94 → 4*15/5 = 12  (strictly < 15) */
+        spo2_score = (uint8)((SPO2 - 90) * HS_WEIGHT_SPO2 / 5);
     }
     else
     {
-        spo2_score = 0;
+        /* 80-89%: dangerously low — linear 0..6 across 10-point range.
+         * Uses half the weight per point so the score stays in [0, 9)
+         * and leaves room for the 90-94% tier above.
+         *   SPO2=80 → 0*15/10/2 = 0
+         *   SPO2=85 → 5*15/10/2 = 3 (rounded down)
+         *   SPO2=89 → 9*15/10/2 = 6 (rounds up to 6)
+         * Integer formula: (SPO2-80) * HS_WEIGHT_SPO2 / 20 */
+        spo2_score = (uint8)((SPO2 - 80) * HS_WEIGHT_SPO2 / 20);
     }
 
     /* --- Total --- */
@@ -132,34 +168,13 @@ void HealthScore_Calculate(void)
 }
 
 /* -----------------------------------------------------------------------
- * Render helpers
+ * Render helpers — thin aliases onto the shared framebuf module
  * ----------------------------------------------------------------------- */
-static void dp(uint8 screen[64][16], int x, int y)
-{
-    if ((unsigned)x < 128 && (unsigned)y < 64)
-        screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
-}
-
-static void dline_h(uint8 screen[64][16], int y, int x0, int x1)
-{
-    for (int x = x0; x <= x1; x++) dp(screen, x, y);
-}
-
-static void dc6(uint8 screen[64][16], int px, int py, char ch)
-{
-    uint8 c = (uint8)ch - 32;
-    if (c >= 96) return;
-    for (int col = 0; col < 6; col++)
-    {
-        uint8 fb = Oled_FontLib_6x8[c][col];
-        for (int bit = 0; bit < 8; bit++)
-            if (fb & (1 << bit)) dp(screen, px + col, py + bit);
-    }
-}
-
-static void ds6(uint8 screen[64][16], int px, int py, const char *s)
-{
-    while (*s) { dc6(screen, px, py, *s++); px += 6; }
+#include "framebuf.h"
+#define dp(s,x,y)        fb_pixel((s),(x),(y))
+#define dline_h(s,y,x0,x1) fb_hline((s),(y),(x0),(x1))
+#define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
+#define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
 }
 
 /* Draw a 12x24 character row into frame buffer */
@@ -223,10 +238,9 @@ void Render_HealthScore(void)
     /* Recalculate every time we render */
     HealthScore_Calculate();
 
-    uint8 screen[64][16];
-    for (int i = 0; i < 64; i++)
-        for (int c = 0; c < 16; c++)
-            screen[i][c] = 0x00;
+    /* Use the shared global framebuffer (saves 1 KB of stack per call). */
+    #define screen g_fb
+    fb_clear(g_fb);
 
     char buf[12];
 

@@ -162,40 +162,14 @@ void AdcScope_Measure(void)
 }
 
 /* -----------------------------------------------------------------------
- * Frame-buffer helpers
+ * Frame-buffer helpers — thin aliases onto the shared framebuf module
  * ----------------------------------------------------------------------- */
-static void dp(uint8 screen[64][16], int x, int y)
-{
-    if ((unsigned)x < 128 && (unsigned)y < 64)
-        screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
-}
-
-static void dline_h(uint8 screen[64][16], int y, int x0, int x1)
-{
-    for (int x = x0; x <= x1; x++) dp(screen, x, y);
-}
-
-static void dline_v(uint8 screen[64][16], int x, int y0, int y1)
-{
-    if (y0 > y1) { int t = y0; y0 = y1; y1 = t; }
-    for (int y = y0; y <= y1; y++) dp(screen, x, y);
-}
-
-static void dc6(uint8 screen[64][16], int px, int py, char ch)
-{
-    uint8 c = (uint8)ch - 32;
-    if (c >= 96) return;
-    for (int col = 0; col < 6; col++)
-    {
-        uint8 fb = Oled_FontLib_6x8[c][col];
-        for (int bit = 0; bit < 8; bit++)
-            if (fb & (1 << bit)) dp(screen, px + col, py + bit);
-    }
-}
-
-static void ds6(uint8 screen[64][16], int px, int py, const char *s)
-{
-    while (*s) { dc6(screen, px, py, *s++); px += 6; }
+#include "framebuf.h"
+#define dp(s,x,y)        fb_pixel((s),(x),(y))
+#define dline_h(s,y,x0,x1) fb_hline((s),(y),(x0),(x1))
+#define dline_v(s,x,y0,y1) fb_vline((s),(x),(y0),(y1))
+#define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
+#define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
 }
 
 /* -----------------------------------------------------------------------
@@ -275,10 +249,9 @@ void Render_AdcScope(void)
     /* Always recompute measurements (pure math, fast) */
     AdcScope_Measure();
 
-    uint8 screen[64][16];
-    for (int i = 0; i < 64; i++)
-        for (int c = 0; c < 16; c++)
-            screen[i][c] = 0x00;
+    /* Use the shared global framebuffer (saves 1 KB of stack per call). */
+    #define screen g_fb
+    fb_clear(g_fb);
 
     char buf[14];
 

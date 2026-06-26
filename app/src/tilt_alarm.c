@@ -136,44 +136,27 @@ void TiltAlarm_Reset_Peak(void)
  * ----------------------------------------------------------------------- */
 
 /* Helper: draw one 6x8 char into screen[64][16] */
-static void dc(uint8 screen[64][16], int px, int py, char ch)
-{
-    uint8 c = (uint8)ch - 32;
-    if (c >= 96) return;
-    for (int col = 0; col < 6; col++)
-    {
-        uint8 fb = Oled_FontLib_6x8[c][col];
-        for (int bit = 0; bit < 8; bit++)
-        {
-            if (fb & (1 << bit))
-            {
-                int x = px + col, y = py + bit;
-                if (x >= 0 && x < 128 && y >= 0 && y < 64)
-                    screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
-            }
-        }
-    }
-}
+/* Thin aliases onto the shared framebuf module.
+ * dc/ds/dline are kept as local aliases to avoid renaming all call sites
+ * inside Render_TiltAlarm. dline is a simplified full-width hline that
+ * attitude3d does not need, so it stays local rather than going into framebuf. */
+#include "framebuf.h"
+#define dc(s,px,py,ch)   fb_char6((s),(px),(py),(ch))
+#define ds(s,px,py,str)  fb_str6((s),(px),(py),(str))
 
-static void ds(uint8 screen[64][16], int px, int py, const char *s)
-{
-    while (*s) { dc(screen, px, py, *s++); px += 6; }
-}
-
-/* Draw a horizontal line */
+/* Full-width horizontal separator line (x=2..125) — tilt_alarm specific */
 static void dline(uint8 screen[64][16], int y)
 {
-    for (int x = 2; x < 126; x++)
-        screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
+    fb_hline(screen, y, 2, 125);
 }
 
 void Render_TiltAlarm(float pitch, float roll)
 {
-    uint8 screen[64][16];
+    /* Use the shared global framebuffer (saves 1 KB of stack per call). */
+    #define screen g_fb
     int i, col;
-    for (i = 0; i < 64; i++)
-        for (col = 0; col < 16; col++)
-            screen[i][col] = 0x00;
+    fb_clear(g_fb);
+    (void)i; (void)col; /* suppress unused-variable warnings */
 
     float abs_pitch = pitch < 0.0f ? -pitch : pitch;
     float abs_roll  = roll  < 0.0f ? -roll  : roll;

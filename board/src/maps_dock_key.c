@@ -12,7 +12,9 @@
 
 #include "activity_history.h"
 #include "adc_scope.h"
+#include "alarm.h"
 #include "animation.h"
+#include "framebuf.h"
 #include "attitude3d.h"
 #include "conf.h"
 #include "freefall.h"
@@ -183,6 +185,24 @@ void MAPS_Dock_KEY_Incident(void)
   sw_second      = Stop_Watch_Now.Second;
   sw_centisecond = Stop_Watch_Now.Centisecond;
   EnableInterrupts;
+
+  // If an alarm is currently ringing, any key press dismisses it immediately.
+  // Check before processing normal key logic so the first key press goes to
+  // dismiss rather than also triggering the normal key action.
+  if (Alarm_Is_Ringing())
+  {
+    if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On ||
+        MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On ||
+        MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On ||
+        MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
+    {
+      Alarm_Dismiss();
+      MAPS_Dock_KEY_Delay(200); /* debounce */
+      return;                   /* swallow the key press */
+    }
+    return; /* no key pressed: keep ringing, skip normal UI processing */
+  }
+
   // render screen saver
   if (Lyra_Status == MAPS_Screen_Saver)
   {
@@ -641,12 +661,34 @@ void MAPS_Dock_KEY_Incident(void)
       // Check current menu selection is activity history (KEY0 = save today)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_ActivityHistory)
       {
-        Activity_Save_Today();
+        /* Pass current RTC seconds so Activity_Save_Today can enforce the
+         * 5-minute write throttle (protects W25Q80 Flash endurance).
+         * The return value indicates whether Flash was actually written:
+         *   1 → saved, briefly show confirmation on OLED
+         *   0 → throttled (too soon), show "WAIT Xmin" hint instead   */
+        if (Activity_Save_Today(RTC_Count))
+        {
+          Oled_I2C_Clean();
+          Oled_I2C_Put_Str_6x8(16, 3, "SAVED TO FLASH");
+        }
+        else
+        {
+          /* Compute remaining wait time for the user */
+          uint32 elapsed  = (RTC_Count >= Activity.last_flash_rtc)
+                            ? (RTC_Count - Activity.last_flash_rtc) : 0;
+          uint32 remain_s = (elapsed < ACTIVITY_SAVE_THROTTLE_S)
+                            ? (ACTIVITY_SAVE_THROTTLE_S - elapsed) : 0;
+          char hint[24];
+          snprintf(hint, sizeof(hint), "WAIT %lus", (unsigned long)remain_s);
+          Oled_I2C_Clean();
+          Oled_I2C_Put_Str_6x8(28, 3, hint);
+        }
+        MAPS_Dock_KEY_Delay(800); /* Show message briefly */
       }
       // Check current menu selection is sleep monitor (KEY0 = toggle on/off)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_SleepMonitor)
       {
-        SleepMonitor_Toggle();
+        SleepMonitor_Toggle(RTC_Count);
       }
       // Check current menu selection is ADC scope (KEY0 = pause/resume)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AdcScope)
@@ -1013,7 +1055,7 @@ void MAPS_Dock_KEY_Incident(void)
       // Check current menu selection is sleep monitor (KEY2 = clear session)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_SleepMonitor)
       {
-        SleepMonitor_Clear();
+        SleepMonitor_Clear(RTC_Count);
       }
       // Check current menu selection is ADC scope (KEY2 = zoom in / faster timebase)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_AdcScope)
@@ -1740,7 +1782,9 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
   sw_second      = Stop_Watch_Now.Second;
   sw_centisecond = Stop_Watch_Now.Centisecond;
   EnableInterrupts;
-  uint8 cache[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define cache g_fb
   // release dynamic animation cache
   Release_Dynamic_Animation_Cache(array, len);
   // index cannot have the same value

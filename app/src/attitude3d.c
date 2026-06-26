@@ -57,12 +57,13 @@ static inline int16 icos(int deg)
     return isin(deg + 90);
 }
 
-/* Draw a pixel into screen[64][16] frame buffer */
-static void draw_pixel(uint8 screen[64][16], int x, int y)
-{
-    if (x >= 0 && x < 128 && y >= 0 && y < 64)
-        screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
-}
+/* Draw a pixel into screen[64][16] frame buffer.
+ * Thin alias onto framebuf; draw_line (Bresenham) calls this and is kept
+ * local because it is specific to the 3D axis rendering in this file. */
+#include "framebuf.h"
+#define draw_pixel(s,x,y)       fb_pixel((s),(x),(y))
+#define draw_char(s,px,py,ch)   fb_char6((s),(px),(py),(ch))
+#define draw_str(s,px,py,str)   fb_str6((s),(px),(py),(str))
 
 /*
  * Draw a line from (x0,y0) to (x1,y1) using Bresenham.
@@ -96,29 +97,6 @@ static void draw_line(uint8 screen[64][16], int x0, int y0, int x1, int y1, int 
 }
 
 /*
- * Draw a 6x8 character into the frame buffer (same bit layout as all other Render_*)
- */
-static void draw_char(uint8 screen[64][16], int px, int py, char ch)
-{
-    uint8 c = (uint8)ch - 32;
-    if (c >= 96) return;
-    for (int col = 0; col < 6; col++)
-    {
-        uint8 fb = Oled_FontLib_6x8[c][col];
-        for (int bit = 0; bit < 8; bit++)
-        {
-            if (fb & (1 << bit))
-                draw_pixel(screen, px + col, py + bit);
-        }
-    }
-}
-
-static void draw_str(uint8 screen[64][16], int px, int py, const char *s)
-{
-    while (*s) { draw_char(screen, px, py, *s++); px += 6; }
-}
-
-/*
  * Render_Attitude3D
  * -----------------
  * Draws rotating XYZ coordinate axes (left) and numeric readout (right).
@@ -138,11 +116,11 @@ static void draw_str(uint8 screen[64][16], int px, int py, const char *s)
  */
 void Render_Attitude3D(float pitch, float roll, float yaw)
 {
-    uint8 screen[64][16];
+    /* Use the shared global framebuffer (saves 1 KB of stack per call). */
+    #define screen g_fb
     int i, col;
-    for (i = 0; i < 64; i++)
-        for (col = 0; col < 16; col++)
-            screen[i][col] = 0x00;
+    fb_clear(g_fb);
+    (void)i; (void)col; /* suppress unused-variable warnings */
 
     /* --- Convert angles to integer degrees (wrap) --- */
     int ip = (int)pitch; ip = ((ip % 360) + 360) % 360;

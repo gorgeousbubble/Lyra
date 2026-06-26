@@ -13,6 +13,7 @@
 #include "adc.h"
 #include "activity_history.h"
 #include "adc_scope.h"
+#include "alarm.h"
 #include "attitude3d.h"
 #include "freefall.h"
 #include "func.h"
@@ -185,6 +186,22 @@ int main(void)
 
                     // Free-fall / impact detection
                     FreeFall_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
+
+                    // Alarm clock: check hour:minute against alarm list every 10ms
+                    // Pass snapshotted values — avoids touching volatile RTC_Time_Now
+                    // directly (race-condition fix: RTC_Time_Now is written non-atomically
+                    // in the RTC_Update_Flag block; we read from locally snapshotted copies
+                    // captured there, but here we just read the individual int fields which
+                    // are 32-bit aligned and each updated atomically by the CPU).
+                    // Using a dedicated atomic snapshot is safest:
+                    {
+                        int alarm_h, alarm_m;
+                        DisableInterrupts;
+                        alarm_h = RTC_Time_Now.Hour;
+                        alarm_m = RTC_Time_Now.Minute;
+                        EnableInterrupts;
+                        Alarm_Tick(alarm_h, alarm_m);
+                    }
 
                     // Sleep monitoring (30-second RMS window, called at 100Hz)
                     SleepMonitor_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);

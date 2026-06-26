@@ -18,16 +18,20 @@
 // Kalman filter state (2-state: angle + gyro bias)
 typedef struct
 {
-    float dt;      // Sample period (s)
-    float angle_f; // Filtered angle output (degrees)
-    float angle_m; // Reserved
-    float wb_m;    // Reserved
-    float wb_f;    // Reserved
-    float q_bias;  // Estimated gyro bias (degrees/s)
-    float P[2][2]; // Error covariance matrix
-    float Q_angle; // Process noise: angle state
-    float Q_gyro;  // Process noise: gyro bias state
-    float R_angle; // Measurement noise
+    float dt;           // Sample period (s)
+    float angle_f;      // Filtered angle output (degrees)
+    float angle_m;      // Reserved
+    float wb_m;         // Reserved
+    float wb_f;         // Reserved
+    float q_bias;       // Estimated gyro bias (degrees/s)
+    float P[2][2];      // Error covariance matrix
+    float Q_angle;      // Process noise: angle state
+    float Q_gyro;       // Process noise: gyro bias state
+    float R_angle;      // Measurement noise
+    uint8 initialized;  // 1 = angle_f has been seeded from accelerometer
+                        // Using a dedicated flag instead of comparing angle_f
+                        // to 0.0f avoids the false-negative when the device is
+                        // truly horizontal (pitch == 0, roll == 0).
 } KalmanFilter;
 
 // Single-axis complementary filter state
@@ -42,8 +46,13 @@ typedef struct
 // Yaw axis: gyro integration only (no absolute reference)
 typedef struct
 {
-    float angle; // Integrated yaw angle (degrees, drifts over time)
-    float dt;    // Sample period (s)
+    float angle;        // Integrated yaw angle (degrees, drifts over time)
+    float dt;           // Sample period (s)
+    // Yaw is wrapped into [-180, 180) after every integration step to prevent
+    // float precision loss.  At 120 MHz, float has ~7 significant digits; an
+    // unclamped yaw accumulating at 10 °/s reaches ~864 000 ° in 24 h, at
+    // which point the LSB is ~0.06 ° — measurably worse than the sensor noise.
+    // Wrapping keeps the value near zero and preserves full float precision.
 } YawIntegrator;
 
 // Gyro zero-bias calibration state

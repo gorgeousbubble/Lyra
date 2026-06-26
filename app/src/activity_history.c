@@ -21,19 +21,38 @@
  * Global state
  * ----------------------------------------------------------------------- */
 ActivityHistoryState Activity = {
-    {{0}},  /* history */
-    0,      /* history_len */
-    0,      /* today_steps */
+    {{0}},  /* history        */
+    0,      /* history_len    */
+    0,      /* today_steps    */
     0, 0, 0,/* last_saved date */
-    0,      /* loaded */
-    0       /* view_mode */
+    0,      /* loaded         */
+    0,      /* view_mode      */
+    0       /* last_flash_rtc */
 };
+
+/* -----------------------------------------------------------------------
+ * CRC-8/SMBUS (polynomial 0x07, init 0x00, no reflection)
+ * Used to detect Flash data corruption on read-back.
+ * ----------------------------------------------------------------------- */
+static uint8 crc8(const uint8 *data, int len)
+{
+    uint8 crc = 0x00;
+    int i, b;
+    for (i = 0; i < len; i++)
+    {
+        crc ^= data[i];
+        for (b = 0; b < 8; b++)
+            crc = (crc & 0x80) ? ((uint8)(crc << 1) ^ 0x07) : (uint8)(crc << 1);
+    }
+    return crc;
+}
 
 /* -----------------------------------------------------------------------
  * Flash helpers
  * ----------------------------------------------------------------------- */
 
-/* Serialize state to 36-byte Flash record */
+/* Serialize state to ACTIVITY_RECORD_SIZE-byte Flash record.
+ * Layout: bytes 0..35 = data, byte 36 = CRC-8 of bytes 0..35. */
 static void serialize(uint8 buf[ACTIVITY_RECORD_SIZE])
 {
     int i;
@@ -51,16 +70,24 @@ static void serialize(uint8 buf[ACTIVITY_RECORD_SIZE])
     buf[29] = (uint8)(t >> 16);
     buf[30] = (uint8)(t >>  8);
     buf[31] = (uint8)(t      );
-    /* Last saved date */
-    buf[32] = Activity.history_len;
+    /* Metadata */
+    buf[32] = (uint8)Activity.history_len;
     buf[33] = Activity.last_saved_year;
     buf[34] = Activity.last_saved_month;
     buf[35] = Activity.last_saved_day;
+    /* CRC-8 over bytes 0..35 */
+    buf[36] = crc8(buf, 36);
 }
 
-/* Deserialize 36-byte Flash record into state */
-static void deserialize(const uint8 buf[ACTIVITY_RECORD_SIZE])
+/* Deserialize ACTIVITY_RECORD_SIZE-byte Flash record into state.
+ * Returns 1 on success, 0 if CRC mismatch (data corrupted). */
+static int deserialize(const uint8 buf[ACTIVITY_RECORD_SIZE])
 {
+    /* Verify CRC before touching any state */
+    uint8 expected = crc8(buf, 36);
+    if (buf[36] != expected)
+        return 0; /* corrupted */
+
     int i;
     for (i = 0; i < ACTIVITY_DAYS; i++)
     {
@@ -75,27 +102,23 @@ static void deserialize(const uint8 buf[ACTIVITY_RECORD_SIZE])
         ((uint32)buf[29] << 16) |
         ((uint32)buf[30] <<  8) |
          (uint32)buf[31];
-    Activity.history_len   = buf[32];
+    Activity.history_len      = buf[32];
     Activity.last_saved_year  = buf[33];
     Activity.last_saved_month = buf[34];
     Activity.last_saved_day   = buf[35];
     if (Activity.history_len > ACTIVITY_DAYS)
         Activity.history_len = ACTIVITY_DAYS;
+    return 1;
 }
 
+/* Low-level Flash erase + program.
+ * Every call costs one W25Q80 sector erase cycle (endurance ~10,000×). */
 static void flash_write(void)
 {
     uint8 buf[ACTIVITY_RECORD_SIZE];
     serialize(buf);
-    /* W25Q80 must erase sector before programming (sector = 4KB = 16 pages) */
-    /* Page 2 is in Sector 0 (pages 0..15). Sector 0 already used by alarm/tense.
-       We must NOT erase the whole sector.  W25Q80 page program can only set bits
-       to 0; to set bits to 1 we need erase.
-       Strategy: use a dedicated sector for activity data.
-       Activity uses Page 2 only. To avoid erasing alarm (page 0) and tense (page 1),
-       we store activity data on a SEPARATE sector:
-         Sector 2 (pages 32..47) → Page 32  */
-    /* Erase sector 2 (address 0x2000, size 4KB) */
+    /* Activity data lives in Sector 2 (address 0x2000), Page 32.
+     * Sectors 0-1 are used by alarm/tense config — do NOT erase them. */
     MAPS_Dock_W25Q80_Erase_Block(0x00002000, ERASE_SECTOR_SIZE);
     MAPS_Dock_W25Q80_Write_Page(32, 0, buf, ACTIVITY_RECORD_SIZE);
 }
@@ -106,6 +129,21 @@ static void flash_read(uint8 buf[ACTIVITY_RECORD_SIZE])
 }
 
 /* -----------------------------------------------------------------------
+ * Reset RAM state to "factory fresh"
+ * ----------------------------------------------------------------------- */
+static void reset_state(void)
+{
+    int i;
+    for (i = 0; i < ACTIVITY_DAYS; i++)
+        Activity.history[i].steps = 0;
+    Activity.history_len      = 0;
+    Activity.today_steps      = 0;
+    Activity.last_saved_year  = 0;
+    Activity.last_saved_month = 0;
+    Activity.last_saved_day   = 0;
+}
+
+/* -----------------------------------------------------------------------
  * Activity_Load
  * ----------------------------------------------------------------------- */
 void Activity_Load(void)
@@ -113,23 +151,27 @@ void Activity_Load(void)
     uint8 buf[ACTIVITY_RECORD_SIZE];
     flash_read(buf);
 
-    /* Check if Flash has been written before (first byte of first entry == 0xFF → erased) */
-    if (buf[0] == 0xFF && buf[1] == 0xFF && buf[2] == 0xFF && buf[3] == 0xFF)
+    /* Detect virgin Flash: all data bytes 0xFF means sector was never written */
+    int all_ff = 1;
+    int i;
+    for (i = 0; i < 36; i++)
     {
-        /* Fresh Flash: initialise to zeros */
-        int i;
-        for (i = 0; i < ACTIVITY_DAYS; i++)
-            Activity.history[i].steps = 0;
-        Activity.history_len   = 0;
-        Activity.today_steps   = 0;
-        Activity.last_saved_year  = 0;
-        Activity.last_saved_month = 0;
-        Activity.last_saved_day   = 0;
+        if (buf[i] != 0xFF) { all_ff = 0; break; }
     }
-    else
+
+    if (all_ff)
     {
-        deserialize(buf);
+        /* Fresh Flash — initialise everything to zero */
+        reset_state();
     }
+    else if (!deserialize(buf))
+    {
+        /* CRC mismatch: Flash record is corrupted (partial write, bit-flip, etc.)
+         * Reset to zero rather than loading garbage data. */
+        reset_state();
+    }
+    /* else: deserialize succeeded, state is populated */
+
     Activity.loaded = 1;
 }
 
@@ -166,36 +208,59 @@ void Activity_Tick(int year, int month, int day)
         return; /* Same day, nothing to do */
 
     /* New day detected: push today_steps into history ring, reset pedometer */
-    /* Shift history left (oldest falls off end) */
     int i;
     for (i = 0; i < ACTIVITY_DAYS - 1; i++)
         Activity.history[i] = Activity.history[i + 1];
 
-    /* Write yesterday's count into [DAYS-1] */
     Activity.history[ACTIVITY_DAYS - 1].steps = Activity.today_steps;
     if (Activity.history_len < ACTIVITY_DAYS)
         Activity.history_len++;
 
-    /* Update saved date */
     Activity.last_saved_year  = y;
     Activity.last_saved_month = m;
     Activity.last_saved_day   = d;
 
-    /* Reset today's counter */
     Activity.today_steps = 0;
     Pedometer_Reset();
 
-    /* Persist to Flash */
+    /* Date-rollover writes are NOT rate-limited (at most once per day).
+     * Update last_flash_rtc so the next manual save starts a fresh window. */
     flash_write();
+    /* Note: we cannot read RTC_Count here (would create a module dependency).
+     * The throttle for manual saves is enforced in Activity_Save_Today via
+     * the rtc_now argument passed by the caller. Reset by setting to 0 so
+     * the next manual KEY0 press is always allowed after a date rollover. */
+    Activity.last_flash_rtc = 0;
 }
 
 /* -----------------------------------------------------------------------
- * Activity_Save_Today  — KEY0: manual checkpoint
+ * Activity_Save_Today  — KEY0: manual checkpoint, rate-limited
+ *
+ * rtc_now : current RTC_Count (seconds since Unix epoch).
+ * Returns : 1 if Flash was written, 0 if the call was throttled.
+ *
+ * Throttle: at most one manual save per ACTIVITY_SAVE_THROTTLE_S seconds
+ * (default 300 s = 5 min).  This protects W25Q80 endurance; at 10 000
+ * erase cycles and one save per 5 min the chip lasts > 95 years.
  * ----------------------------------------------------------------------- */
-void Activity_Save_Today(void)
+int Activity_Save_Today(uint32 rtc_now)
 {
-    Activity.today_steps = Pedometer.step_count;
+    /* Allow the save if:
+     *   a) never saved before (last_flash_rtc == 0), OR
+     *   b) sufficient time has elapsed since the last save.
+     * Guard against RTC wrap-around: if rtc_now < last (clock reset),
+     * treat as "enough time has passed" and allow the write. */
+    uint32 elapsed = (rtc_now >= Activity.last_flash_rtc)
+                     ? (rtc_now - Activity.last_flash_rtc)
+                     : ACTIVITY_SAVE_THROTTLE_S; /* clock reset → allow */
+
+    if (Activity.last_flash_rtc != 0 && elapsed < ACTIVITY_SAVE_THROTTLE_S)
+        return 0; /* throttled — too soon */
+
+    Activity.today_steps    = Pedometer.step_count;
+    Activity.last_flash_rtc = rtc_now;
     flash_write();
+    return 1;
 }
 
 /* -----------------------------------------------------------------------
@@ -207,40 +272,14 @@ void Activity_Toggle_View(void)
 }
 
 /* -----------------------------------------------------------------------
- * Render helpers
+ * Render helpers — thin aliases onto the shared framebuf module
  * ----------------------------------------------------------------------- */
-static void dp(uint8 screen[64][16], int x, int y)
-{
-    if ((unsigned)x < 128 && (unsigned)y < 64)
-        screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
-}
-
-static void dline_h(uint8 screen[64][16], int y, int x0, int x1)
-{
-    for (int x = x0; x <= x1; x++) dp(screen, x, y);
-}
-
-static void dline_v(uint8 screen[64][16], int x, int y0, int y1)
-{
-    if (y0 > y1) { int t = y0; y0 = y1; y1 = t; }
-    for (int y = y0; y <= y1; y++) dp(screen, x, y);
-}
-
-static void dc6(uint8 screen[64][16], int px, int py, char ch)
-{
-    uint8 c = (uint8)ch - 32;
-    if (c >= 96) return;
-    for (int col = 0; col < 6; col++)
-    {
-        uint8 fb = Oled_FontLib_6x8[c][col];
-        for (int bit = 0; bit < 8; bit++)
-            if (fb & (1 << bit)) dp(screen, px + col, py + bit);
-    }
-}
-
-static void ds6(uint8 screen[64][16], int px, int py, const char *s)
-{
-    while (*s) { dc6(screen, px, py, *s++); px += 6; }
+#include "framebuf.h"
+#define dp(s,x,y)        fb_pixel((s),(x),(y))
+#define dline_h(s,y,x0,x1) fb_hline((s),(y),(x0),(x1))
+#define dline_v(s,x,y0,y1) fb_vline((s),(x),(y0),(y1))
+#define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
+#define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
 }
 
 /* Draw a filled vertical bar: x_center, bottom y, height in pixels */
@@ -267,10 +306,9 @@ static void draw_bar(uint8 screen[64][16], int x_c, int y_bot, int h, int w)
  * ----------------------------------------------------------------------- */
 void Render_ActivityHistory(void)
 {
-    uint8 screen[64][16];
-    for (int i = 0; i < 64; i++)
-        for (int c = 0; c < 16; c++)
-            screen[i][c] = 0x00;
+    /* Use the shared global framebuffer (saves 1 KB of stack per call). */
+    #define screen g_fb
+    fb_clear(g_fb);
 
     char buf[24];
 

@@ -34,6 +34,9 @@ void Kalman_Init(KalmanFilter *kf, float p[2][2], float dt, float q_angle, float
     kf->R_angle = r_angle;
     kf->q_bias  = 0.0f;
     kf->angle_f = 0.0f;
+    // Mark as NOT yet seeded from accelerometer.
+    // Fusion_Filter will seed it on the first valid acc sample.
+    kf->initialized = 0;
 }
 
 /*
@@ -77,12 +80,13 @@ float Kalman_Filter(KalmanFilter *kf, float angle_m, float gyro_m)
  */
 void Kalman_Reset(KalmanFilter *kf, float initial_angle)
 {
-    kf->angle_f = initial_angle;
-    kf->q_bias  = 0.0f;
-    kf->P[0][0] = 1.0f;
-    kf->P[0][1] = 0.0f;
-    kf->P[1][0] = 0.0f;
-    kf->P[1][1] = 1.0f;
+    kf->angle_f      = initial_angle;
+    kf->q_bias       = 0.0f;
+    kf->P[0][0]      = 1.0f;
+    kf->P[0][1]      = 0.0f;
+    kf->P[1][0]      = 0.0f;
+    kf->P[1][1]      = 1.0f;
+    kf->initialized  = 1;  // Caller has provided a known starting angle
 }
 
 /*
@@ -197,7 +201,8 @@ void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int
     {
         ff->pitch.angle = Normalize_Angle(ff->pitch.angle + gyro_pitch * ff->pitch.dt);
         ff->roll.angle  = Normalize_Angle(ff->roll.angle  + gyro_roll  * ff->roll.dt);
-        ff->yaw.angle  += gyro_yaw * ff->yaw.dt;
+        // Yaw: wrap here too for the same float-precision reason
+        ff->yaw.angle   = Normalize_Angle(ff->yaw.angle   + gyro_yaw   * ff->yaw.dt);
         // Keep Kalman internal state in sync to avoid output jump when acc recovers
         ff->kf_pitch.angle_f = ff->pitch.angle;
         ff->kf_roll.angle_f  = ff->roll.angle;
@@ -212,11 +217,30 @@ void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int
     ff->roll.acc_angle  = acc_roll;
 
 #if FILTER_MODE == FILTER_MODE_KALMAN
-    // Initialize Kalman angle from accelerometer on first valid sample
-    if (ff->kf_pitch.angle_f == 0.0f && ff->kf_roll.angle_f == 0.0f)
+    // ----------------------------------------------------------------
+    // Seed Kalman state from accelerometer on the very first valid sample.
+    //
+    // OLD (buggy):
+    //   if (kf_pitch.angle_f == 0.0f && kf_roll.angle_f == 0.0f)
+    //
+    // The old check fails when the device starts truly horizontal
+    // (acc_pitch == 0 AND acc_roll == 0): both angle_f fields stay 0
+    // after the seed assignment, so the condition remains true on every
+    // subsequent call and the Kalman state is re-seeded each frame —
+    // effectively bypassing the filter entirely.
+    //
+    // FIX: use a dedicated 'initialized' flag that is set once and never
+    // cleared except by an explicit Kalman_Init / Kalman_Reset call.
+    // ----------------------------------------------------------------
+    if (!ff->kf_pitch.initialized)
     {
-        ff->kf_pitch.angle_f = acc_pitch;
-        ff->kf_roll.angle_f  = acc_roll;
+        ff->kf_pitch.angle_f    = acc_pitch;
+        ff->kf_pitch.initialized = 1;
+    }
+    if (!ff->kf_roll.initialized)
+    {
+        ff->kf_roll.angle_f    = acc_roll;
+        ff->kf_roll.initialized = 1;
     }
     ff->pitch.angle = Kalman_Filter(&ff->kf_pitch, acc_pitch, gyro_pitch);
     ff->roll.angle  = Kalman_Filter(&ff->kf_roll,  acc_roll,  gyro_roll);
@@ -224,5 +248,18 @@ void Fusion_Filter(FusionFilter *ff, int16 ax, int16 ay, int16 az, int16 gx, int
     ff->pitch.angle = Complementary_Update(ff->pitch.angle, acc_pitch, gyro_pitch, ff->pitch.alpha, ff->pitch.dt);
     ff->roll.angle  = Complementary_Update(ff->roll.angle,  acc_roll,  gyro_roll,  ff->roll.alpha,  ff->roll.dt);
 #endif
-    ff->yaw.angle  += gyro_yaw * ff->yaw.dt;
+
+    // ----------------------------------------------------------------
+    // Yaw: gyro-only integration.
+    //
+    // Wrap into [-180, 180) after EVERY step.
+    //
+    // WHY: float has ~7 significant digits.  An unclamped yaw value
+    // accumulating at 10 °/s reaches ~864 000 ° in 24 hours, at which
+    // point the representable step size is ~0.06 ° — larger than the
+    // sensor noise floor (~0.02 °/s × 0.01 s = 0.0002 °/step).
+    // Keeping the value in [-180, 180) preserves full float precision
+    // indefinitely, at the cost of a single fmodf call per 10 ms.
+    // ----------------------------------------------------------------
+    ff->yaw.angle = Normalize_Angle(ff->yaw.angle + gyro_yaw * ff->yaw.dt);
 }

@@ -4,7 +4,7 @@
  *     All rights reserved.
  *
  * @file       init.c
- * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12
+ * @brief      MK64FX512VLQ12/MK64FN1M0VLQ12 — Hardware and application initialisation
  * @author     alopex
  * @version    v1.0
  * @date       2025-06-24
@@ -37,114 +37,98 @@
 #include "watch.h"
 
 /*
- *  @brief      Interrupt_Init     Interrupt initialization
+ *  @brief      Interrupt_Init — Configure and enable all interrupt sources
  *  @since      v1.0
+ *
+ *  Interrupt priority assignments:
+ *    PIT0  priority 2 — 1ms tick (stopwatch, RTC-update flag)
+ *    PIT1  priority 3 — 1ms tick (sensor-read flags at 10ms / 5ms offset)
+ *    RTC   priority 4 — RTC overflow / alarm
+ *
+ *  Note: PTC19 and PTD15 external-interrupt lines are wired on the board
+ *  but are not used by this firmware.  The GPIO pins are left as inputs
+ *  (default state after reset) and no ISRs are registered for them.
  */
 void Interrupt_Init(void)
 {
-  /*PORT_Init_Exit(PTC19,IRQ_EITHER);//PTC19 external interrupt, jump edge trigger
-  set_irq_priority(PORTC_IRQn,0);//Interrupt priority 0
-  enable_irq(PORTC_IRQn);//Interrupts enable
+    PIT_Init_ms(PIT0, 1);
+    set_irq_priority(PIT0_IRQn, 2);
+    Set_Vector_Handler(PIT0_VECTORn, PIT0_IRQHandler);
+    enable_irq(PIT0_IRQn);
 
-  PORT_Init_Exit(PTD15,IRQ_EITHER);//PTD15 external interrupt, jump edge trigger
-  set_irq_priority(PORTD_IRQn,1);//Interrupt priority 1
-  enable_irq(PORTD_IRQn);//Interrupts enable*/
+    PIT_Init_ms(PIT1, 1);
+    set_irq_priority(PIT1_IRQn, 3);
+    Set_Vector_Handler(PIT1_VECTORn, PIT1_IRQHandler);
+    enable_irq(PIT1_IRQn);
 
-  PIT_Init_ms(PIT0, 1);           // PIT0 timed interrupt, with a timing cycle of 1ms
-  set_irq_priority(PIT0_IRQn, 2); // Interrupt priority 2
-  Set_Vector_Handler(PIT0_VECTORn, PIT0_IRQHandler);
-  enable_irq(PIT0_IRQn); // Interrupts enable
-
-  PIT_Init_ms(PIT1, 1);           // PIT1 timed interrupt, with a timing cycle of 1ms
-  set_irq_priority(PIT1_IRQn, 3); // Interrupt priority 3
-  Set_Vector_Handler(PIT1_VECTORn, PIT1_IRQHandler);
-  enable_irq(PIT1_IRQn); // Interrupts enable
-
-  set_irq_priority(RTC_IRQn, 4); // Interrupt priority 4
-  Set_Vector_Handler(RTC_VECTORn, RTC_IRQHandler);
-  enable_irq(RTC_IRQn); // Interrupts enable
+    set_irq_priority(RTC_IRQn, 4);
+    Set_Vector_Handler(RTC_VECTORn, RTC_IRQHandler);
+    enable_irq(RTC_IRQn);
 }
 
 /*
- *  @brief      AllInit     Application initialization
+ *  @brief      AllInit — Full hardware and application initialisation
  *  @since      v1.0
+ *
+ *  Sequence (interrupts disabled throughout):
+ *    1. Board peripherals  : LEDs, LCM, keys, rocker, W25Q80 Flash
+ *    2. LCD display
+ *    3. MCU peripherals    : ADC (×2), I2C0, UART4
+ *    4. Sensors            : MPU6050, OLED, MAX30102/health, RTC, beeper
+ *    5. Sensor fusion      : Kalman/complementary filter init (alpha=0.93, dt=10ms)
+ *    6. Interrupts         : PIT0, PIT1, RTC
+ *
+ *  To set the RTC time at first boot, use the RTC menu under
+ *  "Configure Adjust" rather than hard-coding a time here.
  */
 void AllInit(void)
 {
-  DisableInterrupts; // Close interrupts
-  /*
-  **MAPS_Dock
-  */
-  MAPS_Dock_LED_Init();        // LED initialization
-  MAPS_Dock_LCM_Init();        // LCM initialization
-  MAPS_Dock_KEY_ALL_Init();    // KEY independent button initialization
-  MAPS_Dock_Rocker_Key_Init(); // Rocker joystick button initialization
-  MAPS_Dock_W25Q80_Init();     // W25Q80 initialization
+    DisableInterrupts;
 
-  /*
-  **MAPS
-  */
-  MAPS_LCD_Init(); // LCD initialization
+    /* ---- Board peripherals ---- */
+    MAPS_Dock_LED_Init();
+    MAPS_Dock_LCM_Init();
+    MAPS_Dock_KEY_ALL_Init();
+    MAPS_Dock_Rocker_Key_Init();
+    MAPS_Dock_W25Q80_Init();
 
-  /*
-  **MK64
-  */
-  ADC_Init(ADC0_DP0);            // ADC0_DP0 channel initialization
-  ADC_Init(ADC0_DM0);            // ADC0_DM0 channel initialization
-  I2C_Init(I2C_I2C0, 400000);    // I2C0 initialization, baud rate 400Kbps
-  UART_Init(UART_UART4, 115200); // UART4 initialization, baud rate 115200Bps
-  // DAC_Init(DAC_DAC1);//DAC_DAC1 initialization
-  MPU6050_Init();  // MPU6050 initialization
-  Oled_I2C_Init(); // Oled initialization
-  Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(); // MAX30102 + health GPIO initialization
-  RTC_Init();      // RTC initialization
-  Beep_Init();     // Beep initialization
+    /* ---- LCD ---- */
+    MAPS_LCD_Init();
 
-  // set current time
-  /*struct tm timeinfo = {
-    .tm_year = 2025 - 1900, // Year since 1900
-    .tm_mon = 7 - 1,        // Month (0-11)
-    .tm_mday = 28,          // Day of the month (1-31)
-    .tm_hour = 22,          // Hour (0-23)
-    .tm_min = 35,            // Minute (0-59)
-    .tm_sec = 0             // Second (0-59)
-  };
-  RTC_Set_Time_Format(&timeinfo);//Set RTC time format*/
+    /* ---- MCU peripherals ---- */
+    ADC_Init(ADC0_DP0);
+    ADC_Init(ADC0_DM0);
+    I2C_Init(I2C_I2C0, 400000);    /* 400 kHz */
+    UART_Init(UART_UART4, 115200);  /* 115200 bps telemetry */
 
-  /*// set alarm time
-  struct tm alarm_time = {
-    .tm_year = 2025 - 1900, // Year since 1900
-    .tm_mon = 7 - 1,        // Month (0-11)
-    .tm_mday = 13,          // Day of the month (1-31)
-    .tm_hour = 17,          // Hour (0-23)
-    .tm_min = 41,           // Minute (0-59)
-    .tm_sec = 0             // Second (0-59)
-  };
-  RTC_Set_Alarm_Format(&alarm_time);//Set RTC alarm time format*/
+    /* ---- Sensors ---- */
+    MPU6050_Init();
+    Oled_I2C_Init();
+    Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init();
+    RTC_Init();
+    Beep_Init();
 
-  /*
-  **Complementary filter: alpha=0.93 (93% gyro, 7% accel), dt=0.01s (100Hz)
-  */
-  Fusion_Init(&FF, 0.93f, 0.01f);
+    /* ---- Sensor fusion filter ----
+     * Complementary / Kalman filter: alpha = 0.93 (93% gyro, 7% accel),
+     * dt = 0.01 s (called at 100 Hz from MPU6050_Read_Flag block). */
+    Fusion_Init(&FF, 0.93f, 0.01f);
 
-  /*
-  **Interrupts
-  */
-  Interrupt_Init(); // Interrupt initialization
+    /* ---- Interrupts ---- */
+    Interrupt_Init();
 
-  EnableInterrupts;
+    EnableInterrupts;
 }
 
 /*
- *  @brief      ReadConf     Application confiugration read
+ *  @brief      ReadConf — Read persistent configuration from W25Q80 Flash
  *  @since      v1.0
+ *
+ *  Loads:
+ *    - Alarm clock list  (Sector 0, Page 0)
+ *    - Time-format tense (Sector 1, Page 1, 12H/24H)
  */
 void ReadConf(void)
 {
-  /*
-  **MAPS_Dock
-  */
-  // MAPS_Dock_W25Q80_Erase_Chip(); // Erase W25Q80 chip
-  Read_Alarm_Clock_E2PROM_To_List();             // Read MAPS Dock configuration from W25Q80
-  Read_Configure_Adjust_Tense_E2PROM_To_Value(); // Read MAPS Dock configuration from W25Q80
+    Read_Alarm_Clock_E2PROM_To_List();
+    Read_Configure_Adjust_Tense_E2PROM_To_Value();
 }

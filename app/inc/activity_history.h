@@ -16,27 +16,39 @@
 #include "common.h"
 
 /* -----------------------------------------------------------------------
- * Flash storage layout (W25Q80, Page 2, 256 bytes)
+ * Flash storage layout (W25Q80, Sector 2 / Page 32, 256 bytes)
  *
- *   Bytes 0..27  : 7 × ActivityDay records (4 bytes each)
- *     [0..3]  = Day 0 (oldest): { uint16 steps_hi, uint16 steps_lo }
- *                               packed as uint32 step count
+ *   Bytes 0..27  : 7 × ActivityDay records (4 bytes each, big-endian uint32)
+ *     [0..3]  = Day 0 (oldest) step count
  *     [4..7]  = Day 1 ...
  *     ...
  *     [24..27]= Day 6 (yesterday's completed day)
- *   Bytes 28..31 : Today's accumulated steps (current day, RAM only — NOT saved)
- *   Byte  32     : Day-of-week index of Day 6 (0=Mon..6=Sun), for display label
- *   Bytes 33..35 : Saved date of Day 6 (year-1970, month, day) for rollover check
- *   Bytes 36..255: Reserved (0xFF)
+ *   Bytes 28..31 : Today's accumulated steps (partial count)
+ *   Byte  32     : history_len  (0..7)
+ *   Byte  33     : last_saved_year  (year - 1970, fits uint8 until 2225)
+ *   Byte  34     : last_saved_month (1..12)
+ *   Byte  35     : last_saved_day   (1..31)
+ *   Byte  36     : CRC-8 of bytes 0..35  ← integrity checksum (NEW)
+ *   Bytes 37..255: Reserved (0xFF)
  *
- * On power-up:  Read all 7 days from Flash.
- * Each day:     Compare RTC date; if new day → shift ring buffer, write to Flash.
- * KEY0:         Manual save of today's partial count into Day 6 slot.
+ * CRC-8 polynomial: 0x07 (same as CRC-8/SMBUS).
+ * If the stored CRC does not match bytes 0..35, the record is treated as
+ * corrupted and the state is reset to zero (same as a fresh Flash).
+ *
+ * On power-up:  Read record from Flash, verify CRC, populate RAM state.
+ * Each day:     Date rollover → rotate ring buffer, write Flash.
+ * KEY0:         Manual checkpoint → write Flash (rate-limited, see below).
  * ----------------------------------------------------------------------- */
 
-#define ACTIVITY_FLASH_PAGE       2       /* W25Q80 page number            */
-#define ACTIVITY_DAYS             7       /* History depth (days)          */
-#define ACTIVITY_RECORD_SIZE      36      /* Total bytes written to Flash  */
+#define ACTIVITY_FLASH_PAGE       2       /* Legacy name kept for reference */
+#define ACTIVITY_DAYS             7       /* History depth (days)           */
+#define ACTIVITY_RECORD_SIZE      37      /* 36 data bytes + 1 CRC byte     */
+
+/* Minimum seconds between two consecutive manual Flash saves (KEY0).
+ * W25Q80 endurance: ~10,000 erase cycles per sector.
+ * At one save per 5 minutes the chip lasts > 95 years of continuous use.
+ * Date-rollover saves are NOT rate-limited (at most once per day).      */
+#define ACTIVITY_SAVE_THROTTLE_S  300     /* 5 minutes                      */
 
 /* Step goal for progress bar */
 #define ACTIVITY_GOAL_STEPS       10000
@@ -56,6 +68,10 @@ typedef struct
     uint8       last_saved_day;
     uint8       loaded;                 /* 1 = Flash data loaded         */
     uint8       view_mode;              /* 0=week bar, 1=day detail      */
+    /* Rate-limiting for manual saves (KEY0).
+     * Stores the RTC_Count value at the time of the last Flash write.
+     * A value of 0 means "never written" (first save always allowed). */
+    uint32      last_flash_rtc;         /* RTC seconds of last Flash write */
 } ActivityHistoryState;
 
 extern ActivityHistoryState Activity;
@@ -68,8 +84,12 @@ extern void Activity_Load(void);
    year/month/day: current RTC calendar values. */
 extern void Activity_Tick(int year, int month, int day);
 
-/* Manually save today's step count to Flash (KEY0) */
-extern void Activity_Save_Today(void);
+/* Manually save today's step count to Flash (KEY0).
+ * Rate-limited: will not write Flash more than once per ACTIVITY_SAVE_THROTTLE_S
+ * seconds to protect W25Q80 endurance (~10,000 erase cycles).
+ * Returns 1 if Flash was actually written, 0 if the call was throttled.
+ * rtc_now: current RTC_Count (seconds since epoch). */
+extern int Activity_Save_Today(uint32 rtc_now);
 
 /* Toggle view mode (KEY2) */
 extern void Activity_Toggle_View(void);

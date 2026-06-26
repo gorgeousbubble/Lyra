@@ -12,6 +12,7 @@
 
 #include "animation.h"
 #include "conf.h"
+#include "framebuf.h"
 #include "main.h"
 #include "maps_dock_w25q80.h"
 #include "mpu6050.h"
@@ -1949,7 +1950,9 @@ void Calc_Configure_Adjust_Tense_Digit(uint8* array, const Coord *digit, const i
 */
 void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour, int minute, int second)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock dial array
   Calc_Clock_Current_Time_Dial((uint8*)clock, dial, dialLen, hour, minute, second);
   // render the clock dial picture
@@ -1969,7 +1972,9 @@ void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int ho
 */
 void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int formart)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock digit array
   Calc_Clock_Current_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, formart);
   // render the clock digit picture
@@ -1989,7 +1994,9 @@ void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int
 */
 void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the stopwatch dial array
   Calc_Stop_Watch_Current_Time_Dial((uint8*)clock, dial, dialLen, minute, second, centisecond);
   // render the stopwatch dial picture
@@ -2009,7 +2016,9 @@ void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, i
 */
 void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the stopwatch digit array
   Calc_Stop_Watch_Current_Time_Digit((uint8*)clock, digit, digitLen, minute, second, centisecond);
   // render the stopwatch digit picture
@@ -2029,7 +2038,9 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
 */
 void Render_Alarm_Clock_List_Mode_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int cursor)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock digit array
   Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, cursor);
   // render the clock digit picture
@@ -2050,7 +2061,9 @@ void Render_Alarm_Clock_List_Mode_Time_Digit(const Coord *digit, const int digit
 */
 void Render_Alarm_Clock_Edit_Mode_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int cursor, int number)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock digit array
   Calc_Alarm_Clock_Edit_Mode_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, cursor, number);
   // render the clock digit picture
@@ -2071,7 +2084,9 @@ void Render_Alarm_Clock_Edit_Mode_Time_Digit(const Coord *digit, const int digit
 */
 void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute, int formart)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the world clock time array
   Calc_World_Clock_Time((uint8*)clock, city, cityLen, time, hour, minute, formart);
   // render the world clock time picture
@@ -2088,7 +2103,9 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClo
 */
 void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_List_Mode_Item((uint8*)clock, item, itemLen);
   // render the clock digit picture
@@ -2109,7 +2126,9 @@ void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen
 */
 void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen, int hour, int minute, int second, int number)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_Clock_Digit((uint8*)clock, digit, digitLen, hour, minute, second, number);
   // render the clock digit picture
@@ -2130,7 +2149,9 @@ void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen,
 */
 void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, int year, int month, int day, int number)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_Date_Digit((uint8*)clock, digit, digitLen, year, month, day, number);
   // render the clock digit picture
@@ -2147,7 +2168,9 @@ void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, 
 */
 void Render_Configure_Adjust_Tense_Digit(const Coord *digit, const int digitLen)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  /* Use shared global framebuffer (saves 1 KB of stack). */
+  memset(g_fb, 0x00, sizeof(g_fb));
+  #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_Tense_Digit((uint8*)clock, digit, digitLen);
   // render the clock digit picture

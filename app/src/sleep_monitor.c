@@ -48,6 +48,14 @@ void SleepMonitor_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
 {
     if (!SleepMon.monitoring) return;
 
+    /* ---- Latch session_start_s on first call after monitoring begins ----
+     * session_start_s is set by SleepMonitor_Toggle / SleepMonitor_Clear,
+     * but if the device was powered on with monitoring already ON (default),
+     * session_start_s starts at 0.  Patch it on the first valid RTC value
+     * (rtc_seconds > 0 means the RTC has been set). */
+    if (SleepMon.session_start_s == 0 && rtc_seconds > 0)
+        SleepMon.session_start_s = rtc_seconds;
+
     /* ---- Compute |a| in LSB ---- */
     int64 ax64 = (int64)ax, ay64 = (int64)ay, az64 = (int64)az;
     uint64 mag_sq = (uint64)(ax64*ax64 + ay64*ay64 + az64*az64);
@@ -99,9 +107,10 @@ void SleepMonitor_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
     SleepMon.was_sleeping = (new_state != SLEEP_STATE_AWAKE) ? 1 : 0;
     SleepMon.current_state = new_state;
 
-    /* ---- Push to history ring buffer ---- */
+    /* ---- Push to history ring buffer (with timestamp) ---- */
     SleepSlot slot;
-    slot.state = new_state;
+    slot.state       = new_state;
+    slot.timestamp_s = rtc_seconds;     /* record when this window ended */
     SleepMon.history[SleepMon.hist_head] = slot;
     SleepMon.hist_head = (SleepMon.hist_head + 1) % SLEEP_HIST_SLOTS;
     if (SleepMon.hist_count < SLEEP_HIST_SLOTS)
@@ -111,66 +120,45 @@ void SleepMonitor_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
 /* -----------------------------------------------------------------------
  * SleepMonitor_Toggle / Clear
  * ----------------------------------------------------------------------- */
-void SleepMonitor_Toggle(void)
+void SleepMonitor_Toggle(uint32 rtc_now)
 {
     SleepMon.monitoring = !SleepMon.monitoring;
     if (SleepMon.monitoring)
     {
-        /* Reset window accumulator */
+        /* Record when this monitoring session began.
+         * Previously session_start_s was never assigned, so it stayed 0
+         * and could never be used to compute "time since session started". */
+        SleepMon.session_start_s = rtc_now;
+        /* Reset window accumulator so the first 30-second window is clean */
         SleepMon.sum_sq       = 0;
         SleepMon.sample_count = 0;
     }
 }
 
-void SleepMonitor_Clear(void)
+void SleepMonitor_Clear(uint32 rtc_now)
 {
-    SleepMon.total_sleep_s = 0;
-    SleepMon.total_deep_s  = 0;
-    SleepMon.turn_count    = 0;
-    SleepMon.was_sleeping  = 0;
-    SleepMon.hist_count    = 0;
-    SleepMon.hist_head     = 0;
-    SleepMon.sum_sq        = 0;
-    SleepMon.sample_count  = 0;
-    SleepMon.current_state = SLEEP_STATE_AWAKE;
+    SleepMon.total_sleep_s    = 0;
+    SleepMon.total_deep_s     = 0;
+    SleepMon.turn_count       = 0;
+    SleepMon.was_sleeping     = 0;
+    SleepMon.hist_count       = 0;
+    SleepMon.hist_head        = 0;
+    SleepMon.sum_sq           = 0;
+    SleepMon.sample_count     = 0;
+    SleepMon.current_state    = SLEEP_STATE_AWAKE;
+    /* Reset session start to now so elapsed-time calculation restarts */
+    SleepMon.session_start_s  = rtc_now;
 }
 
 /* -----------------------------------------------------------------------
- * Render helpers
+ * Render helpers — thin aliases onto the shared framebuf module
  * ----------------------------------------------------------------------- */
-static void dp(uint8 screen[64][16], int x, int y)
-{
-    if ((unsigned)x < 128 && (unsigned)y < 64)
-        screen[y][x >> 3] |= (0x01 << (7 - (x & 7)));
-}
-
-static void dline_h(uint8 screen[64][16], int y, int x0, int x1)
-{
-    for (int x = x0; x <= x1; x++) dp(screen, x, y);
-}
-
-static void dline_v(uint8 screen[64][16], int x, int y0, int y1)
-{
-    if (y0 > y1) { int t = y0; y0 = y1; y1 = t; }
-    for (int y = y0; y <= y1; y++) dp(screen, x, y);
-}
-
-static void dc6(uint8 screen[64][16], int px, int py, char ch)
-{
-    uint8 c = (uint8)ch - 32;
-    if (c >= 96) return;
-    for (int col = 0; col < 6; col++)
-    {
-        uint8 fb = Oled_FontLib_6x8[c][col];
-        for (int bit = 0; bit < 8; bit++)
-            if (fb & (1 << bit)) dp(screen, px + col, py + bit);
-    }
-}
-
-static void ds6(uint8 screen[64][16], int px, int py, const char *s)
-{
-    while (*s) { dc6(screen, px, py, *s++); px += 6; }
-}
+#include "framebuf.h"
+#define dp(s,x,y)        fb_pixel((s),(x),(y))
+#define dline_h(s,y,x0,x1) fb_hline((s),(y),(x0),(x1))
+#define dline_v(s,x,y0,y1) fb_vline((s),(x),(y0),(y1))
+#define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
+#define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
 
 /* -----------------------------------------------------------------------
  * Render_SleepMonitor
@@ -192,10 +180,9 @@ static void ds6(uint8 screen[64][16], int px, int py, const char *s)
  * ----------------------------------------------------------------------- */
 void Render_SleepMonitor(void)
 {
-    uint8 screen[64][16];
-    for (int i = 0; i < 64; i++)
-        for (int c = 0; c < 16; c++)
-            screen[i][c] = 0x00;
+    /* Use the shared global framebuffer (saves 1 KB of stack per call). */
+    #define screen g_fb
+    fb_clear(g_fb);
 
     char buf[24];
 
@@ -224,6 +211,20 @@ void Render_SleepMonitor(void)
 
     snprintf(buf, sizeof(buf), "TRN:%lu", (unsigned long)SleepMon.turn_count);
     ds6(screen, 80, 19, buf);
+
+    /* Session start time (HH:MM) derived from session_start_s.
+     * Previously session_start_s was always 0 because Toggle/Clear never
+     * assigned it.  Now it is set when monitoring begins. */
+    if (SleepMon.session_start_s > 0)
+    {
+        uint32 t    = SleepMon.session_start_s;
+        uint32 s_m  = (t / 60) % 60;
+        uint32 s_h  = (t / 3600) % 24;
+        snprintf(buf, sizeof(buf), "ST%02lu:%02lu", (unsigned long)s_h, (unsigned long)s_m);
+        ds6(screen, 80, 19, buf);      /* overwrite TRN on row 19 with start time */
+        snprintf(buf, sizeof(buf), "TRN:%lu", (unsigned long)SleepMon.turn_count);
+        ds6(screen, 2, 19, buf);       /* move TRN to left side */
+    }
 
     dline_h(screen, 27, 0, 127);
 

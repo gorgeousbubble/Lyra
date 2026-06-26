@@ -65,21 +65,44 @@ typedef enum
 typedef struct
 {
     FreeFall_State state;
-    uint32  fall_start_ms;      // When free-fall threshold was first crossed
-    uint32  fall_duration_ms;   // Duration of confirmed free-fall
-    uint32  impact_window_ms;   // ms since impact window opened
+
+    /* ---- Detection timing ----
+     *
+     * OLD design (buggy):
+     *   uint32 elapsed_ms  — absolute ms counter since power-on, incremented
+     *                        +10 each call.  fall_start_ms was snapshotted from
+     *                        it, and duration computed as elapsed_ms - fall_start_ms.
+     *   BUG: uint32 wraps after ~49.7 days.  At that moment
+     *        elapsed_ms - fall_start_ms produces a huge positive value and
+     *        the detector fires a phantom free-fall from the IDLE state.
+     *
+     * NEW design (fixed):
+     *   fall_duration_ms  — counts how many consecutive ms we have been below
+     *                       the free-fall threshold in the current FALLING phase.
+     *                       Reset to 0 whenever we enter FALLING.
+     *                       Incremented by the call interval (10 ms) each sample
+     *                       while the threshold is still exceeded.
+     *                       Never exceeds FF_FREEFALL_MIN_MS + one call interval,
+     *                       so no wrap is possible for any realistic threshold.
+     *   impact_window_ms  — same approach for the IMPACT phase timeout.
+     *
+     * Both counters are local relative durations, never absolute timestamps.
+     * They cannot wrap because they are reset at the start of each phase and
+     * only accumulate for the duration of that phase (tens to hundreds of ms).
+     */
+    uint32  fall_duration_ms;   // ms spent continuously below FF threshold (FALLING phase)
+    uint32  impact_window_ms;   // ms spent in IMPACT phase (reset when entering IMPACT)
     uint32  impact_peak_sq;     // Peak |a|² seen in current impact window
 
-    FreeFall_Event events[FF_MAX_EVENTS]; // Ring buffer of events
+    FreeFall_Event events[FF_MAX_EVENTS]; // Ring buffer of logged events
     int    event_head;          // Next write index
     int    event_count;         // Events stored (0..FF_MAX_EVENTS)
 
-    uint32 total_falls;         // Total free-falls ever detected
+    uint32 total_falls;         // Total confirmed free-falls ever detected
     uint32 total_impacts;       // Total impacts ever detected
     float  max_impact_g;        // Maximum impact force ever seen (g)
 
-    uint32 elapsed_ms;          // Internal ms counter
-    uint32 beep_ms;             // Non-blocking beep duration counter (ms remaining)
+    uint32 beep_ms;             // Non-blocking beep countdown (ms remaining)
 } FreeFallDetector;
 
 extern FreeFallDetector FFDet;
