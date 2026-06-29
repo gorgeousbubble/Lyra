@@ -26,6 +26,7 @@
 #include "it.h"
 #include "main.h"
 #include "maps_dock_key.h"
+#include "misc.h"
 #include "oled_i2c.h"
 #include "pedometer.h"
 #include "rtc.h"

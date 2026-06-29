@@ -28,6 +28,7 @@
 #include "maps_dock_key.h"
 #include "maps_dock_rocker.h"
 #include "max30102.h"
+#include "misc.h"
 #include "mpu6050.h"
 #include "pedometer.h"
 #include "rtc.h"

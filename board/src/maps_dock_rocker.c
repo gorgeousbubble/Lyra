@@ -18,6 +18,7 @@
 #include "maps_dock_key.h"
 #include "maps_dock_lcm.h"
 #include "maps_dock_rocker.h"
+#include "misc.h"
 
 // Joystick button controls LCM
 int Rocker_Key_Switch_Page = 1;          // Current page selection

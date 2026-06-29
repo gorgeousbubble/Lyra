@@ -8517,7 +8517,16 @@
     <group>
         <name>app</name>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\activity_history.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\adc_scope.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\alarm.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\attitude3d.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\src\beep.c</name>
@@ -8529,10 +8538,22 @@
             <name>$PROJ_DIR$\..\..\app\src\filter.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\freefall.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\func.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\gyro_dash.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\health.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\health_monitor.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\health_score.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\src\init.c</name>
@@ -8545,6 +8566,12 @@
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\src\pedometer.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\sleep_monitor.c</name>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\..\app\src\tilt_alarm.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\app\src\watch.c</name>
