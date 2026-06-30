@@ -156,13 +156,11 @@ int main(void)
                 {
                     MPU6050_Read_Flag = 0;
 
-                    // MPU6050 sensor data read (I2C bit-bang, ~200us)
-                    MPU6050.Acc.X = MPU_Get_Acc_X();
-                    MPU6050.Acc.Y = MPU_Get_Acc_Y();
-                    MPU6050.Acc.Z = MPU_Get_Acc_Z();
-                    MPU6050.Gyro.X = MPU_Get_Gyro_X();
-                    MPU6050.Gyro.Y = MPU_Get_Gyro_Y();
-                    MPU6050.Gyro.Z = MPU_Get_Gyro_Z();
+                    // MPU6050 sensor data read (single burst I2C transaction,
+                    // all 6 axes from the same sample — replaces 6 separate
+                    // word reads, ~75-80% less bit-bang I2C time)
+                    MPU_Get_All(&MPU6050.Acc.X,  &MPU6050.Acc.Y,  &MPU6050.Acc.Z,
+                                &MPU6050.Gyro.X, &MPU6050.Gyro.Y, &MPU6050.Gyro.Z);
 
                     // Gyro calibration or fusion filter
                     if (!FF.gyro_bias.calibrated)
