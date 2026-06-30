@@ -27,6 +27,14 @@
 
 #define SPI_FLASH_TIMEOUT (2000)
 
+/* Busy-poll iteration cap for erase/program completion.
+ * Each iteration is one SPI status-register read (~a few µs on this bus).
+ * W25Q80 worst-case timings: page program ≤3 ms, sector erase ≤400 ms,
+ * chip erase ≤6 s.  500000 iterations gives ample margin without ever
+ * blocking longer than the operation actually needs (the loop exits the
+ * instant the BUSY bit clears). */
+#define SPI_FLASH_POLL_MAX (500000UL)
+
 // Flash status
 #define STATUS_BUSY (0x01)
 

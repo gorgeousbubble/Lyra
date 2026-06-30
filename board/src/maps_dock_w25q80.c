@@ -48,13 +48,19 @@ static inline void W25Q80_Write_Enable(void)
 }
 
 /*
- *  @brief      W25Q80 check chip Busy
+ *  @brief      W25Q80 wait until chip is no longer busy (poll STATUS_BUSY)
+ *  @param      TimeOut   max poll iterations before giving up
+ *  @param      CMD       read-status-register command
+ *  @return     1 if chip became idle, 0 if timed out
  *  @since      v1.0
- *  Sample usage:       MAPS_Dock_W25Q80_Check();//W25Q80 check chip Busy
+ *  @note       Each iteration clocks one status byte over SPI; the loop exits
+ *              as soon as the BUSY bit clears.  This replaces the previous
+ *              fixed DELAY_MS busy-wait which always burned the full timeout.
  */
-static inline void MAPS_Dock_W25Q80_Check(uint32 TimeOut, uint8 CMD)
+static inline uint8 MAPS_Dock_W25Q80_Wait_Busy(uint32 TimeOut)
 {
   uint32 i = 0;
+  uint8 CMD = W25Q80_CMD_READ_STATUS_REG;
   uint8 Status = 0;
 
   W25Q80_Transfer(&CMD, NULL, 1);
@@ -64,9 +70,10 @@ static inline void MAPS_Dock_W25Q80_Check(uint32 TimeOut, uint8 CMD)
     W25Q80_Transfer(NULL, &Status, 1);
     if ((Status & STATUS_BUSY) == 0)
     {
-      break;
+      return 1; /* chip idle */
     }
   }
+  return 0; /* timed out */
 }
 
 /*
@@ -110,8 +117,8 @@ void MAPS_Dock_W25Q80_Erase_Chip(void)
 
   W25Q80_Write_Enable();
   W25Q80_Transfer(&CMD, NULL, 1);
-  MAPS_Dock_W25Q80_Check(SPI_FLASH_TIMEOUT, W25Q80_CMD_READ_STATUS_REG);
-  MAPS_Dock_W25Q80_Delay(SPI_FLASH_TIMEOUT);
+  /* Poll until erase completes (≤6 s worst case) — no fixed delay needed */
+  MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
 }
 
 /*
@@ -149,8 +156,8 @@ void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint16 Block_Size)
 
   W25Q80_Write_Enable();
   W25Q80_Transfer(&CMD[0], NULL, 4);
-  MAPS_Dock_W25Q80_Check(SPI_FLASH_TIMEOUT, W25Q80_CMD_READ_STATUS_REG);
-  MAPS_Dock_W25Q80_Delay(SPI_FLASH_TIMEOUT);
+  /* Poll until sector/block erase completes — no fixed delay needed */
+  MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
 }
 
 /*
@@ -168,7 +175,11 @@ void MAPS_Dock_W25Q80_Write_Page(uint16 Page_Number, uint8 Byte_Offset, uint8 *P
 
   W25Q80_Write_Enable();
   W25Q80_TransferCMD(&Send[0], NULL, &Page_Buff[0], NULL, 4, Page_Buff_Len);
-  MAPS_Dock_W25Q80_Delay(SPI_FLASH_TIMEOUT);
+  /* Poll until page-program completes (≤3 ms worst case).
+   * The original code had only a fixed DELAY_MS here with NO busy poll, so
+   * a subsequent SPI op could talk to a still-busy chip if the delay was
+   * too short.  Polling the BUSY bit is both faster and correct. */
+  MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
 }
 
 /*
