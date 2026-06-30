@@ -1,4 +1,4 @@
-/*
+﻿/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
@@ -61,6 +61,37 @@ int Lyra_ConfigureAdjust_Date_Number[8] = {0};                          // Confi
 int Lyra_ConfigureAdjust_Tense_Format = MAPS_ConfigureAdjust_Tense_24H; // Configure Adjust tense format (64: 24-hour/65: 12-hour)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
+
+/* -----------------------------------------------------------------------
+ * Non-blocking key cooldown state
+ *
+ * After any key action MAPS_Dock_KEY_Incident() returns immediately and
+ * records a timestamp + cooldown duration here.  On the next call the guard
+ * at the top of the function skips all processing until the cooldown expires.
+ *
+ * This replaces the old MAPS_Dock_KEY_Delay(ms) busy-wait which blocked the
+ * entire main loop (sensor reads, pedometer, alarms, etc.) for 100–800 ms.
+ * ----------------------------------------------------------------------- */
+static volatile uint32 s_key_last_ms   = 0;   /* Key_Ms_Tick snapshot after last action */
+static          uint32 s_key_cooldown  = 0;   /* required gap in ms                     */
+
+/* Called by KEY_ACTION_DONE macro — record timestamp and cooldown. */
+void key_action_timestamp(uint32 cooldown_ms)
+{
+    s_key_last_ms  = Key_Ms_Tick;
+    s_key_cooldown = cooldown_ms;
+}
+
+/* Returns 1 if still in cooldown, 0 if allowed to process. */
+static int key_in_cooldown(void)
+{
+    if (s_key_cooldown == 0) return 0;
+    uint32 now     = Key_Ms_Tick;
+    uint32 elapsed = (now >= s_key_last_ms)
+                     ? (now - s_key_last_ms)
+                     : (0xFFFFFFFFUL - s_key_last_ms + now + 1); /* wrap-safe */
+    return (elapsed < s_key_cooldown) ? 1 : 0;
+}
 
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
@@ -151,7 +182,7 @@ MAPS_Dock_KEY_Status MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEYn MAPS_Dock_KEYx)
 {
   if (GPIO_GET(MAPS_Dock_KEY_PTXn[MAPS_Dock_KEYx]) == MAPS_Dock_KEY_On)
   {
-    MAPS_Dock_KEY_Delay(10); // Delay debounce by 10ms
+    DELAY_MS(10); // 10ms debounce — acceptable here (short, one-shot per press)
     if (GPIO_GET(MAPS_Dock_KEY_PTXn[MAPS_Dock_KEYx]) == MAPS_Dock_KEY_On)
     {
       return MAPS_Dock_KEY_On;
@@ -186,6 +217,11 @@ void MAPS_Dock_KEY_Incident(void)
   sw_centisecond = Stop_Watch_Now.Centisecond;
   EnableInterrupts;
 
+  /* Non-blocking cooldown guard — replaces all MAPS_Dock_KEY_Delay busy-waits.
+   * If a key action was recorded recently, skip scanning until the cooldown
+   * expires.  The main loop continues running at full speed during this time. */
+  if (key_in_cooldown()) return;
+
   // If an alarm is currently ringing, any key press dismisses it immediately.
   // Check before processing normal key logic so the first key press goes to
   // dismiss rather than also triggering the normal key action.
@@ -197,8 +233,7 @@ void MAPS_Dock_KEY_Incident(void)
         MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
     {
       Alarm_Dismiss();
-      MAPS_Dock_KEY_Delay(200); /* debounce */
-      return;                   /* swallow the key press */
+      KEY_ACTION_DONE(200); /* set 200ms cooldown then return */
     }
     return; /* no key pressed: keep ringing, skip normal UI processing */
   }
@@ -215,7 +250,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Lyra_Status = MAPS_Screen_Status_Max - 1;
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
   }
   else if (MAPS_Screen_StatusN[Lyra_Status] == MAPS_Screen_Menu)
@@ -229,7 +264,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Lyra_Status = MAPS_Screen_Status_Max - 1;
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY1
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
@@ -239,7 +274,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Lyra_Status = MAPS_Screen_Saver;
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY2
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
@@ -377,7 +412,7 @@ void MAPS_Dock_KEY_Incident(void)
       default:
         break;
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY3
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
@@ -515,7 +550,7 @@ void MAPS_Dock_KEY_Incident(void)
       default:
         break;
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Display the current menu selection
     switch (MAPS_Menu_SelectionN[Lyra_Menu_Selection])
@@ -683,7 +718,7 @@ void MAPS_Dock_KEY_Incident(void)
           Oled_I2C_Clean();
           Oled_I2C_Put_Str_6x8(28, 3, hint);
         }
-        MAPS_Dock_KEY_Delay(800); /* Show message briefly */
+        KEY_ACTION_DONE(800); /* Show message briefly */
       }
       // Check current menu selection is sleep monitor (KEY0 = toggle on/off)
       if (MAPS_Menu_SelectionN[Lyra_Menu_Selection] == MAPS_Menu_SleepMonitor)
@@ -803,7 +838,7 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY1
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On)
@@ -866,7 +901,7 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Lyra_Status = MAPS_Screen_Saver;
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY2
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
@@ -1354,7 +1389,7 @@ void MAPS_Dock_KEY_Incident(void)
           Animation_Screen_Switch_Vertical_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 0, 0, 5);
         }
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY3
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
@@ -1553,7 +1588,7 @@ void MAPS_Dock_KEY_Incident(void)
           Animation_Screen_Switch_Vertical_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
         }
       }
-      MAPS_Dock_KEY_Delay(100); // Button delay 500ms
+      KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Display the current menu selection
     switch (MAPS_Menu_SelectionN[Lyra_Menu_Selection])

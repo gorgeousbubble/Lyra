@@ -45,6 +45,8 @@ typedef struct
 } Rocker_Key_Message_s;
 
 // Joystick button macro
+// Note: Rocker key handler is called infrequently (only in LCM debug mode)
+// so a short busy-wait here is acceptable for now.
 #define Rocker_Key_Delay(ms) DELAY_MS(ms)
 
 /*

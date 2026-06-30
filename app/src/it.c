@@ -106,6 +106,9 @@ volatile uint8 UART_Send_Flag = 0; // UART send flag (set in PIT1, cleared in ma
 volatile uint8 MPU6050_Read_Flag = 0;  // Set by PIT1 every 10ms, cleared by main
 volatile uint8 MAX30102_Read_Flag = 0; // Set by PIT1 every 10ms (5ms offset), cleared by main
 volatile uint8 RTC_Update_Flag = 0;    // Set by PIT0 every 100ms, cleared by main
+/* Monotonically increasing 1ms counter — used by non-blocking key debounce.
+ * Wraps at ~49.7 days; callers use saturating subtraction so wrap is safe. */
+volatile uint32 Key_Ms_Tick = 0;
 
 /*
  *  @brief      PORTC_PTC19_IRQHandler     PTC19 External Interrupt Service Function
@@ -196,6 +199,8 @@ void PIT0_IRQHandler(void)
 void PIT1_IRQHandler(void)
 {
   PIT_Flag_Clear(PIT1);
+
+  Key_Ms_Tick++;   /* non-blocking key debounce timestamp */
 
   PIT1_Count++;
 

@@ -84,6 +84,9 @@ extern volatile uint8          UART_Send_Flag;       // Set by PIT1, cleared by 
 extern volatile uint8          MPU6050_Read_Flag;    // Set by PIT1 every 10ms, cleared by main
 extern volatile uint8          MAX30102_Read_Flag;   // Set by PIT1 every 10ms (5ms offset), cleared by main
 extern volatile uint8          RTC_Update_Flag;      // Set by PIT0 every 100ms, cleared by main
+/* Monotonically increasing ms counter — incremented in PIT1_IRQHandler every 1 ms.
+ * uint32 wraps after ~49.7 days; callers handle this with saturating subtraction. */
+extern volatile uint32         Key_Ms_Tick;          // Global 1ms tick for non-blocking debounce
 
 // ISR function declarations
 extern void PORTC_PTC19_IRQHandler(void);
