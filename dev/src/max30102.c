@@ -209,11 +209,72 @@ void MAX30102_Reset(void)
   DELAY_ms(2);
 }
 
-// Read one RED + IR sample from FIFO (6 bytes, 18-bit values)
-void MAX30102_ReadFIFO(uint32 *red, uint32 *ir)
+// Read one RED + IR sample from FIFO (6 bytes, 18-bit values).
+// Returns 1 on success, 0 on NACK (bus error) — outputs left unchanged on error.
+uint8 MAX30102_ReadFIFO(uint32 *red, uint32 *ir)
 {
   uint8 data[6];
-  MAX30102_I2C_GPIO_Read_Reg_Six_Byte(MAX30102_DEVICE_ADDR, REG_FIFO_DATA, data);
+  if (!MAX30102_I2C_GPIO_Read_Reg_Six_Byte(MAX30102_DEVICE_ADDR, REG_FIFO_DATA, data))
+    return 0;   // sensor did not ACK — leave outputs unchanged
   *red = (((uint32_t)data[0] << 16) | ((uint32_t)data[1] << 8) | data[2]) & 0x03FFFF;
   *ir  = (((uint32_t)data[3] << 16) | ((uint32_t)data[4] << 8) | data[5]) & 0x03FFFF;
+  return 1;
+}
+
+/*
+ * ---------------------------------------------------------------------------
+ * Hot-plug support (mirrors the MPU6050 driver)
+ * ---------------------------------------------------------------------------
+ * On a loose-wire disconnect the transfer aborts (the slave may hold SDA low)
+ * and, if power was interrupted, the MAX30102 comes back reset with its LEDs
+ * off and FIFO unconfigured.  MAX30102_ReadFIFO now reports failure so the
+ * main loop can free the bus and re-initialize the sensor, letting it resume
+ * automatically once the connection is restored.
+ */
+
+// Free a bus a slave is holding: clock SCL up to 9 times with SDA released,
+// then issue a STOP.
+void MAX30102_Bus_Recovery(void)
+{
+  int i;
+
+  MAX30102_I2C_DDR_OUT_SCL;   // we always drive SCL
+  MAX30102_I2C_DDR_IN_SDA;    // release SDA so the slave / pull-up drives it
+
+  for (i = 0; i < 9; i++)
+  {
+    MAX30102_I2C_SET_SCL_H;
+    MAX30102_I2C_DELAY_TIME;
+    if (MAX30102_I2C_GET_SDA_IN)   // SDA released high => bus is free
+    {
+      MAX30102_I2C_SET_SCL_L;
+      MAX30102_I2C_DELAY_TIME;
+      break;
+    }
+    MAX30102_I2C_SET_SCL_L;
+    MAX30102_I2C_DELAY_TIME;
+  }
+
+  MAX30102_I2C_GPIO_Stop();
+}
+
+// Return 1 if the MAX30102 answers (PART_ID == 0x15), else 0.
+uint8 MAX30102_Present(void)
+{
+  return (MAX30102_I2C_GPIO_Read_Reg_Byte(MAX30102_DEVICE_ADDR, REG_PART_ID) == 0x15) ? 1 : 0;
+}
+
+// Recover a lost sensor: unstick the bus, confirm presence, then re-init
+// (reset + reconfigure FIFO/LEDs). Returns 1 if the sensor is back, else 0.
+// While the sensor stays absent, MAX30102_Present() NACKs and this returns 0
+// quickly without the 2ms reset delay.
+uint8 MAX30102_Recover(void)
+{
+  MAX30102_Bus_Recovery();
+
+  if (!MAX30102_Present())
+    return 0;              // still absent or bus not yet restored
+
+  MAX30102_Init();         // reset + reapply FIFO/LED configuration
+  return MAX30102_Present();
 }

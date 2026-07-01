@@ -76,6 +76,16 @@
   `app/src/main.c` 10ms 槽改为检查 `MPU_Get_All` 返回值：成功才喂滤波/计步/倾角/陀螺/自由落体；
   失败则跳过（不喂脏数据）并调 `MPU6050_Recover()`，重连后自动恢复。闹钟/ADC 块不依赖 MPU，仍每 10ms 运行。
   遗留小项：`SleepMonitor_Update` 掉线时仍读到冻结的 acc（无害，表现为"静止"），未纳入本次范围。
+- **O** ✅ MAX30102 热插拔支持（与 N 同理，心率/血氧传感器）。MAX30102 同为 GPIO 位带 I2C
+  （PTE10/11），但 `MAX30102_ReadFIFO` 原返回 void 丢弃底层读取成败，主循环也不重init，
+  掉线重连后（断电回到 reset/LED 关）卡住。修复：`dev/src/max30102.c` 的 `ReadFIFO` 改为返回
+  uint8（失败保留出参不变）；新增 `MAX30102_Bus_Recovery` / `MAX30102_Present`(读 PART_ID==0x15)
+  / `MAX30102_Recover`（解卡→确认→重新 Init）。`app/src/main.c` MAX30102 槽改为：读成功才
+  Collect/HealthMonitor_Update，失败调 `MAX30102_Recover()`。重连后自动恢复。
+  说明（分析 #1）：硬件 I2C 外设的 `I2C_Wait` 无超时死等只影响 MAPS-dock 24C02 EEPROM 路径，
+  而该路径当前无任何调用方（潜在/未触发）；看门狗在 `system_init.c` 被 `WDOG_Disable()` 关闭，
+  重新启用需硬件实测标定超时（SD 读图/flash 擦写等长操作），暂不盲改。三个在用传感器
+  (MPU6050/MAX30102/OLED) 均为带 NACK 检测的位带 I2C，不会真死锁。
 
 ---
 

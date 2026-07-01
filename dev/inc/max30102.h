@@ -88,6 +88,9 @@ extern int   MAX30102_I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Ad
 extern uint8 MAX30102_I2C_GPIO_Read_Reg_Six_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr, uint8 *data);
 extern void  MAX30102_Init(void);
 extern void  MAX30102_Reset(void);
-extern void  MAX30102_ReadFIFO(uint32 *red, uint32 *ir);
+extern uint8 MAX30102_ReadFIFO(uint32 *red, uint32 *ir);
+extern void  MAX30102_Bus_Recovery(void);
+extern uint8 MAX30102_Present(void);
+extern uint8 MAX30102_Recover(void);
 
 #endif

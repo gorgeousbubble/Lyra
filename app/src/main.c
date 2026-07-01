@@ -233,13 +233,22 @@ int main(void)
                     MAX30102_Read_Flag = 0;
 
                     uint32 red = 0, ir = 0;
-                    MAX30102_ReadFIFO(&red, &ir);
-                    MAX30102_RED = red;
-                    MAX30102_IR  = ir;
-                    Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(red, ir);
+                    if (MAX30102_ReadFIFO(&red, &ir))
+                    {
+                        MAX30102_RED = red;
+                        MAX30102_IR  = ir;
+                        Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(red, ir);
 
-                    // Feed IR sample to waveform display (downsampled to ~10Hz inside)
-                    HealthMonitor_Update(ir);
+                        // Feed IR sample to waveform display (downsampled to ~10Hz inside)
+                        HealthMonitor_Update(ir);
+                    }
+                    else
+                    {
+                        // Sensor did not respond (e.g. connector unplugged).
+                        // Free the bus and re-initialize so it resumes automatically
+                        // once reconnected (hot-plug). Fails fast while absent.
+                        MAX30102_Recover();
+                    }
                 }
 
                 // --- 100ms periodic: ADC + RTC calendar update (moved from PIT0 ISR) ---
