@@ -24,6 +24,15 @@ int32  SPO2       = 0;
 int32  Heart_Rate = 0;
 uint32 RD_Duty    = 0;
 
+/* Number of new samples collected since the last full algorithm run.
+ * The SpO2/HR algorithm processes a 5-second (HEALTH_BUFFER_SIZE) window,
+ * so there is no benefit to re-running it on almost-identical data every
+ * main-loop iteration.  We only recompute once at least HEALTH_RECALC_INTERVAL
+ * fresh samples have arrived (1 second of new data).  Both Collect() and
+ * Calculate() run in the main loop, so no locking is needed. */
+#define HEALTH_RECALC_INTERVAL  FS   /* FS = 100 samples = 1 second @ 100Hz */
+static uint32 s_new_samples = 0;
+
 // Write one sample into the ring buffer (overwrites oldest when full)
 static void RingBuffer_Add(RingBuffer *rb, uint32 data)
 {
@@ -57,6 +66,8 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(uint32 red, uint32 i
 {
     RingBuffer_Add(&IR_Buff,  ir);
     RingBuffer_Add(&RED_Buff, red);
+    if (s_new_samples < 0xFFFFFFFFUL)
+        s_new_samples++;
 }
 
 /*
@@ -74,6 +85,14 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Calculate(void)
 
     if (IR_Buff.count < HEALTH_BUFFER_SIZE)
         return;
+
+    /* Throttle: only recompute after enough fresh samples have arrived.
+     * Running the O(N) algorithm + 1000-sample copy every main-loop
+     * iteration wastes CPU on near-identical data.  One recompute per
+     * second (HEALTH_RECALC_INTERVAL new samples) is more than adequate. */
+    if (s_new_samples < HEALTH_RECALC_INTERVAL)
+        return;
+    s_new_samples = 0;
 
     // Copy ring buffer into contiguous arrays required by the algorithm
     static uint32 ir_array[HEALTH_BUFFER_SIZE];
