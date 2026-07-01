@@ -327,6 +327,80 @@ void SPI_Extra_PCS_Init(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx)
 }
 
 /*
+ *  @brief      SPI internal helper: transfer a command block
+ *  @note       All bytes keep PCSn asserted (CONT); no EOQ is issued.
+ *              A NULL MO buffer transmits 0x00; a NULL MI buffer discards the
+ *              received bytes. This collapses the four NULL-combination cases
+ *              into inline NULL checks.
+ */
+static void SPI_Xfer_CMD(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *mo, uint8 *mi, uint32 len)
+{
+  uint32 i;
+
+  for (i = 0; i < len; i++)
+  {
+    SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
+                                     | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
+                                     | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(mo != NULL ? mo[i] : 0));
+    while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
+      ;
+
+    if (mi != NULL)
+      mi[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
+    else
+      (void)SPI_POPR_REG(SPIN[SPI_SPIx]);
+
+    SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
+  }
+}
+
+/*
+ *  @brief      SPI internal helper: transfer a data block
+ *  @note       The first len-1 bytes keep PCSn asserted (CONT); the final byte
+ *              asserts EOQ to terminate the SPI queue. A NULL MO buffer
+ *              transmits 0x00; a NULL MI buffer discards the received bytes.
+ */
+static void SPI_Xfer_Data(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *mo, uint8 *mi, uint32 len)
+{
+  uint32 i;
+
+  if (len == 0) return; // Nothing to transfer (avoids uint32 underflow below)
+
+  // Send the first N-1 data
+  for (i = 0; i < (len - 1); i++)
+  {
+    SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
+                                     | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
+                                     | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(mo != NULL ? mo[i] : 0));
+    while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
+      ;
+
+    if (mi != NULL)
+      mi[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
+    else
+      (void)SPI_POPR_REG(SPIN[SPI_SPIx]);
+
+    SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
+  }
+
+  // Send the last data
+  SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
+                                   | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
+                                   | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(mo != NULL ? mo[i] : 0));
+  SPI_EOQF_WAIT(SPI_SPIx);
+
+  while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
+    ;
+
+  if (mi != NULL)
+    mi[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
+  else
+    (void)SPI_POPR_REG(SPIN[SPI_SPIx]);
+
+  SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
+}
+
+/*
  *  @brief      SPI send receive function
  *  @param      SPI_SPIn        SPI_SPIx        SPI module (SPI0��SPI1��SPI2)
  *  @param      SPI_PCSn        SPI_PCSx        Pin number for chip selection
@@ -338,8 +412,6 @@ void SPI_Extra_PCS_Init(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx)
  */
 void SPI_MOSI(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_Data, uint8 *SPI_MI_Data, uint32 SPI_Len)
 {
-  uint32 i = 0;
-
   // Guard against zero-length transfer (would cause uint32 underflow in loop)
   if (SPI_Len == 0) return;
 
@@ -360,128 +432,8 @@ void SPI_MOSI(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_Data, uint8 *S
     );
   } while (SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK);
 
-  if (SPI_MO_Data != NULL) // Sending data is not null
-  {
-    if (SPI_MI_Data != NULL) // Accept data that is not null
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-    else // Accept data as NULL
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-  }
-  else // Sending data as NULL
-  {
-    if (SPI_MI_Data != NULL) // Accept data that is not null
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-    else // Accept data as NULL
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-  }
+  // Transfer the data block (NULL MO transmits 0x00; NULL MI discards receive)
+  SPI_Xfer_Data(SPI_SPIx, SPI_PCSx, SPI_MO_Data, SPI_MI_Data, SPI_Len);
 
   SPI_MCR_REG(SPIN[SPI_SPIx]) &= ~SPI_MCR_PCSIS(SPI_PCSx); // Release selection signal
 }
@@ -501,8 +453,6 @@ void SPI_MOSI(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_Data, uint8 *S
  */
 void SPI_MOSI_CMD(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_CMD, uint8 *SPI_MI_CMD, uint8 *SPI_MO_Data, uint8 *SPI_MI_Data, uint32 SPI_CMD_Len, uint32 SPI_Len)
 {
-  uint32 i = 0;
-
   // Guard against zero-length transfers (would cause uint32 underflow in loop)
   if (SPI_CMD_Len == 0 && SPI_Len == 0) return;
 
@@ -521,195 +471,11 @@ void SPI_MOSI_CMD(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_CMD, uint8
     );
   } while (SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK);
 
-  if (SPI_MO_CMD != NULL) // Send command not null
-  {
-    if (SPI_MI_CMD != NULL) // Receive command not nullL
-    {
-      for (i = 0; i < SPI_CMD_Len; i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_CMD[i]));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
+  // Transfer the command block (CONT throughout, no EOQ)
+  SPI_Xfer_CMD(SPI_SPIx, SPI_PCSx, SPI_MO_CMD, SPI_MI_CMD, SPI_CMD_Len);
 
-        SPI_MI_CMD[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-    }
-    else // Receive command not null
-    {
-      for (i = 0; i < SPI_CMD_Len; i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_CMD[i]));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-    }
-  }
-  else // Send command not null
-  {
-    if (SPI_MI_CMD != NULL) // Receive command not null
-    {
-      for (i = 0; i < SPI_CMD_Len; i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_MI_CMD[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-    }
-    else // Receive command not null
-    {
-      for (i = 0; i < SPI_CMD_Len; i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-    }
-  }
-
-  if (SPI_MO_Data != NULL) // Sending data is not null
-  {
-    if (SPI_MI_Data != NULL) // Accept data that is not null
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-    else // Accept data as NULL
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(SPI_MO_Data[i]));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-  }
-  else // Sending data as NULL
-  {
-    if (SPI_MI_Data != NULL) // Accept data that is not null
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_MI_Data[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-    else // Accept data as NULL
-    {
-      // Send the first N-1 data
-      for (i = 0; i < (SPI_Len - 1); i++)
-      {
-        SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                         | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
-                                         | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-        while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-          ;
-
-        SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-        SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-      }
-
-      // Send the last data
-      SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
-                                       | SPI_PUSHR_EOQ_MASK  // Transfer the final data of SPI
-                                       | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(NULL));
-      SPI_EOQF_WAIT(SPI_SPIx);
-
-      while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-        ;
-
-      SPI_POPR_REG(SPIN[SPI_SPIx]);
-
-      SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_RFDF_MASK;
-    }
-  }
+  // Transfer the data block (NULL MO transmits 0x00; NULL MI discards receive)
+  SPI_Xfer_Data(SPI_SPIx, SPI_PCSx, SPI_MO_Data, SPI_MI_Data, SPI_Len);
 
   SPI_MCR_REG(SPIN[SPI_SPIx]) &= ~SPI_MCR_PCSIS(SPI_PCSx); // Release selection signal
 }
