@@ -136,12 +136,28 @@ uint8 MAX30102_I2C_GPIO_Read_Reg_Byte(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
   return I2C_Data;
 }
 
-// Read two bytes in two separate transactions (used for non-critical registers)
+// Read a 16-bit register atomically in a SINGLE I2C transaction.
+// Uses repeated START to read the high and low bytes back-to-back without
+// releasing the bus, so the two bytes are guaranteed to come from the same
+// register snapshot (no tearing between independent transactions).
+// Returns the 16-bit value, or 0 on NACK (bus error).
 int MAX30102_I2C_GPIO_Read_Reg_Word(uint8 I2C_Div_Adr, uint8 I2C_Reg_Adr)
 {
-  uint8 I2C_Reg_H = MAX30102_I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr, I2C_Reg_Adr);
-  uint8 I2C_Reg_L = MAX30102_I2C_GPIO_Read_Reg_Byte(I2C_Div_Adr, I2C_Reg_Adr + 1);
-  return ((I2C_Reg_H << 8) + I2C_Reg_L);
+  uint8 I2C_Reg_H = 0;
+  uint8 I2C_Reg_L = 0;
+
+  MAX30102_I2C_GPIO_Start();
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr))      { MAX30102_I2C_GPIO_Stop(); return 0; }
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Reg_Adr))      { MAX30102_I2C_GPIO_Stop(); return 0; }
+  MAX30102_I2C_GPIO_Start();                           // Repeated START for read
+  if (!MAX30102_I2C_GPIO_Send_Byte(I2C_Div_Adr + 1))  { MAX30102_I2C_GPIO_Stop(); return 0; }
+  I2C_Reg_H = MAX30102_I2C_GPIO_Recv_Byte();
+  MAX30102_I2C_GPIO_Send_Ack(0);                       // ACK: more bytes to read
+  I2C_Reg_L = MAX30102_I2C_GPIO_Recv_Byte();
+  MAX30102_I2C_GPIO_Send_Ack(1);                       // NACK: last byte
+  MAX30102_I2C_GPIO_Stop();
+
+  return ((I2C_Reg_H << 8) | I2C_Reg_L);
 }
 
 // Read 6 consecutive bytes in a single I2C transaction (used for FIFO read)
