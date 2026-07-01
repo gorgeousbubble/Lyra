@@ -919,34 +919,33 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   // convert hour and minute to digits
   char ch[5][2] = {"", ""}; // initialize with "00"
-  // utc timezone
-  snprintf(ch[0], sizeof(ch[0]), "%s", "U"); // tens place of hour
-  snprintf(ch[1], sizeof(ch[1]), "%s", "T");
-  snprintf(ch[2], sizeof(ch[2]), "%s", "C"); // separator
-  snprintf(ch[3], sizeof(ch[3]), "%s", (time.hour_offset >= 0) ? "+" : "-"); // tens place of minute
-  snprintf(ch[4], sizeof(ch[4]), "%d", (time.hour_offset >= 0) ? time.hour_offset : -time.hour_offset);
-  for (int i = 0; i < 5; i++)
+  // utc timezone: "UTC" + sign + offset (offset may be 1 or 2 digits, e.g. "UTC+10")
+  char utc[8];
+  int utc_off = (time.hour_offset >= 0) ? time.hour_offset : -time.hour_offset;
+  snprintf(utc, sizeof(utc), "UTC%c%d", (time.hour_offset >= 0) ? '+' : '-', utc_off);
+  int utc_len = 0;
+  while (utc[utc_len] != '\0') utc_len++;
+  // Right-align to the panel edge so a two-digit offset stays on screen.
+  // (5 chars -> x=97, identical to before; 6 chars -> x=91.)
+  int utc_x = 127 - utc_len * 6;
+  for (int i = 0; i < utc_len; i++)
   {
-    for (int j = 0; ch[i][j] != '\0'; j++)
+    uint8 c = utc[i] - 32; // convert character to font index
+    for (int k = 0; k < 6; k++)
     {
-      uint8 c = ch[i][j] - 32; // convert character to ASCII value
-      for (int k = 0; k < 6; k++) 
+      for (int l = 0; l < 8; l++)
       {
-        for (int l = 0; l < 8; l++)
+        if (Oled_FontLib_6x8[c][k] & (0x01 << l))
         {
-          if (Oled_FontLib_6x8[c][k] & (0x01 << l))
-          {
-            // if the pixel is set, draw it
-            // calculate the x and y coordinates for the character
-            uint8 char_x = 97 + i * 6 + k; // 6 pixels per character
-            uint8 char_y = l + 24;
-            // create a new coordinate node for the character pixel
-            /* scratch append */
-            if (s_scratch_count < WATCH_SCRATCH_MAX) {
-                s_scratch[s_scratch_count].x = char_x;
-                s_scratch[s_scratch_count].y = char_y;
-                s_scratch_count++;
-            }
+          // if the pixel is set, draw it
+          uint8 char_x = (uint8)(utc_x + i * 6 + k); // 6 pixels per character
+          uint8 char_y = l + 24;
+          // create a new coordinate node for the character pixel
+          /* scratch append */
+          if (s_scratch_count < WATCH_SCRATCH_MAX) {
+              s_scratch[s_scratch_count].x = char_x;
+              s_scratch[s_scratch_count].y = char_y;
+              s_scratch_count++;
           }
         }
       }
