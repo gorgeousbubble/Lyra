@@ -93,6 +93,65 @@ static int key_in_cooldown(void)
     return (elapsed < s_key_cooldown) ? 1 : 0;
 }
 
+/* -----------------------------------------------------------------------
+ * Menu icon tables
+ *
+ * Replace three duplicated 16-case switch statements (KEY2 scroll-left,
+ * KEY3 scroll-right, and the display-icon switch) with two data tables
+ * indexed by menu selection.  Adding a new menu item is now one row in
+ * each table instead of editing three switch blocks.
+ *
+ * menu_scroll_icon: coordinate-list icons used by the horizontal scroll
+ *   animation.  Only six distinct coordinate arrays exist, so menu items
+ *   6-15 all use the Configure_Adjust placeholder — matching the original
+ *   code (which also fixes a copy-paste inconsistency where Pedometer used
+ *   a different src icon for KEY2 vs KEY3).
+ *
+ * menu_display_bmp: full-frame BMP icon drawn for the currently-selected
+ *   item.  Mapping copied verbatim from the original display switch.
+ *
+ * Entries are in MAPS_Menu_Selection enum order (0..MAPS_Menu_Selection_Max-1).
+ * ----------------------------------------------------------------------- */
+typedef struct { const Coord *coord; int len; } MenuScrollIcon;
+
+static const MenuScrollIcon menu_scroll_icon[MAPS_Menu_Selection_Max] = {
+    { LCM_Watch_icon_coordinate,            LCM_Watch_icon_coordinate_length },            /* Clock           */
+    { LCM_Stop_Watch_icon_coordinate,       LCM_Stop_Watch_icon_coordinate_length },       /* StopWatch       */
+    { LCM_Alarm_Clock_icon_coordinate,      LCM_Alarm_Clock_icon_coordinate_length },      /* AlarmClock      */
+    { LCM_World_Clock_icon_coordinate,      LCM_World_Clock_icon_coordinate_length },      /* WorldClock      */
+    { LCM_Spirit_Level_icon_coordinate,     LCM_Spirit_Level_icon_coordinate_length },     /* SpiritLevel     */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* Pedometer       */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* Attitude3D      */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* TiltAlarm       */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* GyroDash        */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* FreeFall        */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* HealthMonitor   */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* ActivityHistory */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* SleepMonitor    */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* AdcScope        */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* HealthScore     */
+    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* Configure_Adjust*/
+};
+
+static const uint8 *const menu_display_bmp[MAPS_Menu_Selection_Max] = {
+    LCM_Watch_icon,            /* Clock           */
+    LCM_Stop_Watch_icon,       /* StopWatch       */
+    LCM_Alarm_Clock_icon,      /* AlarmClock      */
+    LCM_World_Clock_icon,      /* WorldClock      */
+    LCM_Spirit_Level_icon,     /* SpiritLevel     */
+    LCM_Pedometer_icon,        /* Pedometer       */
+    LCM_Configure_Adjust_icon, /* Attitude3D      */
+    LCM_Spirit_Level_icon,     /* TiltAlarm       */
+    LCM_Stop_Watch_icon,       /* GyroDash        */
+    LCM_Alarm_Clock_icon,      /* FreeFall        */
+    LCM_Watch_icon,            /* HealthMonitor   */
+    LCM_Stop_Watch_icon,       /* ActivityHistory */
+    LCM_World_Clock_icon,      /* SleepMonitor    */
+    LCM_Configure_Adjust_icon, /* AdcScope        */
+    LCM_Watch_icon,            /* HealthScore     */
+    LCM_Configure_Adjust_icon, /* Configure_Adjust*/
+};
+
 /*
  *  @brief      MAPs_Dock_KEY initializes all keys
  *  @since      v1.0
@@ -279,332 +338,34 @@ void MAPS_Dock_KEY_Incident(void)
     // Press KEY2
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On)
     {
-      switch (MAPS_Menu_SelectionN[Lyra_Menu_Selection])
-      {
-      case MAPS_Menu_Clock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_StopWatch:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_AlarmClock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_WorldClock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_SpiritLevel:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_Pedometer:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_Attitude3D:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_TiltAlarm:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_GyroDash:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_FreeFall:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_HealthMonitor:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_ActivityHistory:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_SleepMonitor:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_AdcScope:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_HealthScore:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      case MAPS_Menu_Configure_Adjust:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 0, 0, 5);
-        Lyra_Menu_Selection--;
-        if (Lyra_Menu_Selection < 0)
-        {
-          Lyra_Menu_Selection = MAPS_Menu_Selection_Max - 1;
-        }
-        break;
-      default:
-        break;
-      }
+      /* Scroll left to previous menu item (table-driven, replaces 16-case switch) */
+      int cur  = MAPS_Menu_SelectionN[Lyra_Menu_Selection];
+      int prev = (Lyra_Menu_Selection - 1 + MAPS_Menu_Selection_Max) % MAPS_Menu_Selection_Max;
+      int pe   = MAPS_Menu_SelectionN[prev];
+      Animation_Screen_Switch_Horizontal_Scroll_Array(
+          menu_scroll_icon[cur].coord, menu_scroll_icon[cur].len,
+          menu_scroll_icon[pe].coord,  menu_scroll_icon[pe].len, 0, 0, 5);
+      Lyra_Menu_Selection = prev;
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY3
     else if (MAPS_Dock_KEY_KEYn_Check(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
     {
-      switch (MAPS_Menu_SelectionN[Lyra_Menu_Selection])
-      {
-      case MAPS_Menu_Clock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_StopWatch:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Stop_Watch_icon_coordinate, LCM_Stop_Watch_icon_coordinate_length, LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_AlarmClock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Alarm_Clock_icon_coordinate, LCM_Alarm_Clock_icon_coordinate_length, LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_WorldClock:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_World_Clock_icon_coordinate, LCM_World_Clock_icon_coordinate_length, LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_SpiritLevel:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_Pedometer:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Spirit_Level_icon_coordinate, LCM_Spirit_Level_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_Attitude3D:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_TiltAlarm:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_GyroDash:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_FreeFall:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_HealthMonitor:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_ActivityHistory:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_SleepMonitor:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_AdcScope:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_HealthScore:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      case MAPS_Menu_Configure_Adjust:
-        Animation_Screen_Switch_Horizontal_Scroll_Array(LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length, LCM_Watch_icon_coordinate, LCM_Watch_icon_coordinate_length, 1, 0, 5);
-        Lyra_Menu_Selection++;
-        if (Lyra_Menu_Selection >= MAPS_Menu_Selection_Max)
-        {
-          Lyra_Menu_Selection = 0;
-        }
-        break;
-      default:
-        break;
-      }
+      /* Scroll right to next menu item (table-driven, replaces 16-case switch) */
+      int cur  = MAPS_Menu_SelectionN[Lyra_Menu_Selection];
+      int next = (Lyra_Menu_Selection + 1) % MAPS_Menu_Selection_Max;
+      int ne   = MAPS_Menu_SelectionN[next];
+      Animation_Screen_Switch_Horizontal_Scroll_Array(
+          menu_scroll_icon[cur].coord, menu_scroll_icon[cur].len,
+          menu_scroll_icon[ne].coord,  menu_scroll_icon[ne].len, 1, 0, 5);
+      Lyra_Menu_Selection = next;
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
-    // Display the current menu selection
-    switch (MAPS_Menu_SelectionN[Lyra_Menu_Selection])
+    // Display the current menu selection (table-driven, replaces 16-case switch)
     {
-    case MAPS_Menu_Clock:
-      Oled_I2C_Draw_BMP_128x64(LCM_Watch_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_StopWatch:
-      Oled_I2C_Draw_BMP_128x64(LCM_Stop_Watch_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_AlarmClock:
-      Oled_I2C_Draw_BMP_128x64(LCM_Alarm_Clock_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_WorldClock:
-      Oled_I2C_Draw_BMP_128x64(LCM_World_Clock_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_SpiritLevel:
-      Oled_I2C_Draw_BMP_128x64(LCM_Spirit_Level_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_Pedometer:
-      Oled_I2C_Draw_BMP_128x64(LCM_Pedometer_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_Attitude3D:
-      Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_TiltAlarm:
-      Oled_I2C_Draw_BMP_128x64(LCM_Spirit_Level_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_GyroDash:
-      Oled_I2C_Draw_BMP_128x64(LCM_Stop_Watch_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_FreeFall:
-      Oled_I2C_Draw_BMP_128x64(LCM_Alarm_Clock_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_HealthMonitor:
-      Oled_I2C_Draw_BMP_128x64(LCM_Watch_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_ActivityHistory:
-      Oled_I2C_Draw_BMP_128x64(LCM_Stop_Watch_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_SleepMonitor:
-      Oled_I2C_Draw_BMP_128x64(LCM_World_Clock_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_AdcScope:
-      Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_HealthScore:
-      Oled_I2C_Draw_BMP_128x64(LCM_Watch_icon, OLED_Invert_Color);
-      break;
-    case MAPS_Menu_Configure_Adjust:
-      Oled_I2C_Draw_BMP_128x64(LCM_Configure_Adjust_icon, OLED_Invert_Color);
-      break;
-    default:
-      break;
+      int e = MAPS_Menu_SelectionN[Lyra_Menu_Selection];
+      if (e >= 0 && e < MAPS_Menu_Selection_Max && menu_display_bmp[e] != NULL)
+        Oled_I2C_Draw_BMP_128x64(menu_display_bmp[e], OLED_Invert_Color);
     }
   }
   else if (Lyra_Status == MAPS_Screen_Normal)
