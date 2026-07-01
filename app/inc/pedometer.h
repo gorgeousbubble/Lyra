@@ -35,9 +35,27 @@
 // A walking step peak is typically 1.3~2.0g total; we set the threshold at ~1.2g
 // static rest:  az ≈ 16384  → mag_sq ≈ 16384² = 268,435,456
 // 1.2g motion:  mag ≈ 19660 → mag_sq ≈ 386,516,0 (above rest, triggered by step)
-#define STEP_THRESHOLD        19660UL   // ~1.2g in LSB (sqrt threshold)
-#define STEP_THRESHOLD_SQ     (19660ULL * 19660ULL)  // Pre-squared, use uint64 comparison
+#define STEP_THRESHOLD        19660UL   // ~1.2g in LSB — initial/fallback threshold
+#define STEP_THRESHOLD_SQ     (19660ULL * 19660ULL)  // Pre-squared (legacy)
 #define STEP_MIN_INTERVAL_MS  300     // Minimum ms between two steps (max ~200 steps/min)
+
+/* -----------------------------------------------------------------------
+ * Adaptive threshold parameters
+ *
+ * A single fixed threshold cannot fit every user: a wrist-worn device sees
+ * very different acceleration amplitudes depending on gait, arm swing and
+ * how tightly the strap is worn.  Instead of a constant, the detector tracks
+ * the recent min/max envelope of the acceleration magnitude and places the
+ * step-detection threshold at the midpoint of that envelope, refreshed once
+ * per ADAPT_WINDOW samples.
+ *
+ * An amplitude gate (STEP_MIN_AMPLITUDE) suppresses counting when the
+ * peak-to-peak magnitude is too small to be real walking (rest, typing,
+ * small hand tremor) — this replaces the old fixed 1.2g gate.
+ * ----------------------------------------------------------------------- */
+#define STEP_ADAPT_WINDOW     50      // Samples per envelope window (0.5s @ 100Hz)
+#define STEP_MIN_AMPLITUDE    4000    // Min peak-to-peak magnitude (LSB, ~0.24g) to count
+#define STEP_THRESHOLD_INIT   17000   // Initial magnitude threshold before first adaptation
 
 // Average stride length (cm) – tunable
 #define STEP_STRIDE_CM        65
@@ -51,8 +69,14 @@
 typedef struct
 {
     uint32 step_count;        // Total steps since last reset
-    uint32 last_step_ms;      // Timestamp of last detected step (ms, from PIT0_Count accumulator)
+    uint32 last_step_ms;      // Timestamp of last detected step (ms accumulator)
     uint8  above_threshold;   // 1 = magnitude is currently above threshold (peak state)
+
+    /* Adaptive threshold state */
+    uint32 dyn_min;           // Running minimum magnitude in current window
+    uint32 dyn_max;           // Running maximum magnitude in current window
+    uint32 threshold;         // Current step-detection threshold (magnitude units)
+    uint16 win_count;         // Samples accumulated in current envelope window
 } PedometerState;
 
 extern PedometerState Pedometer;

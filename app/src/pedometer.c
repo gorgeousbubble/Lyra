@@ -14,35 +14,78 @@
 #include "oled_i2c.h"
 #include <stdio.h>
 
-/* Global pedometer state */
-PedometerState Pedometer = {0, 0, 0};
+/* Global pedometer state:
+ * step_count=0, last_step_ms=0, above_threshold=0,
+ * dyn_min=MAX, dyn_max=0, threshold=INIT, win_count=0 */
+PedometerState Pedometer = {0, 0, 0, 0xFFFFFFFFUL, 0, STEP_THRESHOLD_INIT, 0};
 
 /* Internal elapsed time accumulator (ms) */
 static uint32 s_elapsed_total_ms = 0;
+
+/* Integer square root (Newton's method) for uint64 magnitude-squared values. */
+static uint32 isqrt64(uint64 n)
+{
+    if (n == 0) return 0;
+    uint64 x = n;
+    uint64 y = (x + 1) / 2;
+    while (y < x) { x = y; y = (x + n / x) / 2; }
+    return (uint32)x;
+}
 
 /*
  * Pedometer_Update
  * ----------------
  * Called every 10ms from the main loop after MPU6050 is read.
- * Detects steps via threshold-crossing peak detection on |a| squared.
+ *
+ * Adaptive threshold-crossing peak detection:
+ *   1. Compute |a| = sqrt(ax^2+ay^2+az^2) in LSB.
+ *   2. Track the min/max envelope of |a| over a 0.5s window; every window
+ *      the detection threshold is refreshed to the envelope midpoint.
+ *   3. An amplitude gate rejects windows whose peak-to-peak swing is too
+ *      small to be real walking (rest, typing, tremor).
+ *   4. A step is counted on a rising crossing of the threshold, subject to
+ *      the STEP_MIN_INTERVAL_MS debounce.
  */
 void Pedometer_Update(int16 ax, int16 ay, int16 az, uint32 elapsed_ms)
 {
     s_elapsed_total_ms += elapsed_ms;
 
-    // Compute magnitude squared using int64 to prevent overflow.
-    // int16 max = 32767; 32767^2 * 3 = ~3.2e9 which exceeds int32 max (2.1e9).
-    int64 ax64 = (int64)ax;
-    int64 ay64 = (int64)ay;
-    int64 az64 = (int64)az;
+    // Magnitude squared (int64 to prevent overflow) then magnitude via isqrt.
+    int64 ax64 = (int64)ax, ay64 = (int64)ay, az64 = (int64)az;
     uint64 mag_sq = (uint64)(ax64 * ax64 + ay64 * ay64 + az64 * az64);
+    uint32 mag = isqrt64(mag_sq);
 
-    // Rising-edge detection: cross threshold from below
-    if (mag_sq >= (uint64)STEP_THRESHOLD_SQ)
+    // --- Update the envelope for the current window ---
+    if (mag > Pedometer.dyn_max) Pedometer.dyn_max = mag;
+    if (mag < Pedometer.dyn_min) Pedometer.dyn_min = mag;
+    Pedometer.win_count++;
+
+    if (Pedometer.win_count >= STEP_ADAPT_WINDOW)
+    {
+        uint32 amp = (Pedometer.dyn_max > Pedometer.dyn_min)
+                     ? (Pedometer.dyn_max - Pedometer.dyn_min) : 0;
+        if (amp >= STEP_MIN_AMPLITUDE)
+        {
+            // Enough movement: set threshold to the envelope midpoint.
+            Pedometer.threshold = (Pedometer.dyn_min + Pedometer.dyn_max) / 2;
+        }
+        else
+        {
+            // Too little movement (rest/noise): raise threshold out of reach
+            // so no steps are counted this period.
+            Pedometer.threshold = 0xFFFFFFFFUL;
+        }
+        // Reset envelope for the next window.
+        Pedometer.dyn_min   = 0xFFFFFFFFUL;
+        Pedometer.dyn_max   = 0;
+        Pedometer.win_count = 0;
+    }
+
+    // --- Rising-edge detection against the adaptive threshold ---
+    if (mag >= Pedometer.threshold)
     {
         if (!Pedometer.above_threshold)
         {
-            // Just entered the "above threshold" zone: check debounce interval
             uint32 dt = s_elapsed_total_ms - Pedometer.last_step_ms;
             if (dt >= STEP_MIN_INTERVAL_MS)
             {
@@ -55,7 +98,6 @@ void Pedometer_Update(int16 ax, int16 ay, int16 az, uint32 elapsed_ms)
     }
     else
     {
-        // Below threshold: reset edge flag so next crossing is detected
         Pedometer.above_threshold = 0;
     }
 }
@@ -63,13 +105,17 @@ void Pedometer_Update(int16 ax, int16 ay, int16 az, uint32 elapsed_ms)
 /*
  * Pedometer_Reset
  * ---------------
- * Resets step count and timing.
+ * Resets step count, timing and the adaptive envelope.
  */
 void Pedometer_Reset(void)
 {
-    Pedometer.step_count    = 0;
-    Pedometer.last_step_ms  = s_elapsed_total_ms; // Avoid false step on resume
+    Pedometer.step_count      = 0;
+    Pedometer.last_step_ms    = s_elapsed_total_ms; // Avoid false step on resume
     Pedometer.above_threshold = 0;
+    Pedometer.dyn_min         = 0xFFFFFFFFUL;
+    Pedometer.dyn_max         = 0;
+    Pedometer.threshold       = STEP_THRESHOLD_INIT;
+    Pedometer.win_count       = 0;
 }
 
 /*
