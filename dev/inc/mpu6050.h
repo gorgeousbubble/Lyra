@@ -107,5 +107,8 @@ extern int16 MPU_Get_Gyro_Y(void);
 extern int16 MPU_Get_Gyro_Z(void);
 extern uint8 MPU_Get_All(int16 *ax, int16 *ay, int16 *az, int16 *gx, int16 *gy, int16 *gz);
 extern void  MPU6050_Init(void);
+extern void  MPU6050_Bus_Recovery(void);
+extern uint8 MPU6050_Present(void);
+extern uint8 MPU6050_Recover(void);
 
 #endif

@@ -159,9 +159,9 @@ int main(void)
                     // MPU6050 sensor data read (single burst I2C transaction,
                     // all 6 axes from the same sample — replaces 6 separate
                     // word reads, ~75-80% less bit-bang I2C time)
-                    MPU_Get_All(&MPU6050.Acc.X,  &MPU6050.Acc.Y,  &MPU6050.Acc.Z,
-                                &MPU6050.Gyro.X, &MPU6050.Gyro.Y, &MPU6050.Gyro.Z);
-
+                    if (MPU_Get_All(&MPU6050.Acc.X,  &MPU6050.Acc.Y,  &MPU6050.Acc.Z,
+                                    &MPU6050.Gyro.X, &MPU6050.Gyro.Y, &MPU6050.Gyro.Z))
+                    {
                     // Gyro calibration or fusion filter
                     if (!FF.gyro_bias.calibrated)
                     {
@@ -184,6 +184,16 @@ int main(void)
 
                     // Free-fall / impact detection
                     FreeFall_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
+                    }
+                    else
+                    {
+                        // MPU6050 did not respond (e.g. connector unplugged).
+                        // Do NOT feed stale/garbage data to the filter this cycle.
+                        // Free the bus and re-initialize so the sensor resumes
+                        // automatically once the connection is restored (hot-plug).
+                        // While it stays absent, WHO_AM_I NACKs and this fails fast.
+                        MPU6050_Recover();
+                    }
 
                     // Alarm clock: check hour:minute against alarm list every 10ms
                     // Pass snapshotted values — avoids touching volatile RTC_Time_Now

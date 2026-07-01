@@ -240,3 +240,77 @@ void MPU6050_Init(void)
   I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, ACCEL_CONFIG,  0x01); // ±2g
   I2C_GPIO_Write_Reg(I2C_ADR_MPU6050, GYRO_CONFIG,   0x00); // ±250°/s
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ * Hot-plug support
+ * ---------------------------------------------------------------------------
+ * If the sensor's wiring is momentarily disconnected (e.g. a loose dupont
+ * jumper), two things go wrong:
+ *   1. The transfer in progress is aborted; the slave may be left holding SDA
+ *      low mid-byte, leaving the bus stuck for every subsequent transaction.
+ *   2. If VCC/GND were interrupted, the MPU6050 power-cycles and comes back in
+ *      its default SLEEP state, so it produces no data until it is woken and
+ *      reconfigured again.
+ *
+ * MPU6050_Bus_Recovery / MPU6050_Present / MPU6050_Recover let the main loop
+ * detect the loss (MPU_Get_All returns 0) and transparently bring the sensor
+ * back once the connection is restored.
+ */
+
+/*
+ * Free a bus that a slave is holding: clock SCL up to 9 times with SDA
+ * released so the slave can finish/abort its current byte, then issue a STOP.
+ */
+void MPU6050_Bus_Recovery(void)
+{
+  int i;
+
+  I2C_DDR_OUT_SCL;   // we always drive SCL
+  I2C_DDR_IN_SDA;    // release SDA so the slave (or pull-up) drives it
+
+  for (i = 0; i < 9; i++)
+  {
+    I2C_SET_SCL_H;
+    I2C_DELAY_TIME;
+    if (I2C_GET_SDA_IN)   // SDA released high => bus is free again
+    {
+      I2C_SET_SCL_L;
+      I2C_DELAY_TIME;
+      break;
+    }
+    I2C_SET_SCL_L;
+    I2C_DELAY_TIME;
+  }
+
+  I2C_GPIO_Stop();   // leave the bus in a clean idle state
+}
+
+/*
+ * Return 1 if the MPU6050 answers on the bus (WHO_AM_I == 0x68), else 0.
+ * A disconnected or unpowered sensor NACKs, so the read returns 0xFF.
+ */
+uint8 MPU6050_Present(void)
+{
+  return (I2C_GPIO_Read_Reg_Byte(I2C_ADR_MPU6050, WHO_AM_I) == 0x68) ? 1 : 0;
+}
+
+/*
+ * Attempt to recover a lost MPU6050 after a hot-unplug/replug:
+ *   - unstick the bus,
+ *   - confirm the sensor is present again,
+ *   - re-initialize it (wake from sleep + reconfigure).
+ * Returns 1 if the sensor is back and configured, 0 otherwise.
+ * Cheap enough (a few hundred us of bit-bang) to call from the 10 ms slot;
+ * while the sensor is absent WHO_AM_I NACKs quickly and it returns 0.
+ */
+uint8 MPU6050_Recover(void)
+{
+  MPU6050_Bus_Recovery();
+
+  if (!MPU6050_Present())
+    return 0;              // still absent or bus not yet restored
+
+  MPU6050_Init();          // wake from sleep + reapply configuration
+  return MPU6050_Present(); // confirm it really came back
+}
