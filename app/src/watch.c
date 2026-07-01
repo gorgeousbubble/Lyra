@@ -1,4 +1,4 @@
-﻿/*
+/*
  *     COPYRIGHT NOTICE
  *     Copyright(c) 2025, alopex
  *     All rights reserved.
@@ -116,7 +116,8 @@ uint8 Configure_Adjust_Tense = 0; // 0: 12-hour format, 1: 24-hour format (page:
 */
 void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int hour, int minute, int second)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
 
   // draw clock numbers
@@ -320,14 +321,7 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -344,7 +338,8 @@ void Calc_Clock_Current_Time_Dial(uint8* array, const Coord *dial, const int dia
 */
 void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int formart)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   // convert hour and minute to digits
   char ch[4][2] = {"", ""}; // initialize with "00"
@@ -414,14 +409,7 @@ void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int d
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -438,7 +426,8 @@ void Calc_Clock_Current_Time_Digit(uint8* array, const Coord *digit, const int d
 */
 void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const int dialLen, int minute, int second, int centisecond)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
 
   // draw clock hands
@@ -588,14 +577,7 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -612,7 +594,8 @@ void Calc_Stop_Watch_Current_Time_Dial(uint8* array, const Coord *dial, const in
 */
 void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int minute, int second, int centisecond)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   // convert minute, second and centisecond to digits
   char ch[8][2] = {"", ""}; // initialize with "00"
@@ -665,14 +648,7 @@ void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const 
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -689,7 +665,8 @@ void Calc_Stop_Watch_Current_Time_Digit(uint8* array, const Coord *digit, const 
 */
 void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int cursor)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   // convert hour and minute to digits
   char ch[7][2] = {"", ""}; // initialize with "00"
@@ -777,14 +754,7 @@ void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, con
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -802,7 +772,8 @@ void Calc_Alarm_Clock_List_Mode_Time_Digit(uint8* array, const Coord *digit, con
 */
 void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int cursor, int number)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   static int counter = 0;
   // blink every second
@@ -925,14 +896,7 @@ void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, con
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -950,7 +914,8 @@ void Calc_Alarm_Clock_Edit_Mode_Time_Digit(uint8* array, const Coord *digit, con
 */
 void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute, int formart)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   // convert hour and minute to digits
   char ch[5][2] = {"", ""}; // initialize with "00"
@@ -1301,14 +1266,7 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -1322,7 +1280,8 @@ void Calc_World_Clock_Time(uint8* array, const Coord *city, const int cityLen, M
 */
 void Calc_Configure_Adjust_List_Mode_Item(uint8* array, const Coord *item, const int itemLen)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
 
   // draw clock digit
@@ -1339,14 +1298,7 @@ void Calc_Configure_Adjust_List_Mode_Item(uint8* array, const Coord *item, const
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -1364,7 +1316,8 @@ void Calc_Configure_Adjust_List_Mode_Item(uint8* array, const Coord *item, const
 */
 void Calc_Configure_Adjust_Clock_Digit(uint8* array, const Coord *digit, const int digitLen, int hour, int minute, int second, int number)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   static int counter = 0;
   // blink every second
@@ -1503,14 +1456,7 @@ void Calc_Configure_Adjust_Clock_Digit(uint8* array, const Coord *digit, const i
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -1528,7 +1474,8 @@ void Calc_Configure_Adjust_Clock_Digit(uint8* array, const Coord *digit, const i
 */
 void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const int digitLen, int year, int month, int day, int number)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   static int counter = 0;
   // blink every second
@@ -1683,14 +1630,7 @@ void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const in
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 /*
@@ -1704,7 +1644,8 @@ void Calc_Configure_Adjust_Date_Digit(uint8* array, const Coord *digit, const in
 */
 void Calc_Configure_Adjust_Tense_Digit(uint8* array, const Coord *digit, const int digitLen)
 {
-  uint8 clock[64][16] = {0x00}; // 64 rows, 128 columns
+  uint8 (*clock)[16] = (uint8 (*)[16])array; // write directly into caller buffer (no 1 KB stack copy)
+  memset(array, 0x00, 64 * 16);
   s_scratch_count = 0;  /* reset scratch buffer for this Calc call */
   // draw clock digit
   for (int i = 0; i < digitLen; i++) 
@@ -1720,14 +1661,7 @@ void Calc_Configure_Adjust_Tense_Digit(uint8* array, const Coord *digit, const i
       clock[_py][_px >> 3] |= (0x01 << (7 - (_px & 7)));
   }
   /* scratch buffer is static — no free needed */
-  // return the clock array
-  for (int i = 0; i < 64; i++)
-  {
-    for (int j = 0; j < 16; j++)
-    {
-      *array++ = clock[i][j];
-    }
-  }
+  /* pixels were written straight into the caller buffer - nothing to copy back */
 }
 
 

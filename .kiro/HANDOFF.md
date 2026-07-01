@@ -66,9 +66,14 @@
   → 提取 `SPI_Xfer_CMD` / `SPI_Xfer_Data` 两个静态 helper，内联 NULL 检查
   （NULL MO 发 0x00，NULL MI 丢弃接收）。顺带修复 CMD_Len>0 且 Len==0 时数据阶段
   `SPI_Len-1` 的 uint32 下溢（helper 内 `if (len == 0) return;` 保护）。约 -200 行。
-- **K**：`app/src/watch.c` 的 11 个 `Calc_*` 函数仍各自在栈上分配 `uint8 clock[64][16]`
-  （1KB）。与 Render_* 不同，Calc_* 通过 `array` 出参输出，改法需谨慎（可考虑让
-  Calc_* 直接写全局 g_fb 或调用方传入缓冲）。
+- **K** ✅ 已修复：`app/src/watch.c` 的 11 个 `Calc_*` 函数原各自在栈上分配
+  `uint8 clock[64][16]`（1KB）再整块拷贝进 `array` 出参。
+  → 将 `clock` 改为指向 `array` 的指针别名 `uint8 (*clock)[16] = (uint8 (*)[16])array;`
+  （所有 `clock[y][x]` 索引不变），函数开头 `memset(array,0,64*16)` 清零，删除末尾
+  1024 字节拷贝循环。省 11×1KB 栈 + 11×1024 字节拷贝。
+  注意：所有调用方（watch.c `Render_*` 与 maps_dock_key.c `Refresh_Dynamic_Animation_Cache`）
+  都传 `g_fb`；`Refresh` 会连续两次向同一 `g_fb` 调 `Calc_*`，因此每个 `Calc_*` 内部
+  必须自清零（原来靠局部 `{0x00}`）——已由内部 memset 保证独立性。
 
 ---
 
