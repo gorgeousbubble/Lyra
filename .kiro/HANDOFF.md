@@ -58,6 +58,11 @@
 > ⚠️ 确认最后 5 个 commit（7dca927 起）是否已推送：`git log --oneline origin/main..HEAD`
 > 若非空则需 push。
 
+### 第三批（新一轮 review，逐个修复）
+- **L** ✅ `app/src/health_monitor.c` SpO2 无效分支 `snprintf(buf,...,"--%")` 格式串以
+  单个 `%` 结尾（不完整转换说明符，UB）→ 改为 `"--%%"`，输出字面 "--%"（与有效分支
+  `"%ld%%"` 一致）。
+
 ---
 
 ## 剩余未修复的问题（低优先级）

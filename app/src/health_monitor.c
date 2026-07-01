@@ -214,7 +214,7 @@ void Render_HealthMonitor(void)
     if (SPO2 > 0 && SPO2 <= 100)
         snprintf(buf, sizeof(buf), "%ld%%", (long)SPO2);
     else
-        snprintf(buf, sizeof(buf), "--%");
+        snprintf(buf, sizeof(buf), "--%%");
 
     draw_str8x16(screen, 70, 10, buf);
 
