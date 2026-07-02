@@ -86,6 +86,13 @@
   而该路径当前无任何调用方（潜在/未触发）；看门狗在 `system_init.c` 被 `WDOG_Disable()` 关闭，
   重新启用需硬件实测标定超时（SD 读图/flash 擦写等长操作），暂不盲改。三个在用传感器
   (MPU6050/MAX30102/OLED) 均为带 NACK 检测的位带 I2C，不会真死锁。
+- **P** ✅ SPI 死等加超时（分析 #2，LCD/W25Q80 flash 走 SPI，是实际卡死风险点）。
+  `chip/inc/spi.h` 新增 `SPI_WAIT_TIMEOUT`(1e6 次，远大于单字节耗时、远小于无限)，并把
+  `SPI_EOQF_WAIT` 宏改为有界。`chip/src/spi.c` 新增 `SPI_SPIN_WHILE(cond)` 有界自旋宏 +
+  `SPI_Clear_Flags()`（合并原三处相同的清标志 do-while 并加计数上限）。把 `SPI_Xfer_CMD`/
+  `SPI_Xfer_Data` 的 RFDF 等待、`SPI_Send` 的 TCF 等待、三处 flag-clear 全部改为有界。
+  函数签名保持 void（尽力而为：超时则放弃本次传输而非永久卡死），调用方 LCD/flash 不受影响。
+  权衡：硬件真故障时可能拿到不完整数据，但系统不再假死（看门狗当前关闭，这点尤其重要）。
 
 ---
 

@@ -51,9 +51,20 @@ typedef enum
 /*
 **SPI macro
 */
+/* Upper bound on any SPI status-flag spin-wait. Large enough never to trip
+ * during a normal byte transfer (a byte takes microseconds; this is tens of
+ * milliseconds of polling), but finite so an unresponsive SPI device (LCD,
+ * W25Q80 flash) can never hang the whole system. */
+#define SPI_WAIT_TIMEOUT 1000000UL
+
 #define SPI_TX_WAIT(SPIn) while ((SPI_SR_REG(SPIN[SPIn]) & SPI_SR_TXRXS_MASK) == 1)
 #define SPI_RX_WAIT(SPIn) while ((SPI_SR_REG(SPIN[SPIn]) & SPI_SR_RFDF_MASK) == 0)
-#define SPI_EOQF_WAIT(SPIn) while ((SPI_SR_REG(SPIN[SPIn]) & SPI_SR_EOQF_MASK) == 0)
+#define SPI_EOQF_WAIT(SPIn)                                                        \
+  do {                                                                             \
+    volatile uint32 _spi_eoq_to = SPI_WAIT_TIMEOUT;                                \
+    while (((SPI_SR_REG(SPIN[SPIn]) & SPI_SR_EOQF_MASK) == 0) && (--_spi_eoq_to))  \
+    { }                                                                            \
+  } while (0)
 
 /*
 **variate declaration

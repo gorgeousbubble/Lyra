@@ -327,6 +327,42 @@ void SPI_Extra_PCS_Init(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx)
 }
 
 /*
+ *  @brief      SPI internal helper: bounded spin-wait
+ *  @note       Loop while (cond) holds, but give up after SPI_WAIT_TIMEOUT
+ *              iterations so a stuck status flag from an unresponsive device
+ *              (LCD / W25Q80 flash) can never hang the system. Best-effort:
+ *              on timeout the transfer is abandoned rather than blocking.
+ */
+#define SPI_SPIN_WHILE(cond)                    \
+  do {                                          \
+    volatile uint32 _spi_to = SPI_WAIT_TIMEOUT; \
+    while ((cond) && (--_spi_to)) { }           \
+  } while (0)
+
+/*
+ *  @brief      SPI internal helper: reset status/FIFO flags before a transfer
+ *  @note       Bounded so a stuck RFDF cannot hang forever. Replaces three
+ *              identical open-coded flag-clear loops.
+ */
+static void SPI_Clear_Flags(SPI_SPIn SPI_SPIx)
+{
+  volatile uint32 to = SPI_WAIT_TIMEOUT;
+
+  do
+  {
+    SPI_SR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_SR_EOQF_MASK // The sending queue is empty, sending completed
+                                   | SPI_SR_TFUF_MASK   // Transmit FIFO underflow flag
+                                   | SPI_SR_TFFF_MASK   // Transmit FIFO fill flag
+                                   | SPI_SR_RFOF_MASK   // Receive FIFO overflow flag
+                                   | SPI_SR_RFDF_MASK   // Receive FIFO drain flag
+    );
+    SPI_MCR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_MCR_CLR_TXF_MASK // Clear Tx FIFO counter
+                                    | SPI_MCR_CLR_RXF_MASK   // Clear Rx FIFO counter
+    );
+  } while ((SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK) && (--to));
+}
+
+/*
  *  @brief      SPI internal helper: transfer a command block
  *  @note       All bytes keep PCSn asserted (CONT); no EOQ is issued.
  *              A NULL MO buffer transmits 0x00; a NULL MI buffer discards the
@@ -342,8 +378,7 @@ static void SPI_Xfer_CMD(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *mo, uint8 
     SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
                                      | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
                                      | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(mo != NULL ? mo[i] : 0));
-    while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-      ;
+    SPI_SPIN_WHILE(!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK));
 
     if (mi != NULL)
       mi[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
@@ -372,8 +407,7 @@ static void SPI_Xfer_Data(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *mo, uint8
     SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0) // Select CTAR0 register
                                      | SPI_PUSHR_CONT_MASK // Maintain PCSn signal during transmission
                                      | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(mo != NULL ? mo[i] : 0));
-    while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-      ;
+    SPI_SPIN_WHILE(!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK));
 
     if (mi != NULL)
       mi[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
@@ -389,8 +423,7 @@ static void SPI_Xfer_Data(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *mo, uint8
                                    | SPI_PUSHR_PCS(SPI_PCSx) | SPI_PUSHR_TXDATA(mo != NULL ? mo[i] : 0));
   SPI_EOQF_WAIT(SPI_SPIx);
 
-  while (!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK))
-    ;
+  SPI_SPIN_WHILE(!(SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK));
 
   if (mi != NULL)
     mi[i] = (uint8)SPI_POPR_REG(SPIN[SPI_SPIx]);
@@ -417,20 +450,8 @@ void SPI_MOSI(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_Data, uint8 *S
 
   SPI_MCR_REG(SPIN[SPI_SPIx]) |= SPI_MCR_PCSIS(SPI_PCSx); // Select the film and signal
 
-  // Clear the transmission flag bit
-  do
-  {
-    SPI_SR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_SR_EOQF_MASK // The sending queue is empty, sending completed
-                                   | SPI_SR_TFUF_MASK   // When the transmission FIFO overflow flag is set, SPI is in slave mode, Tx FIFO is empty, and external SPI master mode starts transmission, the flag will be set to 1 and write 1 to clear 0
-                                   | SPI_SR_TFFF_MASK   // Transfer FIFO full flag bit Write 1 or the DMA controller will clear 0.0 when it detects that the transmit FIFO is full, indicating that the Tx FIFO is full
-                                   | SPI_SR_RFOF_MASK   // Receive FIFO overflow flag bit
-                                   | SPI_SR_RFDF_MASK   // Receive FIFO loss flag bit, write 1 or DMA controller will clear 0.0 if transmission FIFO is empty, indicating Rx FIFO is empty
-    );
-
-    SPI_MCR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_MCR_CLR_TXF_MASK // Clear Tx FIFO counter
-                                    | SPI_MCR_CLR_RXF_MASK   // Clear Rx FIFO counter
-    );
-  } while (SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK);
+  // Clear the transmission flag bit (bounded so a stuck RFDF cannot hang)
+  SPI_Clear_Flags(SPI_SPIx);
 
   // Transfer the data block (NULL MO transmits 0x00; NULL MI discards receive)
   SPI_Xfer_Data(SPI_SPIx, SPI_PCSx, SPI_MO_Data, SPI_MI_Data, SPI_Len);
@@ -458,18 +479,7 @@ void SPI_MOSI_CMD(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 *SPI_MO_CMD, uint8
 
   SPI_MCR_REG(SPIN[SPI_SPIx]) |= SPI_MCR_PCSIS(SPI_PCSx); // Select the film and signal
 
-  do
-  {
-    SPI_SR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_SR_EOQF_MASK // The sending queue is empty, sending completed
-                                   | SPI_SR_TFUF_MASK   // When the transmission FIFO overflow flag is set, SPI is in slave mode, Tx FIFO is empty, and external SPI master mode starts transmission, the flag will be set to 1 and write 1 to clear 0
-                                   | SPI_SR_TFFF_MASK   // Transfer FIFO full flag bit Write 1 or the DMA controller will clear 0.0 when it detects that the transmit FIFO is full, indicating that the Tx FIFO is full
-                                   | SPI_SR_RFOF_MASK   // Receive FIFO overflow flag bit
-                                   | SPI_SR_RFDF_MASK   // Receive FIFO loss flag bit, write 1 or DMA controller will clear 0.0 if transmission FIFO is empty, indicating Rx FIFO is empty
-    );
-    SPI_MCR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_MCR_CLR_TXF_MASK // Clear Tx FIFO counter
-                                    | SPI_MCR_CLR_RXF_MASK   // Clear Rx FIFO counter
-    );
-  } while (SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK);
+  SPI_Clear_Flags(SPI_SPIx); // bounded flag/FIFO reset
 
   // Transfer the command block (CONT throughout, no EOQ)
   SPI_Xfer_CMD(SPI_SPIx, SPI_PCSx, SPI_MO_CMD, SPI_MI_CMD, SPI_CMD_Len);
@@ -492,18 +502,7 @@ void SPI_Send(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 Data)
 {
   SPI_MCR_REG(SPIN[SPI_SPIx]) |= SPI_MCR_PCSIS(SPI_PCSx); // Select the film and signal
 
-  do
-  {
-    SPI_SR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_SR_EOQF_MASK // The sending queue is empty, sending completed
-                                   | SPI_SR_TFUF_MASK   // When the transmission FIFO overflow flag is set, SPI is in slave mode, Tx FIFO is empty, and external SPI master mode starts transmission, the flag will be set to 1 and write 1 to clear 0
-                                   | SPI_SR_TFFF_MASK   // Transfer FIFO full flag bit Write 1 or the DMA controller will clear 0.0 when it detects that the transmit FIFO is full, indicating that the Tx FIFO is full
-                                   | SPI_SR_RFOF_MASK   // Receive FIFO overflow flag bit
-                                   | SPI_SR_RFDF_MASK   // Receive FIFO loss flag bit, write 1 or DMA controller will clear 0.0 if transmission FIFO is empty, indicating Rx FIFO is empty
-    );
-    SPI_MCR_REG(SPIN[SPI_SPIx]) |= (0 | SPI_MCR_CLR_TXF_MASK // Clear Tx FIFO counter
-                                    | SPI_MCR_CLR_RXF_MASK   // Clear Rx FIFO counter
-    );
-  } while (SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_RFDF_MASK);
+  SPI_Clear_Flags(SPI_SPIx); // bounded flag/FIFO reset
 
   SPI_PUSHR_REG(SPIN[SPI_SPIx]) = (0 | SPI_PUSHR_CTAS(0)     // Select CTAR0 register
                                    | SPI_PUSHR_EOQ_MASK      // Transfer the final data of SPI
@@ -511,8 +510,7 @@ void SPI_Send(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, uint8 Data)
                                    | SPI_PUSHR_TXDATA(Data)  // Send 8Bit data
   );
 
-  while ((SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_TCF_MASK) != SPI_SR_TCF_MASK)
-    ; // Waiting for SPI transmission to complete
+  SPI_SPIN_WHILE((SPI_SR_REG(SPIN[SPI_SPIx]) & SPI_SR_TCF_MASK) != SPI_SR_TCF_MASK); // Wait for SPI transmission to complete
 
   SPI_SR_REG(SPIN[SPI_SPIx]) |= SPI_SR_TCF_MASK; // Clear TCF transmission completion flag
 
