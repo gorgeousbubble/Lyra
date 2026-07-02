@@ -184,6 +184,12 @@ int main(void)
 
                     // Free-fall / impact detection
                     FreeFall_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
+
+                    // Sleep monitoring (30-second RMS window, called at 100Hz).
+                    // Only fed fresh samples: on a disconnect we skip it rather
+                    // than feeding frozen "perfectly still" data (which would
+                    // otherwise be misread as deep sleep).
+                    SleepMonitor_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
                     }
                     else
                     {
@@ -210,9 +216,6 @@ int main(void)
                         EnableInterrupts;
                         Alarm_Tick(alarm_h, alarm_m);
                     }
-
-                    // Sleep monitoring (30-second RMS window, called at 100Hz)
-                    SleepMonitor_Update(MPU6050.Acc.X, MPU6050.Acc.Y, MPU6050.Acc.Z, RTC_Count);
 
                     // ADC scope: sample both channels at 100Hz for oscilloscope display
                     {
