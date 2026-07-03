@@ -105,6 +105,13 @@ void SysInit(void)
     MK64_Bus_KHz = MK64_Core_KHz / (((SIM_CLKDIV1 & SIM_CLKDIV1_OUTDIV2_MASK) >> SIM_CLKDIV1_OUTDIV2_SHIFT) + 1);
 }
 
+/* Watchdog timeout in milliseconds (1 kHz LPO clock, prescaler 1 => 1 count = 1 ms).
+ * Chosen generous enough to cover boot (including the SD BMP load) and any single
+ * main-loop iteration, yet small enough that a genuine hang resets the MCU within
+ * a couple of seconds. The main loop and each boot milestone call WDOG_Feed().
+ * Increase this if a legitimate long operation is ever found to trip it. */
+#define WDOG_TIMEOUT_MS 2000u
+
 /*
  *  @brief      Kinetis Startup
  *  @since      v1.0
@@ -116,7 +123,12 @@ void Start(void)
     SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2)); // FPU support
 #endif
 
-    WDOG_Disable(); // disable WDOG
+    /* Enable the watchdog here at boot, BEFORE any peripheral interrupt is
+     * active: WDOG_Unlock re-enables interrupts and the K64 requires the
+     * reconfigure to complete within the unlock window, so no ISR may preempt
+     * it. Fed by every boot milestone and every main-loop iteration; a hang
+     * that stops feeding resets the MCU after ~WDOG_TIMEOUT_MS. */
+    WDOG_Init(WDOG_TIMEOUT_MS);
 
     Common_StartUp(); // Copy interrupt vector tables and data to RAM
 

@@ -133,3 +133,14 @@
   memset。移除 `app/src/watch.c` 的 11 处 + `board/src/maps_dock_key.c` 的 1 处（注释改为
   "Calc_* zeroes it"）。已确认每处 memset 后到 Calc 之间无人读 g_fb，早退路径也不使用 g_fb，
   故移除安全。纯清理，正常路径行为不变。
+- **S** ✅ 重新启用看门狗（分析 #1）。`startup/src/system_init.c` 的 `Start()` 里把
+  `WDOG_Disable()` 换成 `WDOG_Init(WDOG_TIMEOUT_MS)`（新增宏，2000ms；1kHz LPO、PRESC=0 →
+  1 count=1ms）。**必须在 boot 阶段配置**：driver 的 `WDOG_Unlock` 结束会重新开中断，而 K64
+  要求解锁后在窗口内完成重配置、不能被 ISR 打断；`Start()` 此时外设中断尚未启用，安全。
+  喂狗点：`app/src/main.c` 的 `AllInit()` 后、`Activity_Load()` 后、SD 载图后各一次，以及
+  `for(;;)` 每次迭代开头一次（并 `#include "wdog.h"`）。挂死超过 ~2s 不喂狗即复位。
+  ⚠️ **需硬件实测**：确认 (1) boot（尤其 SD 挂载+载图）不超过 2s 否则会 boot-loop；
+  (2) 运行时没有单次主循环迭代（菜单切换动画 / 临时 SD 载图等）超过 2s。若有，调大
+  `WDOG_TIMEOUT_MS` 或在该长操作内部补 `WDOG_Feed()`。`WDOG_Feed()` 内部已保护刷新序列
+  （DisableInterrupts 包裹），运行期任意调用安全。另注：`WDOG_Init` 设了 STOPEN/WAITEN，
+  调试器 halt 时可能触发复位。

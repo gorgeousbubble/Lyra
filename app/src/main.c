@@ -35,6 +35,7 @@
 #include "rtc.h"
 #include "sleep_monitor.h"
 #include "tilt_alarm.h"
+#include "wdog.h"
 
 /*
 ** MAPS Screen Status
@@ -144,13 +145,18 @@ int main(void)
         Site_t Site = {0, 0};
 
         AllInit();  // initialization
+        WDOG_Feed(); // keep the dog fed across long boot phases
+
         ReadConf(); // read configuration from e2prom
         Activity_Load(); // load 7-day step history from Flash
+        WDOG_Feed();
 
         MAPS_LCDC_BMP_From_SD("0:/Mitsuha.bmp", Site); // load image
+        WDOG_Feed();
 
         for (;;)
         {
+                WDOG_Feed(); // refresh the watchdog every iteration; a hung loop resets after ~WDOG_TIMEOUT_MS
                 // --- 10ms periodic: MPU6050 I2C read + filter (moved from PIT1 ISR) ---
                 if (MPU6050_Read_Flag)
                 {
