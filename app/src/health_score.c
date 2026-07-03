@@ -175,7 +175,6 @@ void HealthScore_Calculate(void)
 #define dline_h(s,y,x0,x1) fb_hline((s),(y),(x0),(x1))
 #define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
 #define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
-}
 
 /* Draw a 12x24 character row into frame buffer */
 static void draw12row(uint8 screen[64][16], int px, int py, int cidx, int row)

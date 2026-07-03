@@ -144,3 +144,9 @@
   `WDOG_TIMEOUT_MS` 或在该长操作内部补 `WDOG_Feed()`。`WDOG_Feed()` 内部已保护刷新序列
   （DisableInterrupts 包裹），运行期任意调用安全。另注：`WDOG_Init` 设了 STOPEN/WAITEN，
   调试器 halt 时可能触发复位。
+- **T** ✅ 修复 5 个文件里多余的文件作用域 `}`（编译阻断，最高优先）。framebuf 重构当初把
+  各文件私有的 static 绘制 helper 换成 `#include framebuf.h` + 宏别名时，漏删了旧 helper 块
+  收尾的 `}`，导致 `#define ds6(...)` 之后多出一个文件作用域右花括号 → 语法错误、编译不过。
+  受影响：`health_monitor.c` / `gyro_dash.c` / `adc_scope.c` / `health_score.c` / `activity_history.c`。
+  各删除该多余 `}`。花括号计数复核：修复前 5 文件各 close 比 open 多 1（同风格的
+  pedometer.c/freefall.c 本就平衡）；修复后全部 open==close。framebuf.h 已确认平衡、不会吸收该括号。

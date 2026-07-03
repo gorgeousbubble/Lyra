@@ -280,7 +280,6 @@ void Activity_Toggle_View(void)
 #define dline_v(s,x,y0,y1) fb_vline((s),(x),(y0),(y1))
 #define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
 #define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
-}
 
 /* Draw a filled vertical bar: x_center, bottom y, height in pixels */
 static void draw_bar(uint8 screen[64][16], int x_c, int y_bot, int h, int w)

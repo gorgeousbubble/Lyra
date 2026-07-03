@@ -49,7 +49,6 @@ void GyroDash_Toggle_Mode(void)
 #define dline_v(s,x,y0,y1) fb_vline((s),(x),(y0),(y1))
 #define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
 #define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
-}
 
 /* -----------------------------------------------------------------------
  * Waveform rendering

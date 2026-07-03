@@ -170,7 +170,6 @@ void AdcScope_Measure(void)
 #define dline_v(s,x,y0,y1) fb_vline((s),(x),(y0),(y1))
 #define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
 #define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
-}
 
 /* -----------------------------------------------------------------------
  * draw_channel — render one waveform in x=[ADC_WAVE_X0..ADC_WAVE_X1]

@@ -62,7 +62,6 @@ void HealthMonitor_Update(uint32 ir_raw)
 #define dline_v(s,x,y0,y1) fb_vline((s),(x),(y0),(y1))
 #define dc6(s,px,py,ch)  fb_char6((s),(px),(py),(ch))
 #define ds6(s,px,py,str) fb_str6((s),(px),(py),(str))
-}
 
 /* Draw one row of a 12x24 character (row_idx = 0/1/2) */
 static void draw_char12_row(uint8 screen[64][16], int px, int py,
