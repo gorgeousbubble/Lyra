@@ -1677,8 +1677,7 @@ void Calc_Configure_Adjust_Tense_Digit(uint8* array, const Coord *digit, const i
 */
 void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int hour, int minute, int second)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock dial array
   Calc_Clock_Current_Time_Dial((uint8*)clock, dial, dialLen, hour, minute, second);
@@ -1699,8 +1698,7 @@ void Render_Clock_Current_Time_Dial(const Coord *dial, const int dialLen, int ho
 */
 void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int formart)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock digit array
   Calc_Clock_Current_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, formart);
@@ -1721,8 +1719,7 @@ void Render_Clock_Current_Time_Digit(const Coord *digit, const int digitLen, int
 */
 void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, int minute, int second, int centisecond)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the stopwatch dial array
   Calc_Stop_Watch_Current_Time_Dial((uint8*)clock, dial, dialLen, minute, second, centisecond);
@@ -1743,8 +1740,7 @@ void Render_Stop_Watch_Current_Time_Dial(const Coord *dial, const int dialLen, i
 */
 void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen, int minute, int second, int centisecond)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the stopwatch digit array
   Calc_Stop_Watch_Current_Time_Digit((uint8*)clock, digit, digitLen, minute, second, centisecond);
@@ -1765,8 +1761,7 @@ void Render_Stop_Watch_Current_Time_Digit(const Coord *digit, const int digitLen
 */
 void Render_Alarm_Clock_List_Mode_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int cursor)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock digit array
   Calc_Alarm_Clock_List_Mode_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, cursor);
@@ -1788,8 +1783,7 @@ void Render_Alarm_Clock_List_Mode_Time_Digit(const Coord *digit, const int digit
 */
 void Render_Alarm_Clock_Edit_Mode_Time_Digit(const Coord *digit, const int digitLen, int hour, int minute, int cursor, int number)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock digit array
   Calc_Alarm_Clock_Edit_Mode_Time_Digit((uint8*)clock, digit, digitLen, hour, minute, cursor, number);
@@ -1811,8 +1805,7 @@ void Render_Alarm_Clock_Edit_Mode_Time_Digit(const Coord *digit, const int digit
 */
 void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClock_Time time, int hour, int minute, int formart)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the world clock time array
   Calc_World_Clock_Time((uint8*)clock, city, cityLen, time, hour, minute, formart);
@@ -1830,8 +1823,7 @@ void Render_World_Clock_Time(const Coord *city, const int cityLen, MAPS_WorldClo
 */
 void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_List_Mode_Item((uint8*)clock, item, itemLen);
@@ -1853,8 +1845,7 @@ void Render_Configure_Adjust_List_Mode_Item(const Coord *item, const int itemLen
 */
 void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen, int hour, int minute, int second, int number)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_Clock_Digit((uint8*)clock, digit, digitLen, hour, minute, second, number);
@@ -1876,8 +1867,7 @@ void Render_Configure_Adjust_Clock_Digit(const Coord *digit, const int digitLen,
 */
 void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, int year, int month, int day, int number)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_Date_Digit((uint8*)clock, digit, digitLen, year, month, day, number);
@@ -1895,8 +1885,7 @@ void Render_Configure_Adjust_Date_Digit(const Coord *digit, const int digitLen, 
 */
 void Render_Configure_Adjust_Tense_Digit(const Coord *digit, const int digitLen)
 {
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define clock g_fb
   // calculate the clock digit array
   Calc_Configure_Adjust_Tense_Digit((uint8*)clock, digit, digitLen);

@@ -1578,8 +1578,7 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
   sw_second      = Stop_Watch_Now.Second;
   sw_centisecond = Stop_Watch_Now.Centisecond;
   EnableInterrupts;
-  /* Use shared global framebuffer (saves 1 KB of stack). */
-  memset(g_fb, 0x00, sizeof(g_fb));
+  /* Shared global framebuffer (saves 1 KB of stack); Calc_* zeroes it. */
   #define cache g_fb
   // release dynamic animation cache
   Release_Dynamic_Animation_Cache(array, len);

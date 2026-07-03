@@ -128,3 +128,8 @@
 > 且需按 6x8/8x16/12x24 各自字库大小分别钳制（12x24 "参数输入"字库覆盖字符更少）；而所有
 > 调用方传入的都是受控可打印 ASCII（snprintf 数字、固定标签、城市名），实际无暴露。暂缓，
 > 若日后有通用字符串绘制 API 接收外部文本再补。
+- **R** ✅ 删除 `Render_*` 与 `Refresh_Dynamic_Animation_Cache` 里冗余的 `memset(g_fb,...)`
+  （分析 #6）。自 K 修复起每个 `Calc_*` 内部已自清零 `g_fb`，调用前再清一次是每帧多余的全帧
+  memset。移除 `app/src/watch.c` 的 11 处 + `board/src/maps_dock_key.c` 的 1 处（注释改为
+  "Calc_* zeroes it"）。已确认每处 memset 后到 Calc 之间无人读 g_fb，早退路径也不使用 g_fb，
+  故移除安全。纯清理，正常路径行为不变。
