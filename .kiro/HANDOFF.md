@@ -150,3 +150,9 @@
   受影响：`health_monitor.c` / `gyro_dash.c` / `adc_scope.c` / `health_score.c` / `activity_history.c`。
   各删除该多余 `}`。花括号计数复核：修复前 5 文件各 close 比 open 多 1（同风格的
   pedometer.c/freefall.c 本就平衡）；修复后全部 open==close。framebuf.h 已确认平衡、不会吸收该括号。
+- **U** ✅ 修复 `app/src/freefall.c` 蜂鸣器可能一直响。蜂鸣在 FALLING→IMPACT 确认自由落体时
+  开启（Beep_On + beep_ms=300ms），但倒计时 + Beep_Off 原本只在 IMPACT 分支里。撞击检测后
+  state→IDLE，此时 beep_ms 通常还 >0（撞击一般在 300ms 内发生），而 IDLE/FALLING 不递减
+  beep_ms → 蜂鸣器一直响到下次自由落体或 FreeFall_Clear()。修复：把蜂鸣倒计时块从 IMPACT
+  分支移到 `switch` 之前，每次调用都跑、与状态无关，确保 300ms 后一定 Beep_Off。花括号复核
+  仍 21/21 平衡。

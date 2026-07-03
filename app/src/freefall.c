@@ -78,6 +78,18 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
     int64  az64    = (int64)az;
     uint64 mag_sq64 = (uint64)(ax64*ax64 + ay64*ay64 + az64*az64);
 
+    /* Non-blocking beep countdown — runs every call regardless of state so the
+     * buzzer is always silenced after FF_BEEP_DURATION_MS. Previously this lived
+     * only in the IMPACT case, so an impact that ended IMPACT before the beep
+     * elapsed left the buzzer stuck on until the next free-fall. */
+    if (FFDet.beep_ms > 0)
+    {
+        FFDet.beep_ms = (FFDet.beep_ms > FF_CALL_INTERVAL_MS)
+                        ? (FFDet.beep_ms - FF_CALL_INTERVAL_MS) : 0;
+        if (FFDet.beep_ms == 0)
+            Beep_Off();
+    }
+
     switch (FFDet.state)
     {
     /* ---- IDLE: watch for free-fall onset ---- */
@@ -135,15 +147,6 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
 
     /* ---- IMPACT: watch for high-g impact within 500 ms of fall end ---- */
     case FF_STATE_IMPACT:
-        /* Non-blocking beep countdown */
-        if (FFDet.beep_ms > 0)
-        {
-            FFDet.beep_ms = (FFDet.beep_ms > FF_CALL_INTERVAL_MS)
-                            ? (FFDet.beep_ms - FF_CALL_INTERVAL_MS) : 0;
-            if (FFDet.beep_ms == 0)
-                Beep_Off();
-        }
-
         FFDet.impact_window_ms += FF_CALL_INTERVAL_MS;
 
         /* Track peak impact force */
