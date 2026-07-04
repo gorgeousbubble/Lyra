@@ -8538,6 +8538,9 @@
             <name>$PROJ_DIR$\..\..\app\src\filter.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\..\..\app\src\framebuf.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\..\..\app\src\freefall.c</name>
         </file>
         <file>

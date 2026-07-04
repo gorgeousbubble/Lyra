@@ -168,3 +168,8 @@
   animation.h（alarm.c 等场景可能先失败）。同理 watch.h 还用了 `MAPS_WorldClock_Time`
   （定义在 main.h）。修复：watch.h 补上 `#include "main.h"` 和 `#include "animation.h"`，
   头文件自包含。已确认 main.h/animation.h 都只 include common.h、不回指 watch.h，无循环包含。
+- **X** ✅ 修复 `g_fb` 链接未定义。`app/src/framebuf.c`（framebuf 重构时新建，定义了 `g_fb`
+  及 `fb_pixel`/`fb_hline`/`fb_vline`/`fb_char6`/`fb_str6`/`fb_clear`）**从未被加入 IAR 工程**
+  → 所有引用 g_fb 及 fb_* 的地方在链接期报未定义符号。修复：把 `framebuf.c` 加入 `prj/IAR/lyra.ewp`
+  和 `lyra.ewt` 的 app 组（filter.c 之后）。`lyra.dep` 是依赖缓存会自动重建，无需改。
+  注：这是 framebuf 重构遗留的一批"从未编译验证"问题之一（同批还有 T/V/W）。
