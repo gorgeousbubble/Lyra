@@ -173,3 +173,7 @@
   → 所有引用 g_fb 及 fb_* 的地方在链接期报未定义符号。修复：把 `framebuf.c` 加入 `prj/IAR/lyra.ewp`
   和 `lyra.ewt` 的 app 组（filter.c 之后）。`lyra.dep` 是依赖缓存会自动重建，无需改。
   注：这是 framebuf 重构遗留的一批"从未编译验证"问题之一（同批还有 T/V/W）。
+- **Y** ✅ 消除 `app/src/freefall.c` 的 IAR 警告 Pe188 "enumerated type mixed with another type"。
+  `FFDet` 初始化里 `events` 字段用 `{{0}}`，而 `FreeFall_Event.type` 是枚举
+  `FreeFall_EventType`，等于用 int 字面量 0 显式初始化枚举字段 → Pe188。改为
+  `{{FF_EVENT_FREEFALL}}`（该枚举常量值也是 0，其余元素仍隐式零初始化，不触发警告）。

@@ -38,7 +38,7 @@ FreeFallDetector FFDet = {
     0,          /* fall_duration_ms  */
     0,          /* impact_window_ms  */
     0,          /* impact_peak_sq    */
-    {{0}},      /* events            */
+    {{FF_EVENT_FREEFALL}}, /* events (element 0 .type set with enum, rest zero) */
     0,          /* event_head        */
     0,          /* event_count       */
     0,          /* total_falls       */
