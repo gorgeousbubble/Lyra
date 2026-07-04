@@ -162,3 +162,9 @@
   constant"，IAR/ARMCC 报错。（`.coord` 用数组名，是地址常量，合法。）修复：把结构体 `len`
   字段改为 `const int *`，初始化用 `&LCM_*_coordinate_length`（地址常量，合法静态初始化），
   4 处调用点改为解引用 `*menu_scroll_icon[i].len`。
+- **W** ✅ 修复 `app/inc/watch.h` 头文件不自包含（Coord 未定义）。watch.h 用了 `Coord`
+  （`extern const Coord LCM_*_coordinate[]` 及各 Calc_*/Render_* 原型）却只 include `common.h`，
+  `Coord` 定义在 `utils/inc/animation.h`。此前能编译只因所有 includer 恰好先 include 了
+  animation.h（alarm.c 等场景可能先失败）。同理 watch.h 还用了 `MAPS_WorldClock_Time`
+  （定义在 main.h）。修复：watch.h 补上 `#include "main.h"` 和 `#include "animation.h"`，
+  头文件自包含。已确认 main.h/animation.h 都只 include common.h、不回指 watch.h，无循环包含。

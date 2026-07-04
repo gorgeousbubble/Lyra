@@ -14,6 +14,8 @@
 #define __WATCH_H__
 
 #include "common.h"
+#include "main.h"        /* MAPS_WorldClock_Time used by the World Clock prototypes */
+#include "animation.h"   /* Coord type used by the LCM_*_coordinate declarations below */
 
 /*
 **structure definition
