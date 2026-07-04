@@ -112,25 +112,28 @@ static int key_in_cooldown(void)
  *
  * Entries are in MAPS_Menu_Selection enum order (0..MAPS_Menu_Selection_Max-1).
  * ----------------------------------------------------------------------- */
-typedef struct { const Coord *coord; int len; } MenuScrollIcon;
+typedef struct { const Coord *coord; const int *len; } MenuScrollIcon;
 
 static const MenuScrollIcon menu_scroll_icon[MAPS_Menu_Selection_Max] = {
-    { LCM_Watch_icon_coordinate,            LCM_Watch_icon_coordinate_length },            /* Clock           */
-    { LCM_Stop_Watch_icon_coordinate,       LCM_Stop_Watch_icon_coordinate_length },       /* StopWatch       */
-    { LCM_Alarm_Clock_icon_coordinate,      LCM_Alarm_Clock_icon_coordinate_length },      /* AlarmClock      */
-    { LCM_World_Clock_icon_coordinate,      LCM_World_Clock_icon_coordinate_length },      /* WorldClock      */
-    { LCM_Spirit_Level_icon_coordinate,     LCM_Spirit_Level_icon_coordinate_length },     /* SpiritLevel     */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* Pedometer       */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* Attitude3D      */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* TiltAlarm       */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* GyroDash        */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* FreeFall        */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* HealthMonitor   */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* ActivityHistory */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* SleepMonitor    */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* AdcScope        */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* HealthScore     */
-    { LCM_Configure_Adjust_icon_coordinate, LCM_Configure_Adjust_icon_coordinate_length }, /* Configure_Adjust*/
+    /* NOTE: the *_length symbols are `const int` variables (not compile-time
+     * constants), so they cannot appear directly in a static initializer.
+     * Store their addresses instead and dereference at the call site. */
+    { LCM_Watch_icon_coordinate,            &LCM_Watch_icon_coordinate_length },            /* Clock           */
+    { LCM_Stop_Watch_icon_coordinate,       &LCM_Stop_Watch_icon_coordinate_length },       /* StopWatch       */
+    { LCM_Alarm_Clock_icon_coordinate,      &LCM_Alarm_Clock_icon_coordinate_length },      /* AlarmClock      */
+    { LCM_World_Clock_icon_coordinate,      &LCM_World_Clock_icon_coordinate_length },      /* WorldClock      */
+    { LCM_Spirit_Level_icon_coordinate,     &LCM_Spirit_Level_icon_coordinate_length },     /* SpiritLevel     */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* Pedometer       */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* Attitude3D      */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* TiltAlarm       */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* GyroDash        */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* FreeFall        */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* HealthMonitor   */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* ActivityHistory */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* SleepMonitor    */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* AdcScope        */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* HealthScore     */
+    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* Configure_Adjust*/
 };
 
 static const uint8 *const menu_display_bmp[MAPS_Menu_Selection_Max] = {
@@ -343,8 +346,8 @@ void MAPS_Dock_KEY_Incident(void)
       int prev = (Lyra_Menu_Selection - 1 + MAPS_Menu_Selection_Max) % MAPS_Menu_Selection_Max;
       int pe   = MAPS_Menu_SelectionN[prev];
       Animation_Screen_Switch_Horizontal_Scroll_Array(
-          menu_scroll_icon[cur].coord, menu_scroll_icon[cur].len,
-          menu_scroll_icon[pe].coord,  menu_scroll_icon[pe].len, 0, 0, 5);
+          menu_scroll_icon[cur].coord, *menu_scroll_icon[cur].len,
+          menu_scroll_icon[pe].coord,  *menu_scroll_icon[pe].len, 0, 0, 5);
       Lyra_Menu_Selection = prev;
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -356,8 +359,8 @@ void MAPS_Dock_KEY_Incident(void)
       int next = (Lyra_Menu_Selection + 1) % MAPS_Menu_Selection_Max;
       int ne   = MAPS_Menu_SelectionN[next];
       Animation_Screen_Switch_Horizontal_Scroll_Array(
-          menu_scroll_icon[cur].coord, menu_scroll_icon[cur].len,
-          menu_scroll_icon[ne].coord,  menu_scroll_icon[ne].len, 1, 0, 5);
+          menu_scroll_icon[cur].coord, *menu_scroll_icon[cur].len,
+          menu_scroll_icon[ne].coord,  *menu_scroll_icon[ne].len, 1, 0, 5);
       Lyra_Menu_Selection = next;
       KEY_ACTION_DONE(100); // Button delay 500ms
     }

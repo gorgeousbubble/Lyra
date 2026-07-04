@@ -156,3 +156,9 @@
   beep_ms → 蜂鸣器一直响到下次自由落体或 FreeFall_Clear()。修复：把蜂鸣倒计时块从 IMPACT
   分支移到 `switch` 之前，每次调用都跑、与状态无关，确保 300ms 后一定 Beep_Off。花括号复核
   仍 21/21 平衡。
+- **V** ✅ 修复 `board/src/maps_dock_key.c` 的 `menu_scroll_icon` 静态初始化非法（编译错误）。
+  该表（表驱动菜单重构 A 引入）的 `.len` 字段用 `LCM_*_coordinate_length` 初始化，而这些是
+  `extern const int` 运行期变量、不是编译期常量表达式 → C 语言 "initializer element is not
+  constant"，IAR/ARMCC 报错。（`.coord` 用数组名，是地址常量，合法。）修复：把结构体 `len`
+  字段改为 `const int *`，初始化用 `&LCM_*_coordinate_length`（地址常量，合法静态初始化），
+  4 处调用点改为解引用 `*menu_scroll_icon[i].len`。
