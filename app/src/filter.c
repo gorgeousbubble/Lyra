@@ -160,10 +160,13 @@ static float Normalize_Angle(float angle)
     return angle - 180.0f;
 }
 
+#if FILTER_MODE != FILTER_MODE_KALMAN
 /*
  * Single-axis complementary filter update with shortest-path correction.
  * Predicts with gyro, then corrects toward accelerometer angle via the
  * shortest angular path to avoid jumps at the ±180° boundary.
+ * (Only compiled when the complementary filter is selected; the Kalman
+ *  build does not reference it.)
  */
 static float Complementary_Update(float prev_angle, float acc_angle, float gyro_dps, float alpha, float dt)
 {
@@ -171,6 +174,7 @@ static float Complementary_Update(float prev_angle, float acc_angle, float gyro_
     float err       = Normalize_Angle(acc_angle - predicted);
     return Normalize_Angle(predicted + (1.0f - alpha) * err);
 }
+#endif
 
 /*
  * Complementary filter update for pitch, roll and yaw.

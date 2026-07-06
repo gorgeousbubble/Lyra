@@ -177,3 +177,8 @@
   `FFDet` 初始化里 `events` 字段用 `{{0}}`，而 `FreeFall_Event.type` 是枚举
   `FreeFall_EventType`，等于用 int 字面量 0 显式初始化枚举字段 → Pe188。改为
   `{{FF_EVENT_FREEFALL}}`（该枚举常量值也是 0，其余元素仍隐式零初始化，不触发警告）。
+- **Z** ✅ 消除 `app/src/filter.c` 警告 "Complementary_Update declared but never referenced"。
+  该 static 函数只在 `Fusion_Filter` 的 `#else`（非 Kalman）分支调用；当前 build 是
+  `FILTER_MODE == FILTER_MODE_KALMAN`，`#else` 被排除 → 函数编译但未被引用。修复：给函数定义
+  加上 `#if FILTER_MODE != FILTER_MODE_KALMAN ... #endif`，只在选用互补滤波时才编译。
+  （`Normalize_Angle` 未加守卫，因 acc-reject 分支等处仍在用。）
