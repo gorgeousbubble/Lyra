@@ -187,3 +187,8 @@
   ——同文件 `Oled_I2C_Put_Pixel` 与 LCM 驱动都用 `|0x00`,属文件内不一致的笔误。连带 `Oled_I2C_Fill`/
   `Oled_I2C_Clean` 的低列命令 `WrCmd(0x01)` 同样应为 `0x00`(否则从第 1 列开始、漏掉第 0 列)。
   三处全部改为 `0x00`。建议硬件上确认走 Set_Pos 的文本不再横向错位。
+- **AB** ✅ 修复 `chip/src/flash.c` 扇区边界 off-by-one。`Flash_Write`/`Flash_Write_Buff` 原用
+  `offset > FLASH_SECTOR_SIZE` 判越界:`offset == FLASH_SECTOR_SIZE` 能通过 → 写到下一个扇区首字节,
+  破坏相邻 flash。修复:`Flash_Write`(写 8 字节)改为 `(uint32)offset + FLASH_ALIGN_ADDR > FLASH_SECTOR_SIZE`;
+  `Flash_Write_Buff` 改为 `(uint32)offset + cnt > FLASH_SECTOR_SIZE`(同时补上原先缺失的 cnt 越界检查,
+  防止大 cnt 静默写过界)。当前调用方都用 offset=0,属潜在 bug。

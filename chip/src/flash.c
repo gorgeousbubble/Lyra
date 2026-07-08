@@ -105,8 +105,11 @@ __RAMFUNC uint8 Flash_Write(uint16 sector_num, uint16 offset, FLASH_WRITE_TYPE d
   uint32 addr = sector_num * FLASH_SECTOR_SIZE + offset;
   uint32 tmpdata;
 
-  // The offset address is not a multiple of FLASH_LIGN_ADDR or the offset address is greater than the sector size, resulting in execution failure
-  if (offset % FLASH_ALIGN_ADDR != 0 || offset > FLASH_SECTOR_SIZE)
+  // Reject a misaligned offset, or one that leaves no room for the 8-byte
+  // program (offset must satisfy offset + FLASH_ALIGN_ADDR <= FLASH_SECTOR_SIZE;
+  // the old check used '> FLASH_SECTOR_SIZE' which let offset == SECTOR_SIZE
+  // through and wrote into the next sector).
+  if (offset % FLASH_ALIGN_ADDR != 0 || (uint32)offset + FLASH_ALIGN_ADDR > FLASH_SECTOR_SIZE)
   {
     return 0;
   }
@@ -156,8 +159,11 @@ __RAMFUNC uint8 Flash_Write_Buff(uint16 sector_num, uint16 offset, uint16 cnt, u
   uint32 addr;
   uint32 data;
 
-  // The offset address is not a multiple of FLASH_LIGN_ADDR or the offset address is greater than the sector size, resulting in execution failure
-  if (offset % FLASH_ALIGN_ADDR != 0 || offset > FLASH_SECTOR_SIZE)
+  // Reject a misaligned offset, or a buffer that would run past the end of the
+  // sector (offset + cnt must be <= FLASH_SECTOR_SIZE). The old check only
+  // tested 'offset > FLASH_SECTOR_SIZE', so a large cnt silently spilled into
+  // the next sector.
+  if (offset % FLASH_ALIGN_ADDR != 0 || (uint32)offset + cnt > FLASH_SECTOR_SIZE)
   {
     return 0;
   }
