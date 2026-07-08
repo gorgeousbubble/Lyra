@@ -182,3 +182,8 @@
   `FILTER_MODE == FILTER_MODE_KALMAN`，`#else` 被排除 → 函数编译但未被引用。修复：给函数定义
   加上 `#if FILTER_MODE != FILTER_MODE_KALMAN ... #endif`，只在选用互补滤波时才编译。
   （`Normalize_Angle` 未加守卫，因 acc-reject 分支等处仍在用。）
+- **AA** ✅ 修复 `dev/src/oled_i2c.c` SSD1306 列地址命令笔误。`Oled_I2C_Set_Pos` 的低列地址
+  命令写成 `(x&0x0f)|0x01`(bit0 强制置 1 → 偶数列被并到奇数列、整体横向错位),应为 `|0x00`
+  ——同文件 `Oled_I2C_Put_Pixel` 与 LCM 驱动都用 `|0x00`,属文件内不一致的笔误。连带 `Oled_I2C_Fill`/
+  `Oled_I2C_Clean` 的低列命令 `WrCmd(0x01)` 同样应为 `0x00`(否则从第 1 列开始、漏掉第 0 列)。
+  三处全部改为 `0x00`。建议硬件上确认走 Set_Pos 的文本不再横向错位。

@@ -201,7 +201,7 @@ void Oled_I2C_Set_Pos(uint8 x,uint8 y)
 {
   Oled_I2C_WrCmd(0xb0+y);
   Oled_I2C_WrCmd(((x&0xf0)>>4)|0x10);
-  Oled_I2C_WrCmd((x&0x0f)|0x01);
+  Oled_I2C_WrCmd((x&0x0f)|0x00);
 }
 
 /*
@@ -217,7 +217,7 @@ void Oled_I2C_Fill(uint8 data)
   for(j=0;j<8;j++)
   {
     Oled_I2C_WrCmd(0xb0+j);
-    Oled_I2C_WrCmd(0x01);
+    Oled_I2C_WrCmd(0x00);
     Oled_I2C_WrCmd(0x10);
     for(i=0;i<OLED_I2C_X_WIDTH;i++)
     {
@@ -238,7 +238,7 @@ void Oled_I2C_Clean(void)
   for(j=0;j<8;j++)
   {
     Oled_I2C_WrCmd(0xb0+j);
-    Oled_I2C_WrCmd(0x01);
+    Oled_I2C_WrCmd(0x00);
     Oled_I2C_WrCmd(0x10);
     for(i=0;i<OLED_I2C_X_WIDTH;i++)
     {
