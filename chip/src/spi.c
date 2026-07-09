@@ -164,7 +164,7 @@ uint32 SPI_Init(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, SPI_CFG SPI_cfg, uint32 SP
       for (SPI_Pbr = 0; SPI_Pbr < 4; SPI_Pbr++)
       {
         SPI_Tmp = SPI_Scaler[SPI_Br] * SPI_PreScaler[SPI_Pbr];
-        SPI_Diff = abs(SPI_Tmp - SPI_Clk);
+        SPI_Diff = (SPI_Tmp > SPI_Clk) ? (SPI_Tmp - SPI_Clk) : (SPI_Clk - SPI_Tmp);
         if (SPI_Min_Diff > SPI_Diff)
         {
           SPI_Min_Diff = SPI_Diff;
@@ -189,13 +189,17 @@ uint32 SPI_Init(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, SPI_CFG SPI_cfg, uint32 SP
     for (SPI_Cssck = 0; SPI_Cssck < 15; SPI_Cssck++)
     {
       SPI_Tmp = 1 << (SPI_Cssck + 1);
+      if (SPI_Clk < SPI_Tmp)
+      {
+        continue; // ratio would be 0 → (0 - 1) underflows below; skip
+      }
       SPI_Pcssck = (SPI_Clk / SPI_Tmp - 1) / 2;
       if (SPI_Pcssck > 3)
       {
         continue;
       }
       SPI_Tmp = SPI_Tmp * (2 * SPI_Pcssck + 1);
-      SPI_Diff = abs(SPI_Tmp - SPI_Clk);
+      SPI_Diff = (SPI_Tmp > SPI_Clk) ? (SPI_Tmp - SPI_Clk) : (SPI_Clk - SPI_Tmp);
       if (SPI_Min_Diff > SPI_Diff)
       {
         SPI_Min_Diff = SPI_Diff;

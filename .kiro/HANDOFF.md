@@ -197,3 +197,8 @@
   但原来写成 `>>8`(得 Q16、比配对的 Q8 双积项大 256 倍),导致 pitch≠0 时 Y/Z 轴投影暴涨、
   渲染严重错位。把这 4 个三重积项的 `>>8` 改为 `>>16`(双积项仍 `>>8`)。仅影响 3D 姿态显示界面。
   中间量 max ±2^24,int32 不溢出。
+- **AD** ✅ 修复 `chip/src/spi.c` `SPI_Init` 里 `abs(uint32-uint32)` 的无符号/UB 问题。两处
+  `SPI_Diff = abs(SPI_Tmp - SPI_Clk)`:操作数均 uint32,相减在无符号域回绕后再传给 `abs(int)`
+  (超范围有符号转换=UB,量值错误,分频搜索可能选次优值)。改为 `(a>b)?(a-b):(b-a)` 的正确
+  无符号绝对差。顺带修 CSSCK 循环里 `SPI_Pcssck=(SPI_Clk/SPI_Tmp-1)/2` 的下溢:当 SPI_Clk<SPI_Tmp
+  时比值为 0、`0-1` 无符号下溢,前置 `if (SPI_Clk < SPI_Tmp) continue;` 规避。
