@@ -52,7 +52,7 @@ void maxim_heart_rate_and_oxygen_saturation(uint32 *pun_ir_buffer, int32 n_ir_bu
     int32 i, s, m, n_exact_ir_valley_locs_count, n_middle_idx;
     int32 n_th1, n_npks, n_c_min;
     int32 an_ir_valley_locs[15];
-    int32 an_exact_ir_valley_locs[15];
+    int32 an_exact_ir_valley_locs[15] = {0}; // init: a skipped peak leaves a slot unwritten; 0 is a safe in-range index (avoids uninitialized OOB subscript)
     int32 an_dx_peak_locs[15];
     int32 n_peak_interval_sum;
 
@@ -180,7 +180,7 @@ void maxim_heart_rate_and_oxygen_saturation(uint32 *pun_ir_buffer, int32 n_ir_bu
         an_ratio[k] = 0;
     for (k = 0; k < n_exact_ir_valley_locs_count; k++)
     {
-        if (an_exact_ir_valley_locs[k] > BUFFER_SIZE)
+        if (an_exact_ir_valley_locs[k] >= BUFFER_SIZE)
         {
             *pn_spo2 = -999; // do not use SPO2 since valley loc is out of range
             *pch_spo2_valid = 0;
