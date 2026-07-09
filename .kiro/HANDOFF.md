@@ -206,3 +206,7 @@
   `/ ADC_Samp_Num` 除零 → 加 `if (ADC_Samp_Num == 0) return 0;`。`chip/src/ftm.c`
   `FTM_PWM_Init`/`FTM_PWM_Freq`:`FTM_Freq==0` 时 `(FTM_Clk_Hz>>16)/FTM_Freq` 除零 →
   各加 `if (FTM_Freq == 0) return;`。当前均以常量调用、不触发,属防御性加固。
+- **AF** ✅ 修复 `utils/src/animation.c` 潜在死循环。两个 `Animation_Screen_Switch_*_Scroll_Array`
+  以 `x_offset/y_offset += speed` 推进,`while(animation_flag==0)` 退出;若 `speed==0` 且 `acc==0`,
+  偏移永不前进 → 死循环。在两函数 NULL 检查后加 `if (speed == 0) speed = 1;` 保证至少每帧步进 1
+  (保留动画、不跳过)。调用方目前都传 speed=5,属防御性加固。

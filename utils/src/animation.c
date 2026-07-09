@@ -44,6 +44,8 @@ void Animation_Screen_Switch_Horizontal_Scroll_Array(const Coord *src, const int
         return; // Invalid input, exit the function
     }
 
+    if (speed == 0) speed = 1; // guarantee progress; speed==0 && acc==0 would loop forever
+
     if (direction == 0) { // Left to right
         // Implement left to right scroll logic
         uint8 x_offset = 0; // Starting offset for the scroll
@@ -153,6 +155,8 @@ void Animation_Screen_Switch_Vertical_Scroll_Array(const Coord *src, const int s
     if (src == NULL || dst == NULL) {
         return; // Invalid input, exit the function
     }
+
+    if (speed == 0) speed = 1; // guarantee progress; speed==0 && acc==0 would loop forever
 
     if (direction == 0) { // Left to right
         // Implement left to right scroll logic
