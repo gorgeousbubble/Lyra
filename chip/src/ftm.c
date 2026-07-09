@@ -369,6 +369,7 @@ void FTM_PWM_Init(FTM_FTMn FTM_FTMx, FTM_CHn FTM_CHx, uint32 FTM_Freq, uint32 FT
 
   // The formula for calculating PWM frequency is: PWM_Sreq=(MK66_Sus_Clock)/(2 ^ FTM-PS * (MOD - CNTIN+1))
   // The initial count value CNTIN is set to 0, and the frequency calculation formula can be simplified as: PWM_Sreq=(MK66_Sus_Clock)/(2 ^ FTM-PS * (MOD+1))
+  if (FTM_Freq == 0) return; // guard against divide-by-zero in FTM_Mod calc
   FTM_Clk_Hz = MK64_Bus_KHz * 1000;        // FTM clock frequency (Hz)
   FTM_Mod = (FTM_Clk_Hz >> 16) / FTM_Freq; // FTM-Mod temporary cache, (MOD+1) first set to the maximum value (0xffff+0x1=0x10000, i.e. 2 ^ 16, shifted 16 bits to the right, calculate the value of FTM-PS)
   FTM_Ps = 0;
@@ -493,6 +494,7 @@ void FTM_PWM_Freq(FTM_FTMn FTM_FTMx, uint32 FTM_Freq)
   uint32 FTM_Mod = 0;    // FTM modulus value, FTM pulse period
   uint32 FTM_Clk_Hz = 0; // FTM clock frequency, select the bus clock, which is Bus_Clock
 
+  if (FTM_Freq == 0) return; // guard against divide-by-zero in FTM_Mod calc
   FTM_Clk_Hz = MK64_Bus_KHz * 1000;        // Bus frequency
   FTM_Mod = (FTM_Clk_Hz >> 16) / FTM_Freq; // FTM-Mod Temporary Cache
   FTM_Ps = 0;

@@ -202,3 +202,7 @@
   (超范围有符号转换=UB,量值错误,分频搜索可能选次优值)。改为 `(a>b)?(a-b):(b-a)` 的正确
   无符号绝对差。顺带修 CSSCK 循环里 `SPI_Pcssck=(SPI_Clk/SPI_Tmp-1)/2` 的下溢:当 SPI_Clk<SPI_Tmp
   时比值为 0、`0-1` 无符号下溢,前置 `if (SPI_Clk < SPI_Tmp) continue;` 规避。
+- **AE** ✅ 补除零防御。`chip/src/adc.c` `ADC_Average`:入参 `ADC_Samp_Num==0` 时结尾
+  `/ ADC_Samp_Num` 除零 → 加 `if (ADC_Samp_Num == 0) return 0;`。`chip/src/ftm.c`
+  `FTM_PWM_Init`/`FTM_PWM_Freq`:`FTM_Freq==0` 时 `(FTM_Clk_Hz>>16)/FTM_Freq` 除零 →
+  各加 `if (FTM_Freq == 0) return;`。当前均以常量调用、不触发,属防御性加固。

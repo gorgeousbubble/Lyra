@@ -246,6 +246,8 @@ uint16 ADC_Average(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint8 ADC_Samp_Num)
   uint16 ADC_Samp_Ave = 0;
   uint32 ADC_Samp_Temp = 0;
 
+  if (ADC_Samp_Num == 0) return 0; // guard against divide-by-zero below
+
   for (i = 0; i < ADC_Samp_Num; i++)
   {
     ADC_Start(ADCn_CHx, ADC_xBit); // enable ADC conversion
