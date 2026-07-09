@@ -621,6 +621,8 @@ void MAPS_Dock_LCM_Put_Para_Pot_6x8(uint8 x, uint8 y, uint8 *ch, float Value, LC
   uint8 c = 0, i = 0, j = 0;
   int LCM_Num[6] = {0};
 
+  if (Value < 0.0f) Value = -Value; // contract is positive-only; guard against negative font indices
+
   LCM_Ten = ((int)Value % 100) / 10;
   LCM_Single = (int)Value % 10;
   LCM_Pot_Ten = (int)(Value * 10) % 10;
@@ -742,6 +744,8 @@ void MAPS_Dock_LCM_Put_Para_8x16(uint8 x, uint8 y, uint8 *ch, int Value, LCM_Col
 {
   uint8 c = 0, i = 0, j = 0;
   int LCM_Num[6] = {0};
+
+  if (Value < 0) Value = -Value; // contract is positive-only; guard against negative font indices
 
   LCM_TenThousand = Value / 10000;
   LCM_Thousand = (Value % 10000) / 1000;
@@ -917,6 +921,8 @@ void MAPS_Dock_LCM_Put_Para_Pot_8x16(uint8 x, uint8 y, uint8 *ch, float Value, L
 {
   uint8 c = 0, i = 0, j = 0;
   int LCM_Num[6] = {0};
+
+  if (Value < 0.0f) Value = -Value; // contract is positive-only; guard against negative font indices
 
   LCM_Ten = ((int)Value % 100) / 10;
   LCM_Single = (int)Value % 10;

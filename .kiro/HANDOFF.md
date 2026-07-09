@@ -210,3 +210,7 @@
   以 `x_offset/y_offset += speed` 推进,`while(animation_flag==0)` 退出;若 `speed==0` 且 `acc==0`,
   偏移永不前进 → 死循环。在两函数 NULL 检查后加 `if (speed == 0) speed = 1;` 保证至少每帧步进 1
   (保留动画、不跳过)。调用方目前都传 speed=5,属防御性加固。
+- **AG** ✅ 修复 `board/src/maps_dock_lcm.c` 负数 → 负字库下标(越界读)。`Put_Para_8x16`(int)与
+  `Put_Para_Pot_6x8`/`_8x16`(float)按各位拆数字时假定 Value 为正,负值会算出负的 `LCM_Num` 下标,
+  索引 `Oled_FontLib_*` 越界。(6x8 整数版本本已用 abs_val 处理,8x16 整数版本却没有——不一致。)
+  三处入口各加绝对值钳制(`if (Value<0) Value=-Value;` / 浮点版 `<0.0f`),符合"仅正数"契约、防越界。
