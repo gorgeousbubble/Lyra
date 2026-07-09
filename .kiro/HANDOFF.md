@@ -192,3 +192,8 @@
   破坏相邻 flash。修复:`Flash_Write`(写 8 字节)改为 `(uint32)offset + FLASH_ALIGN_ADDR > FLASH_SECTOR_SIZE`;
   `Flash_Write_Buff` 改为 `(uint32)offset + cnt > FLASH_SECTOR_SIZE`(同时补上原先缺失的 cnt 越界检查,
   防止大 cnt 静默写过界)。当前调用方都用 offset=0,属潜在 bug。
+- **AC** ✅ 修复 `app/src/attitude3d.c` 3D 姿态定点数 Q8/Q16 缩放错误。旋转矩阵里 4 个三重积项
+  `cy*sp*sr` / `sy_v*sp*sr` / `cy*sp*cr` / `sy_v*sp*cr` 是 Q8×Q8×Q8=Q24,应 `>>16` 回到 Q8,
+  但原来写成 `>>8`(得 Q16、比配对的 Q8 双积项大 256 倍),导致 pitch≠0 时 Y/Z 轴投影暴涨、
+  渲染严重错位。把这 4 个三重积项的 `>>8` 改为 `>>16`(双积项仍 `>>8`)。仅影响 3D 姿态显示界面。
+  中间量 max ±2^24,int32 不溢出。

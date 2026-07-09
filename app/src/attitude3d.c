@@ -178,14 +178,16 @@ void Render_Attitude3D(float pitch, float roll, float yaw)
     int wx_y = ((int32)sy_v * cp) >> 8;
     int wx_z = -sp;   /* already Q8 */
 
-    /* World coords for body Y axis */
-    int wy_x = ((((int32)cy * sp * sr) >> 8) - (((int32)sy_v * cr) >> 8));
-    int wy_y = ((((int32)sy_v * sp * sr) >> 8) + (((int32)cy * cr) >> 8));
+    /* World coords for body Y axis
+     * Triple products (cy*sp*sr, sy_v*sp*sr) are Q8*Q8*Q8 = Q24 → >>16 back to
+     * Q8; the paired double products (sy_v*cr, cy*cr) are Q16 → >>8. */
+    int wy_x = ((((int32)cy * sp * sr) >> 16) - (((int32)sy_v * cr) >> 8));
+    int wy_y = ((((int32)sy_v * sp * sr) >> 16) + (((int32)cy * cr) >> 8));
     int wy_z = ((int32)cp * sr) >> 8;
 
-    /* World coords for body Z axis */
-    int wz_x = ((((int32)cy * sp * cr) >> 8) + (((int32)sy_v * sr) >> 8));
-    int wz_y = ((((int32)sy_v * sp * cr) >> 8) - (((int32)cy * sr) >> 8));
+    /* World coords for body Z axis (same Q24 triple-product >>16 rule) */
+    int wz_x = ((((int32)cy * sp * cr) >> 16) + (((int32)sy_v * sr) >> 8));
+    int wz_y = ((((int32)sy_v * sp * cr) >> 16) - (((int32)cy * sr) >> 8));
     int wz_z = ((int32)cp * cr) >> 8;
 
     /*
