@@ -480,7 +480,7 @@ void MAPS_Dock_KEY_Incident(void)
           char hint[24];
           snprintf(hint, sizeof(hint), "WAIT %lus", (unsigned long)remain_s);
           Oled_I2C_Clean();
-          Oled_I2C_Put_Str_6x8(28, 3, hint);
+          Oled_I2C_Put_Str_6x8(28, 3, (uint8 *)hint);
         }
         KEY_ACTION_DONE(800); /* Show message briefly */
       }

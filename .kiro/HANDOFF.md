@@ -218,6 +218,12 @@
   （与 Y 同根因）。`SleepMon` 全局初始化里 `history` 数组第一个 `SleepSlot` 元素用 `{{0}}`
   初始化，其 `state` 字段类型是枚举 `SleepState`，用 int 字面量 0 显式初始化 → Pe188。改为
   `{{SLEEP_STATE_AWAKE}}`（该枚举常量值也是 0，其余数组元素仍隐式零初始化，不触发警告）。
+- **AJ** ✅ 消除 `board/src/maps_dock_key.c` 警告 Pe167 "argument of type 'char*' is
+  incompatible with parameter of type 'uint8*'"。`Oled_I2C_Put_Str_6x8` 签名是
+  `(uint8 x, uint8 y, uint8 ch[])`，而 Activity History 的 "WAIT Xs" 提示走
+  `char hint[24]` 局部缓冲区直接传参，未做转换（同文件其余调用都传字符串字面量，
+  隐式转换不报警；`pedometer.c` 里同类场景已用 `(uint8 *)dist_str` 处理）。加上
+  `(uint8 *)hint` 显式转换，与既有约定一致。
 - **AH** ✅ `dev/src/max30102_algo.c` 内存安全最小修复(源自 Maxim 参考算法,未改算法取值逻辑)。
   谷值精确定位循环写 `an_exact_ir_valley_locs[k]` 但 count 单独自增,某峰被跳过时该槽位未初始化,
   后续却当下标索引 `an_x[]` → 未初始化读/越界(UB)。修复:(1) 数组初始化 `= {0}`(未写槽位=0,
