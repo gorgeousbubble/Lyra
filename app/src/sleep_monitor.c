@@ -22,7 +22,7 @@ SleepMonitorState SleepMon = {
     0, 0,           /* sum_sq, sample_count */
     SLEEP_STATE_AWAKE,
     0, 0, 0, 0, 0,  /* session stats */
-    {{0}}, 0, 0,    /* history ring */
+    {{SLEEP_STATE_AWAKE}}, 0, 0,    /* history ring */
     1               /* monitoring ON by default */
 };
 

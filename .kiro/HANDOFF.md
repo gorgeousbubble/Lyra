@@ -214,6 +214,10 @@
   `Put_Para_Pot_6x8`/`_8x16`(float)按各位拆数字时假定 Value 为正,负值会算出负的 `LCM_Num` 下标,
   索引 `Oled_FontLib_*` 越界。(6x8 整数版本本已用 abs_val 处理,8x16 整数版本却没有——不一致。)
   三处入口各加绝对值钳制(`if (Value<0) Value=-Value;` / 浮点版 `<0.0f`),符合"仅正数"契约、防越界。
+- **AI** ✅ 消除 `app/src/sleep_monitor.c` 警告 Pe188 "enumerated type mixed with another type"
+  （与 Y 同根因）。`SleepMon` 全局初始化里 `history` 数组第一个 `SleepSlot` 元素用 `{{0}}`
+  初始化，其 `state` 字段类型是枚举 `SleepState`，用 int 字面量 0 显式初始化 → Pe188。改为
+  `{{SLEEP_STATE_AWAKE}}`（该枚举常量值也是 0，其余数组元素仍隐式零初始化，不触发警告）。
 - **AH** ✅ `dev/src/max30102_algo.c` 内存安全最小修复(源自 Maxim 参考算法,未改算法取值逻辑)。
   谷值精确定位循环写 `an_exact_ir_valley_locs[k]` 但 count 单独自增,某峰被跳过时该槽位未初始化,
   后续却当下标索引 `an_x[]` → 未初始化读/越界(UB)。修复:(1) 数组初始化 `= {0}`(未写槽位=0,
