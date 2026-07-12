@@ -51,6 +51,16 @@ extern const Coord LCM_Stop_Watch_icon_coordinate[];
 extern const Coord LCM_Alarm_Clock_icon_coordinate[];
 extern const Coord LCM_World_Clock_icon_coordinate[];
 extern const Coord LCM_Spirit_Level_icon_coordinate[];
+extern const Coord LCM_Pedometer_icon_coordinate[];
+extern const Coord LCM_Attitude3D_icon_coordinate[];
+extern const Coord LCM_TiltAlarm_icon_coordinate[];
+extern const Coord LCM_GyroDash_icon_coordinate[];
+extern const Coord LCM_FreeFall_icon_coordinate[];
+extern const Coord LCM_HealthMonitor_icon_coordinate[];
+extern const Coord LCM_ActivityHistory_icon_coordinate[];
+extern const Coord LCM_SleepMonitor_icon_coordinate[];
+extern const Coord LCM_AdcScope_icon_coordinate[];
+extern const Coord LCM_HealthScore_icon_coordinate[];
 extern const Coord LCM_Configure_Adjust_icon_coordinate[];
 
 extern const int LCM_Watch_icon_coordinate_length;
@@ -58,6 +68,16 @@ extern const int LCM_Stop_Watch_icon_coordinate_length;
 extern const int LCM_Alarm_Clock_icon_coordinate_length;
 extern const int LCM_World_Clock_icon_coordinate_length;
 extern const int LCM_Spirit_Level_icon_coordinate_length;
+extern const int LCM_Pedometer_icon_coordinate_length;
+extern const int LCM_Attitude3D_icon_coordinate_length;
+extern const int LCM_TiltAlarm_icon_coordinate_length;
+extern const int LCM_GyroDash_icon_coordinate_length;
+extern const int LCM_FreeFall_icon_coordinate_length;
+extern const int LCM_HealthMonitor_icon_coordinate_length;
+extern const int LCM_ActivityHistory_icon_coordinate_length;
+extern const int LCM_SleepMonitor_icon_coordinate_length;
+extern const int LCM_AdcScope_icon_coordinate_length;
+extern const int LCM_HealthScore_icon_coordinate_length;
 extern const int LCM_Configure_Adjust_icon_coordinate_length;
 
 /*

@@ -218,6 +218,29 @@
   （与 Y 同根因）。`SleepMon` 全局初始化里 `history` 数组第一个 `SleepSlot` 元素用 `{{0}}`
   初始化，其 `state` 字段类型是枚举 `SleepState`，用 int 字面量 0 显式初始化 → Pe188。改为
   `{{SLEEP_STATE_AWAKE}}`（该枚举常量值也是 0，其余数组元素仍隐式零初始化，不触发警告）。
+- **AK** ✅ 菜单图标补全 + 切换动画（Pedometer~HealthScore）。原来 Pedometer(5)~HealthScore(14)
+  这 10 个菜单项：静态显示 `menu_display_bmp` 里只有 Pedometer 有专属 BMP，其余 9 项复用
+  Clock/StopWatch/... 的旧图标当占位；横向滚动动画 `menu_scroll_icon` 里 10 项**全部**用
+  `LCM_Configure_Adjust_icon_coordinate` 占位，切换动画形状全错。
+  修复内容：
+  (1) 新增 9 个 128x64 专属 BMP 图标到 `board/inc/maps_dock_lcm_lib.h`（Attitude3D=线框立方体+
+  三轴、TiltAlarm=警告三角+叹号、GyroDash=速度表指针、FreeFall=下落箭头+速度线+撞击、
+  HealthMonitor=心形+ECG波、ActivityHistory=周柱状图、SleepMonitor=弯月+ZZZ、AdcScope=示波器
+  网格+正弦波、HealthScore=盾牌+五角星），插在 LCM_Pedometer_icon 与 LCM_Wait_icon 之间，
+  page 扫描格式、bit=1 背景/bit=0 墨（与既有 LCM_*_icon 一致），各 1024 字节已核验。
+  (2) 新增 10 个滚动动画坐标数组到 `utils/src/animation.c`（含 Pedometer——它此前有 BMP 但无
+  坐标）。Pedometer 坐标由其现有 BMP 逐位解析得到，保证滚动动画与静态显示形状完全一致；
+  其余 9 个坐标与各自 BMP 由同一栅格生成、天然一致。
+  (3) extern 声明补齐：BMP → `dev/inc/oled_i2c.h` + `board/inc/maps_dock_lcm.h`；
+  坐标+length → `utils/inc/animation.h`。
+  (4) `board/src/maps_dock_key.c` 的 `menu_scroll_icon`（索引 5-14）和 `menu_display_bmp`
+  （索引 6-14）改为指向各自专属图标；更新表上方过时注释。
+  机制说明：菜单左右切换（KEY2/KEY3）本就统一走 `menu_scroll_icon` +
+  `Animation_Screen_Switch_Horizontal_Scroll_Array`，与 Clock/StopWatch/AlarmClock 同一路径，
+  所以补齐坐标数组后这些页面自动获得与前三个页面一致的横向滑入滑出动画，无需改按键逻辑。
+  `maps_dock_lcm_lib.h` 仅被 `maps_dock_lcm.c` 单一包含，无重复定义；`animation.c` 已在 IAR 工程内。
+  ⚠️ 未硬件实测：图标是用向量图元（圆/线/弧/填充）在 128x64 栅格上程序生成的，建议上机确认
+  观感（尤其 SleepMonitor 弯月的实心填充、AdcScope 网格密度）符合预期，如需微调可重跑生成脚本。
 - **AJ** ✅ 消除 `board/src/maps_dock_key.c` 警告 Pe167 "argument of type 'char*' is
   incompatible with parameter of type 'uint8*'"。`Oled_I2C_Put_Str_6x8` 签名是
   `(uint8 x, uint8 y, uint8 ch[])`，而 Activity History 的 "WAIT Xs" 提示走

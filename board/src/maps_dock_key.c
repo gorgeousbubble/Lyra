@@ -102,13 +102,12 @@ static int key_in_cooldown(void)
  * each table instead of editing three switch blocks.
  *
  * menu_scroll_icon: coordinate-list icons used by the horizontal scroll
- *   animation.  Only six distinct coordinate arrays exist, so menu items
- *   6-15 all use the Configure_Adjust placeholder — matching the original
- *   code (which also fixes a copy-paste inconsistency where Pedometer used
- *   a different src icon for KEY2 vs KEY3).
+ *   animation.  Each menu item now has its own dedicated coordinate array
+ *   (Pedometer..HealthScore added their own icons); only Configure_Adjust
+ *   still shares its historical placeholder art.
  *
  * menu_display_bmp: full-frame BMP icon drawn for the currently-selected
- *   item.  Mapping copied verbatim from the original display switch.
+ *   item.  Every item now maps to its own dedicated 128x64 BMP.
  *
  * Entries are in MAPS_Menu_Selection enum order (0..MAPS_Menu_Selection_Max-1).
  * ----------------------------------------------------------------------- */
@@ -123,16 +122,16 @@ static const MenuScrollIcon menu_scroll_icon[MAPS_Menu_Selection_Max] = {
     { LCM_Alarm_Clock_icon_coordinate,      &LCM_Alarm_Clock_icon_coordinate_length },      /* AlarmClock      */
     { LCM_World_Clock_icon_coordinate,      &LCM_World_Clock_icon_coordinate_length },      /* WorldClock      */
     { LCM_Spirit_Level_icon_coordinate,     &LCM_Spirit_Level_icon_coordinate_length },     /* SpiritLevel     */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* Pedometer       */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* Attitude3D      */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* TiltAlarm       */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* GyroDash        */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* FreeFall        */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* HealthMonitor   */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* ActivityHistory */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* SleepMonitor    */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* AdcScope        */
-    { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* HealthScore     */
+    { LCM_Pedometer_icon_coordinate,        &LCM_Pedometer_icon_coordinate_length },        /* Pedometer       */
+    { LCM_Attitude3D_icon_coordinate,       &LCM_Attitude3D_icon_coordinate_length },       /* Attitude3D      */
+    { LCM_TiltAlarm_icon_coordinate,        &LCM_TiltAlarm_icon_coordinate_length },        /* TiltAlarm       */
+    { LCM_GyroDash_icon_coordinate,         &LCM_GyroDash_icon_coordinate_length },         /* GyroDash        */
+    { LCM_FreeFall_icon_coordinate,         &LCM_FreeFall_icon_coordinate_length },         /* FreeFall        */
+    { LCM_HealthMonitor_icon_coordinate,    &LCM_HealthMonitor_icon_coordinate_length },    /* HealthMonitor   */
+    { LCM_ActivityHistory_icon_coordinate,  &LCM_ActivityHistory_icon_coordinate_length },  /* ActivityHistory */
+    { LCM_SleepMonitor_icon_coordinate,     &LCM_SleepMonitor_icon_coordinate_length },     /* SleepMonitor    */
+    { LCM_AdcScope_icon_coordinate,         &LCM_AdcScope_icon_coordinate_length },         /* AdcScope        */
+    { LCM_HealthScore_icon_coordinate,      &LCM_HealthScore_icon_coordinate_length },      /* HealthScore     */
     { LCM_Configure_Adjust_icon_coordinate, &LCM_Configure_Adjust_icon_coordinate_length }, /* Configure_Adjust*/
 };
 
@@ -143,15 +142,15 @@ static const uint8 *const menu_display_bmp[MAPS_Menu_Selection_Max] = {
     LCM_World_Clock_icon,      /* WorldClock      */
     LCM_Spirit_Level_icon,     /* SpiritLevel     */
     LCM_Pedometer_icon,        /* Pedometer       */
-    LCM_Configure_Adjust_icon, /* Attitude3D      */
-    LCM_Spirit_Level_icon,     /* TiltAlarm       */
-    LCM_Stop_Watch_icon,       /* GyroDash        */
-    LCM_Alarm_Clock_icon,      /* FreeFall        */
-    LCM_Watch_icon,            /* HealthMonitor   */
-    LCM_Stop_Watch_icon,       /* ActivityHistory */
-    LCM_World_Clock_icon,      /* SleepMonitor    */
-    LCM_Configure_Adjust_icon, /* AdcScope        */
-    LCM_Watch_icon,            /* HealthScore     */
+    LCM_Attitude3D_icon,       /* Attitude3D      */
+    LCM_TiltAlarm_icon,        /* TiltAlarm       */
+    LCM_GyroDash_icon,         /* GyroDash        */
+    LCM_FreeFall_icon,         /* FreeFall        */
+    LCM_HealthMonitor_icon,    /* HealthMonitor   */
+    LCM_ActivityHistory_icon,  /* ActivityHistory */
+    LCM_SleepMonitor_icon,     /* SleepMonitor    */
+    LCM_AdcScope_icon,         /* AdcScope        */
+    LCM_HealthScore_icon,      /* HealthScore     */
     LCM_Configure_Adjust_icon, /* Configure_Adjust*/
 };
 
