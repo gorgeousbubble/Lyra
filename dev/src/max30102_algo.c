@@ -206,6 +206,13 @@ void maxim_heart_rate_and_oxygen_saturation(uint32 *pun_ir_buffer, int32 n_ir_bu
     {
         n_y_dc_max = -16777216;
         n_x_dc_max = -16777216;
+        // Seed the DC-max indices with the valley start (a known in-range
+        // index). The inner scan below normally overwrites them on its first
+        // iteration, but seeding here removes the "may be used uninitialized"
+        // read (undefined behaviour / compiler warning) should the scan ever
+        // be skipped, and keeps any array subscript that uses them in bounds.
+        n_x_dc_max_idx = an_exact_ir_valley_locs[k];
+        n_y_dc_max_idx = an_exact_ir_valley_locs[k];
         if (an_exact_ir_valley_locs[k + 1] - an_exact_ir_valley_locs[k] > 10)
         {
             for (i = an_exact_ir_valley_locs[k]; i < an_exact_ir_valley_locs[k + 1]; i++)
