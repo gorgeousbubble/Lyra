@@ -115,8 +115,20 @@ void maxim_heart_rate_and_oxygen_saturation(uint32 *pun_ir_buffer, int32 n_ir_bu
         for (k = 1; k < n_npks; k++)
             n_peak_interval_sum += (an_dx_peak_locs[k] - an_dx_peak_locs[k - 1]);
         n_peak_interval_sum = n_peak_interval_sum / (n_npks - 1);
-        *pn_heart_rate = (int32)(6000 / n_peak_interval_sum); // beats per minutes
-        *pch_hr_valid = 1;
+        // Guard against divide-by-zero: although kept peaks are separated by
+        // more than the min-distance (so the averaged interval is normally
+        // >= that distance), integer truncation or a future tuning change
+        // could yield 0 and a 6000/0 division would hard-fault the CPU.
+        if (n_peak_interval_sum > 0)
+        {
+            *pn_heart_rate = (int32)(6000 / n_peak_interval_sum); // beats per minutes
+            *pch_hr_valid = 1;
+        }
+        else
+        {
+            *pn_heart_rate = -999;
+            *pch_hr_valid = 0;
+        }
     }
     else
     {

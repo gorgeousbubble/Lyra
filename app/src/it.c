@@ -236,17 +236,26 @@ void PIT1_IRQHandler(void)
 void RTC_IRQHandler(void)
 {
   disable_irq(RTC_IRQn);
-  if (RTC_SR & RTC_SR_TIF_MASK) // Time invalid
+
+  // --- Time Invalid / Counter Overflow ---------------------------------
+  // The old handler did `RTC_SR = 0; RTC_TSR = 0;` here, which had two bugs:
+  //   1. Writing RTC_TSR = 0 slammed the calendar back to the 1970 epoch,
+  //      wiping out the current time on any (possibly stale) TIF/TOF flag.
+  //   2. Writing RTC_SR = 0 clears TCE (counter enable) but it was never set
+  //      again, so after a single TIF/TOF the RTC counter froze permanently.
+  // Fix: reseed the hardware counter from RTC_Count -- the software time
+  // mirror updated every 100 ms in the main loop -- which clears TIF/TOF and
+  // restores the time to within ~100 ms, and always re-enable the counter.
+  if (RTC_SR & (RTC_SR_TIF_MASK | RTC_SR_TOF_MASK))
   {
-    RTC_SR  = 0;
-    RTC_TSR = 0;
+    RTC_SR  &= ~RTC_SR_TCE_MASK;                 // disable counter to allow TSR write
+    RTC_TSR  = (RTC_Count > 0) ? RTC_Count : 1;  // rewrite clears the flag + restores time
+    RTC_SR  |= RTC_SR_TCE_MASK;                  // re-enable counter (old code never did)
   }
-  if (RTC_SR & RTC_SR_TOF_MASK) // Counter overflow
-  {
-    RTC_SR  = 0;
-    RTC_TSR = 0;
-  }
-  if (RTC_SR & RTC_SR_TAF_MASK) // Alarm triggered
+
+  // --- Alarm triggered --------------------------------------------------
+  // Clear TAF by writing TAR; leave the time counter untouched.
+  if (RTC_SR & RTC_SR_TAF_MASK)
   {
     RTC_TAR = 0;
   }
