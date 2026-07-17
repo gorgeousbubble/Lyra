@@ -52,11 +52,27 @@ typedef enum
   I2C_C1_REG(I2CN[I2Cn]) |= I2C_C1_TXAK_MASK
 // Disable response
 #define I2C_DisableAck(I2Cn) I2C_C1_REG(I2CN[I2Cn]) |= I2C_C1_TXAK_MASK;
-// Waiting for I2C_S
-#define I2C_Wait(I2Cn)                                    \
-  while ((I2C_S_REG(I2CN[I2Cn]) & I2C_S_IICIF_MASK) == 0) \
-    ;                                                     \
-  I2C_S_REG(I2CN[I2Cn]) |= I2C_S_IICIF_MASK
+// Maximum spin iterations while waiting for the I2C interrupt flag (IICIF).
+// Bounds the busy-wait so a stuck/undriven bus (missing pull-ups, a wedged
+// slave holding SCL/SDA, or a missing 24C02 EEPROM) cannot hang the CPU
+// forever and trip the watchdog into a reboot loop. At 120 MHz this spin is
+// a few milliseconds -- far longer than a normal byte transfer (~25 us @
+// 400 kHz), so it never expires during healthy communication.
+#define I2C_WAIT_TIMEOUT 100000UL
+
+// Waiting for I2C_S (bounded).  On timeout we still clear IICIF and fall
+// through so the caller issues STOP and returns rather than dead-locking.
+#define I2C_Wait(I2Cn)                                        \
+  do                                                          \
+  {                                                           \
+    uint32 _i2c_to = I2C_WAIT_TIMEOUT;                        \
+    while ((I2C_S_REG(I2CN[I2Cn]) & I2C_S_IICIF_MASK) == 0)   \
+    {                                                         \
+      if (--_i2c_to == 0)                                     \
+        break;                                                \
+    }                                                         \
+    I2C_S_REG(I2CN[I2Cn]) |= I2C_S_IICIF_MASK;                \
+  } while (0)
 // I2C writes one byte
 #define I2C_Write_Byte(I2Cn, I2C_Data) \
   I2C_D_REG(I2CN[I2Cn]) = I2C_Data;    \
