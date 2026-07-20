@@ -56,7 +56,8 @@ extern uint32 RD_Duty;    // Red LED PWM duty cycle (0~10000)
 // Initialize MAX30102 sensor and all health-related GPIO ports
 extern void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(void);
 
-// Collect one RED/IR sample — call from PIT1 ISR at 100Hz
+// Collect one RED/IR sample — call from the main loop at 100Hz
+// (driven by MAX30102_Read_Flag, which the PIT1 ISR sets every 10ms)
 extern void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(uint32 red, uint32 ir);
 
 // Run SpO2/HR algorithm — call from main loop, NOT from ISR

@@ -60,7 +60,9 @@ void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Init(void)
 
 /*
  * Collect one RED/IR sample into the ring buffers.
- * Call from PIT1 ISR at 100Hz to match the algorithm's expected sample rate.
+ * Call from the main loop at 100Hz -- driven by MAX30102_Read_Flag, which the
+ * PIT1 ISR sets every 10ms -- to match the algorithm's expected sample rate.
+ * (The I2C read was moved out of the ISR into the main loop; this runs there.)
  */
 void Health_Heart_Rate_And_Oxygen_Saturation_Sensor_Collect(uint32 red, uint32 ir)
 {
