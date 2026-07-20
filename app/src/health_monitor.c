@@ -248,4 +248,6 @@ void Render_HealthMonitor(void)
         ds6(screen, 0, 57, "Wait ~5s...");
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+    #undef screen  /* release the framebuffer alias; keep it function-local */
 }

@@ -294,4 +294,6 @@ void Render_FreeFall(void)
     ds6(screen, 22, 56, "KEY0:CLEAR");
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+    #undef screen  /* release the framebuffer alias; keep it function-local */
 }

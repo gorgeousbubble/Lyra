@@ -233,4 +233,6 @@ void Render_GyroDash(int16 gx, int16 gy, int16 gz)
         render_bar(screen, gx, gy, gz);
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+    #undef screen  /* release the framebuffer alias; keep it function-local */
 }

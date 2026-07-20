@@ -292,4 +292,6 @@ void Render_HealthScore(void)
     draw_bar(screen, "SPO2", HealthScore.score_spo2,      HS_WEIGHT_SPO2,      0, 56);
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+    #undef screen  /* release the framebuffer alias; keep it function-local */
 }

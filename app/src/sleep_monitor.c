@@ -280,4 +280,6 @@ void Render_SleepMonitor(void)
     ds6(screen, 68, 57, SleepMon.monitoring ? "K0:OFF K2:CLR" : "K0:ON  K2:CLR");
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+    #undef screen  /* release the framebuffer alias; keep it function-local */
 }

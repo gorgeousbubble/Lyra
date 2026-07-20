@@ -349,4 +349,6 @@ void Render_AdcScope(void)
     ds6(screen, 90, 55, "K0");
 
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+    #undef screen  /* release the framebuffer alias; keep it function-local */
 }

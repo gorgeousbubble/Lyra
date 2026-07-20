@@ -205,4 +205,6 @@ void Render_TiltAlarm(float pitch, float roll)
 
     /* Output */
     Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+    #undef screen  /* release the framebuffer alias; keep it function-local */
 }
