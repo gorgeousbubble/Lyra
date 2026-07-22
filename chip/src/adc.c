@@ -15,6 +15,31 @@
 #include "port.h"
 
 /*
+** Maximum spin iterations while waiting for the ADC conversion-complete (COCO)
+** flag. Bounds the busy-wait so a mis-configured / clock-gated ADC cannot hang
+** the CPU forever and trip the watchdog (ADC_Once runs in the 100 Hz main loop).
+** At 120 MHz this is a few milliseconds -- far longer than a single conversion.
+*/
+#define ADC_WAIT_TIMEOUT 200000UL
+
+/*
+** Bounded wait for the COCO flag on channel A. Falls through on timeout so the
+** caller reads whatever is in the result register and clears the flag, rather
+** than dead-locking.
+*/
+#define ADC_WAIT_COCO(ADCn_CHx)                                                       \
+  do                                                                                  \
+  {                                                                                   \
+    uint32 _adc_to = ADC_WAIT_TIMEOUT;                                                \
+    while ((ADC_SC1_REG(ADCN[ADCn(ADCn_CHx)], ADC_Channel_A) & ADC_SC1_COCO_MASK)     \
+           != ADC_SC1_COCO_MASK)                                                      \
+    {                                                                                 \
+      if (--_adc_to == 0)                                                             \
+        break;                                                                        \
+    }                                                                                 \
+  } while (0)
+
+/*
 **ADC base pointer
 */
 ADC_MemMapPtr ADCN[ADC_ADC_MAX] =
@@ -221,8 +246,7 @@ uint16 ADC_Once(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit)
 
   ADC_Start(ADCn_CHx, ADC_xBit); // enable ADC convert
 
-  while ((ADC_SC1_REG(ADCN[ADCn(ADCn_CHx)], ADC_Channel_A) & ADC_SC1_COCO_MASK) != ADC_SC1_COCO_MASK)
-    ;
+  ADC_WAIT_COCO(ADCn_CHx); // bounded wait for conversion complete (no infinite hang)
 
   ADC_Result = ADC_R_REG(ADCN[ADCn(ADCn_CHx)], ADC_Channel_A); // get ADC convert result
 
@@ -252,8 +276,7 @@ uint16 ADC_Average(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint8 ADC_Samp_Num)
   {
     ADC_Start(ADCn_CHx, ADC_xBit); // enable ADC conversion
 
-    while ((ADC_SC1_REG(ADCN[ADCn(ADCn_CHx)], ADC_Channel_A) & ADC_SC1_COCO_MASK) != ADC_SC1_COCO_MASK)
-      ;
+    ADC_WAIT_COCO(ADCn_CHx); // bounded wait for conversion complete (no infinite hang)
 
     ADC_Samp_Temp += ADC_R_REG(ADCN[ADCn(ADCn_CHx)], ADC_Channel_A); // Obtain ADC conversion results
 
@@ -283,8 +306,7 @@ void ADC_Samp_Array(ADCn_CHn ADCn_CHx, ADC_nBit ADC_xBit, uint16 *ADC_Array, uin
   {
     ADC_Start(ADCn_CHx, ADC_xBit); // Start ADC conversion
 
-    while ((ADC_SC1_REG(ADCN[ADCn(ADCn_CHx)], ADC_Channel_A) & ADC_SC1_COCO_MASK) != ADC_SC1_COCO_MASK)
-      ;
+    ADC_WAIT_COCO(ADCn_CHx); // bounded wait for conversion complete (no infinite hang)
 
     *ADC_Array++ = ADC_R_REG(ADCN[ADCn(ADCn_CHx)], ADC_Channel_A); // Obtain ADC conversion results
 
