@@ -75,11 +75,21 @@ CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 static volatile uint32 s_key_last_ms   = 0;   /* Key_Ms_Tick snapshot after last action */
 static          uint32 s_key_cooldown  = 0;   /* required gap in ms                     */
 
-/* Called by KEY_ACTION_DONE macro — record timestamp and cooldown. */
+/* Edge/release latch.  Set after every key action; the Incident scanner then
+ * refuses to process any further key until ALL keys have been released.  This
+ * turns one physical press into exactly one action regardless of how long the
+ * key is held — the cooldown alone could not do this (a hold longer than the
+ * cooldown re-fired the action, causing double menu-enter/exit and the
+ * stopwatch toggling twice so it appeared unable to stop). */
+static          uint8  s_wait_release  = 0;
+
+/* Called by KEY_ACTION_DONE macro — record timestamp and cooldown, and require
+ * a full release before the next action is accepted. */
 void key_action_timestamp(uint32 cooldown_ms)
 {
     s_key_last_ms  = Key_Ms_Tick;
     s_key_cooldown = cooldown_ms;
+    s_wait_release = 1;
 }
 
 /* Returns 1 if still in cooldown, 0 if allowed to process. */
@@ -282,6 +292,22 @@ void MAPS_Dock_KEY_Incident(void)
    * If a key action was recorded recently, skip scanning until the cooldown
    * expires.  The main loop continues running at full speed during this time. */
   if (key_in_cooldown()) return;
+
+  /* Release gate — after an action, wait until EVERY key is released before
+   * accepting the next press, so a single (possibly long) press produces a
+   * single action.  Uses the raw, non-blocking GPIO read (KEYn_Get); the
+   * per-key debounce in KEYn_Check re-validates the next real press. */
+  if (s_wait_release)
+  {
+    if (MAPS_Dock_KEY_KEYn_Get(MAPS_Dock_KEY0) == MAPS_Dock_KEY_On ||
+        MAPS_Dock_KEY_KEYn_Get(MAPS_Dock_KEY1) == MAPS_Dock_KEY_On ||
+        MAPS_Dock_KEY_KEYn_Get(MAPS_Dock_KEY2) == MAPS_Dock_KEY_On ||
+        MAPS_Dock_KEY_KEYn_Get(MAPS_Dock_KEY3) == MAPS_Dock_KEY_On)
+    {
+      return; /* a key is still held — do not re-trigger */
+    }
+    s_wait_release = 0; /* all keys released — ready for the next press */
+  }
 
   // If an alarm is currently ringing, any key press dismisses it immediately.
   // Check before processing normal key logic so the first key press goes to
