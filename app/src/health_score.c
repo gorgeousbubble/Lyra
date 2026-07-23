@@ -80,33 +80,28 @@ void HealthScore_Calculate(void)
             dev = HS_HR_LOW - (int32)Heart_Rate;     /* below 60 */
         else
             dev = (int32)Heart_Rate - HS_HR_HIGH;    /* above 100 */
-        /* Each 10bpm over boundary = -3pts, floor at 0 */
-        int32 penalty = (dev / 10) * 3;
+        /* Proportional penalty: 3 pts per 10 bpm outside the normal range,
+         * applied per-bpm (dev*3/10) rather than (dev/10)*3 which truncated
+         * so 101-109 bpm (and 51-59) scored full marks like a normal reading. */
+        int32 penalty = dev * 3 / 10;
         int32 s = (int32)HS_WEIGHT_HEART - penalty;
         hr_score = (s > 0) ? (uint8)s : 0;
     }
 
     /* --- 5. SpO2 score (0-15) ---
      *
-     * Scoring tiers:
-     *   SPO2 < 80        : invalid / sensor not worn → half credit (7)
-     *   80 ≤ SPO2 ≤ 89   : dangerously low → linear 0..9 over 10-pt range
-     *                      Formula: (SPO2 - 80) * HS_WEIGHT_SPO2 / (2 * 10)
-     *                        80% → 0,  89% → 6  (≈ 40% of max)
-     *   90 ≤ SPO2 ≤ 94   : borderline low → linear 0..12 over 5-pt range
-     *                      Formula: (SPO2 - 90) * HS_WEIGHT_SPO2 / 5
-     *                        90% → 0,  94% → 12
-     *   SPO2 ≥ 95        : normal → full marks (15)
+     *   SPO2 < 80        : invalid / sensor not worn -> half credit (7)
+     *   80 <= SPO2 <= 94 : below normal -> linear, monotonically increasing
+     *                      and always strictly below full marks:
+     *                        (SPO2 - 80) * HS_WEIGHT_SPO2 / 15
+     *                        80% -> 0, 89% -> 9, 94% -> 14
+     *   SPO2 >= 95       : normal -> full marks (15)
      *
-     * OLD bug: the 90-94% formula was
-     *   HS_WEIGHT_SPO2 * (SPO2-90) / 5 + HS_WEIGHT_SPO2 / 3
-     *   = 3*(SPO2-90) + 5
-     * At SPO2=94 this gives 17, exceeding the cap of 15.
-     * The clamp caught it, but SPO2=94 and SPO2≥95 ended up equal (15),
-     * losing all differentiation within the range.
-     *
-     * The new formula keeps the result strictly within [0, HS_WEIGHT_SPO2)
-     * for values below 95% so the jump from 94% to 95% is always visible.
+     * Previously the 80-89 and 90-94 tiers were scored by two separate
+     * formulas, and the 90-94 tier restarted from 0 -- so 90% (0) scored
+     * LOWER than 89% (6), a non-monotonic drop.  A single linear mapping
+     * across 80..95 keeps the score monotonically increasing with SpO2 while
+     * still reserving full marks for the >=95% normal range.
      */
     uint8 spo2_valid = (SPO2 >= 80 && SPO2 <= 100) ? 1 : 0;
     uint8 spo2_score;
@@ -120,28 +115,11 @@ void HealthScore_Calculate(void)
         /* Normal range: full marks */
         spo2_score = HS_WEIGHT_SPO2;
     }
-    else if (SPO2 >= 90)
-    {
-        /* 90-94%: linear interpolation across 5-point range.
-         * Result is in [0, 12] — always strictly less than HS_WEIGHT_SPO2 (15)
-         * so the jump to full marks at 95% is always preserved.
-         *   SPO2=90 → 0*15/5 =  0
-         *   SPO2=91 → 1*15/5 =  3
-         *   SPO2=92 → 2*15/5 =  6
-         *   SPO2=93 → 3*15/5 =  9
-         *   SPO2=94 → 4*15/5 = 12  (strictly < 15) */
-        spo2_score = (uint8)((SPO2 - 90) * HS_WEIGHT_SPO2 / 5);
-    }
     else
     {
-        /* 80-89%: dangerously low — linear 0..6 across 10-point range.
-         * Uses half the weight per point so the score stays in [0, 9)
-         * and leaves room for the 90-94% tier above.
-         *   SPO2=80 → 0*15/10/2 = 0
-         *   SPO2=85 → 5*15/10/2 = 3 (rounded down)
-         *   SPO2=89 → 9*15/10/2 = 6 (rounds up to 6)
-         * Integer formula: (SPO2-80) * HS_WEIGHT_SPO2 / 20 */
-        spo2_score = (uint8)((SPO2 - 80) * HS_WEIGHT_SPO2 / 20);
+        /* 80-94% valid but below normal: monotonic linear ramp, strictly
+         * below full marks so the step up to 95% is always preserved. */
+        spo2_score = (uint8)((SPO2 - 80) * HS_WEIGHT_SPO2 / 15);
     }
 
     /* --- Total --- */
