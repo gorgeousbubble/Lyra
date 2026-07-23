@@ -131,14 +131,28 @@ void Pedometer_Reset(void)
  *   Page 5      : distance string "DIST: XXX.Xm"
  *   Page 7      : "KEY0:RESET" hint
  */
+/* Render cache. This screen is drawn directly to the OLED (clear-then-fill),
+ * so redrawing an unchanged frame every main-loop iteration would flicker;
+ * we therefore skip redundant redraws. File-scoped (not a function-static) so
+ * it can be invalidated on screen (re)entry via Pedometer_Invalidate_Display()
+ * -- otherwise re-entering the pedometer screen with an unchanged step count
+ * would skip drawing and leave the previous screen's content on the display. */
+static uint32 s_last_rendered_count = 0xFFFFFFFF; // 0xFFFFFFFF forces a draw
+
+/* Force the next Render_Pedometer() to redraw. Call when the pedometer screen
+ * becomes active so a fresh frame is guaranteed even if the count is unchanged. */
+void Pedometer_Invalidate_Display(void)
+{
+    s_last_rendered_count = 0xFFFFFFFF;
+}
+
 void Render_Pedometer(void)
 {
-    static uint32 last_rendered_count = 0xFFFFFFFF; // Force first draw
-
-    // Only redraw when step count changes — eliminates flicker
-    if (Pedometer.step_count == last_rendered_count)
+    // Only redraw when the step count changed (or the display was invalidated
+    // on screen entry) — avoids clear-then-fill flicker while stationary.
+    if (Pedometer.step_count == s_last_rendered_count)
         return;
-    last_rendered_count = Pedometer.step_count;
+    s_last_rendered_count = Pedometer.step_count;
 
     // Clear screen once per update (not every main loop iteration)
     Oled_I2C_Clean();

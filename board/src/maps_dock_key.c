@@ -351,6 +351,10 @@ void MAPS_Dock_KEY_Incident(void)
       {
         Lyra_Status = MAPS_Screen_Status_Max - 1;
       }
+      /* Entering the Normal (feature) screen — force a fresh redraw of any
+       * cached feature display so it cannot show the previous screen's stale
+       * content when its value is unchanged since we last left it. */
+      Pedometer_Invalidate_Display();
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
     // Press KEY1

@@ -94,4 +94,8 @@ extern void Pedometer_Reset(void);
 /* Render the pedometer screen to OLED */
 extern void Render_Pedometer(void);
 
+/* Force the next Render_Pedometer() to redraw (call on screen entry so the
+ * cached display can't show stale content from the previous screen). */
+extern void Pedometer_Invalidate_Display(void);
+
 #endif
