@@ -63,11 +63,21 @@ static inline uint8 MAPS_Dock_W25Q80_Wait_Busy(uint32 TimeOut)
   uint8 CMD = W25Q80_CMD_READ_STATUS_REG;
   uint8 Status = 0;
 
-  W25Q80_Transfer(&CMD, NULL, 1);
-
+  /* Read the status register in a SINGLE chip-select frame each poll: send
+   * the RDSR command (0x05) then clock the status byte back WITHOUT releasing
+   * CS in between (same pattern as Read_ID).
+   *
+   * The old code issued 0x05 and the status read as two SEPARATE
+   * W25Q80_Transfer() calls.  SPI_MOSI deasserts CS on exit of every call,
+   * so the second transfer clocked a byte with CS freshly asserted and 0x05
+   * never re-sent -- the flash saw a no-op and returned garbage (usually 0),
+   * so BUSY read as clear on the very first poll.  The busy-wait therefore
+   * never actually waited: an erase/program could be followed immediately by
+   * another operation while the chip was still busy -> silently corrupted or
+   * lost writes to the alarm list, config, and step history stored in Flash. */
   for (i = 0; i < TimeOut; i++)
   {
-    W25Q80_Transfer(NULL, &Status, 1);
+    W25Q80_TransferCMD(&CMD, NULL, NULL, &Status, 1, 1);
     if ((Status & STATUS_BUSY) == 0)
     {
       return 1; /* chip idle */
@@ -128,9 +138,18 @@ void MAPS_Dock_W25Q80_Erase_Chip(void)
  *  @since      v1.0
  *  Sample usage:       MAPS_Dock_W25Q80_Erase_Block();//W25Q80 chip sector erase
  */
-void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint16 Block_Size)
+void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size)
 {
   uint8 CMD[4] = {0};
+
+  /* Block_Size was uint16, which truncated ERASE_BLOCK_SIZE (65536) to 0 --
+   * that both broke 64 KB block erase and caused a divide-by-zero in the
+   * modulo below. Using uint32 fixes it; guard against 0 defensively. */
+  if (Block_Size == 0)
+  {
+    ASSERT(0);
+    return;
+  }
 
   ASSERT((Address % Block_Size) == 0);
 
