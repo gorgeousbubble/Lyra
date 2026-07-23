@@ -593,7 +593,7 @@ uint8 MAPS_LCDC_BMP_From_SD(char *file, Site_t Site)
     goto BMP_EXIT_FALSE; // Jump to exit function
   }
 
-  if (Width > MAX_BMP_W) // Width exceeds the maximum display width of LCD
+  if (Width <= 0 || Width > MAX_BMP_W) // invalid width, or exceeds the max display width
   {
     goto BMP_EXIT_FALSE; // Jump to exit function
   }
@@ -618,6 +618,15 @@ uint8 MAPS_LCDC_BMP_From_SD(char *file, Site_t Site)
   size.W = Width;
   site.x = Site.x;
   BytesPerLine = BMP_LINE_BYTE(Width, Bitcnt);
+  /* Guard against a crafted/corrupt header: every per-line f_read below reads
+   * BytesPerLine bytes into the fixed MAX_BMP_LINE_BYTE-sized BMP_Buffer, and
+   * f_read's length is unsigned -- a negative BytesPerLine would wrap to a huge
+   * value and a large bit-depth (e.g. 32bpp) would exceed the buffer, either
+   * way overrunning BMP_Buffer from untrusted SD data. */
+  if (BytesPerLine <= 0 || BytesPerLine > MAX_BMP_LINE_BYTE)
+  {
+    goto BMP_EXIT_FALSE;
+  }
 
   switch (Bitcnt)
   {
