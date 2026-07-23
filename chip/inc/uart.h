@@ -30,6 +30,16 @@ typedef enum
 } UART_UARTn;
 
 /*
+** Maximum spin iterations while waiting for a UART flag (TDRE on transmit,
+** RDRF on receive). Bounds the busy-wait so a stalled peer, a disabled
+** transmitter, or a clock fault cannot hang the CPU forever -- UART telemetry
+** (UART_Send_Parameters) runs from the 100 Hz main loop, so an unbounded wait
+** would trip the watchdog into a reboot loop. At 120 MHz this is a few ms,
+** far longer than one character time even at low baud rates.
+*/
+#define UART_WAIT_TIMEOUT 200000UL
+
+/*
 **variate declaration
 */
 extern UART_MemMapPtr UARTN[UART_UART_MAX];

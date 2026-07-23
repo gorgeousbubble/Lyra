@@ -194,6 +194,7 @@ void UART_Init(UART_UARTn UART_UARTx, uint32 UART_Baud)
   }
 
   // UART baud rate UART_Baud = UART_SysClk / (16 * (SBR + BRFD))
+  if (UART_Baud == 0) UART_Baud = 9600; // guard against divide-by-zero
   UART_Sbr = (uint16)(UART_SysClk / (UART_Baud * 16));
 
   if (UART_Sbr > 0x1FFF)
@@ -230,8 +231,11 @@ void UART_Init(UART_UARTn UART_UARTx, uint32 UART_Baud)
  */
 void UART_GetChar(UART_UARTn UART_UARTx, char *ch)
 {
+  uint32 to = UART_WAIT_TIMEOUT;
   while (!(UART_S1_REG(UARTN[UART_UARTx]) & UART_S1_RDRF_MASK))
-    ; // Waiting for data reception
+  {
+    if (--to == 0) { *ch = 0; return; } // timeout: no byte, return 0 rather than hang
+  }
 
   *ch = UART_D_REG(UARTN[UART_UARTx]); // Read the received value from the buffer register
 }
@@ -245,8 +249,11 @@ void UART_GetChar(UART_UARTn UART_UARTx, char *ch)
  */
 void UART_PutChar(UART_UARTn UART_UARTx, char ch)
 {
+  uint32 to = UART_WAIT_TIMEOUT;
   while (!(UART_S1_REG(UARTN[UART_UARTx]) & UART_S1_TDRE_MASK))
-    ; // Waiting to send buffer
+  {
+    if (--to == 0) return; // timeout: drop the byte rather than hang the loop
+  }
 
   UART_D_REG(UARTN[UART_UARTx]) = (uint8)ch; // Send a byte of data
 }
@@ -262,8 +269,11 @@ void UART_PutStr(UART_UARTn UART_UARTx, const uint8 *str)
 {
   for (; *str != '\0'; str++)
   {
+    uint32 to = UART_WAIT_TIMEOUT;
     while (!(UART_S1_REG(UARTN[UART_UARTx]) & UART_S1_TDRE_MASK))
-      ; // Waiting to send buffer
+    {
+      if (--to == 0) return; // timeout: abort the rest of the string rather than hang
+    }
 
     UART_D_REG(UARTN[UART_UARTx]) = (uint8)(*str); // Send a byte of data
   }
