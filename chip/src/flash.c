@@ -70,6 +70,19 @@ __RAMFUNC uint8 Flash_Erase_Sector(uint16 sector_num)
 {
   uint32 addr = sector_num * FLASH_SECTOR_SIZE;
 
+  // Refuse to erase sector 0. It holds the interrupt vector table, the boot
+  // code, AND the Flash Configuration Field (0x400..0x40F). Erasing it wipes
+  // the reset vectors, and — worse — leaves FSEC (0x40C) at its erased value
+  // 0xFF, whose SEC[1:0]=11 SECURES the MCU on the next reset (bricking it,
+  // often permanently). The previous "protection" re-wrote 0x408 with
+  // 0xFFFFFFFFFFFFFFFF, which set FSEC=0xFF and thus caused exactly that
+  // secured/bricked state instead of preventing it. There is no safe reason
+  // to erase sector 0 at runtime, so reject the request outright.
+  if (sector_num == 0)
+  {
+    return 0;
+  }
+
   // Set erase command
   FCMD = ERSSCR;
 
@@ -81,11 +94,6 @@ __RAMFUNC uint8 Flash_Erase_Sector(uint16 sector_num)
   if (Flash_CMD() == 0) // Is the Flash_CMD command completed
   {
     return 0;
-  }
-
-  if (sector_num == 0) // Sector number should not be 0
-  {
-    return Flash_Write(sector_num, 0x000408, 0xFFFFFFFFFFFFFFFF);
   }
 
   return 1;
