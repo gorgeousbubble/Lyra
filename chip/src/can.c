@@ -66,7 +66,7 @@ CAN_Baud_CFG_n CAN_Baud_CFG_60000K[CAN_BAUD_MAX] =
  */
 static void CAN_Set_Baud(CAN_CANn CAN_CANx, CAN_BAUD_n CAN_BAUD_x)
 {
-  CAN_Baud_CFG_n *PCAN_Baud;
+  CAN_Baud_CFG_n *PCAN_Baud = 0;
   uint32 CAN_CLK_KHz = 0;
   uint8 BFreezeMode = 0;
 
@@ -90,6 +90,14 @@ static void CAN_Set_Baud(CAN_CANn CAN_CANx, CAN_BAUD_n CAN_BAUD_x)
   else
   {
     ASSERT(0);
+  }
+
+  // Guard against an unsupported clock: if neither table matched, PCAN_Baud is
+  // still NULL. ASSERT above may be compiled out in release builds, so bail out
+  // here rather than dereferencing a wild pointer into the CAN registers.
+  if (PCAN_Baud == 0)
+  {
+    return;
   }
 
   // Enter freeze mode
@@ -167,7 +175,10 @@ void CAN_Init(CAN_CANn CAN_CANx, CAN_BAUD_n CAN_BAUD_x, CAN_MODE CAN_MODE_x, CAN
   while (!(CAN_MCR_REG(CANN[CAN_CANx]) & CAN_MCR_FRZACK_MASK))
     ; // Waiting to enter freeze mode
 
-  for (i = 16; i > 0; i--)
+  // Clear all message buffers 0..NUMBER_OF_MB-1 (valid indices are 0..15).
+  // The old loop ran i=16..1, which wrote to the out-of-range index 16 and
+  // left MB 0 uninitialised.
+  for (i = 0; i < NUMBER_OF_MB; i++)
   {
     CAN_CS_REG(CANN[CAN_CANx], i) = 0;
     CAN_ID_REG(CANN[CAN_CANx], i) = 0;
@@ -189,7 +200,9 @@ void CAN_Init(CAN_CANn CAN_CANx, CAN_BAUD_n CAN_BAUD_x, CAN_MODE CAN_MODE_x, CAN
   // Default independent mask
   CAN_MCR_REG(CANN[CAN_CANx]) |= CAN_MCR_IRMQ_MASK;
 
-  for (i = NUMBER_OF_MB; i > 0; i--)
+  // Clear individual mask registers for MB 0..NUMBER_OF_MB-1. Same off-by-one
+  // as above: the old loop ran i=16..1, touching index 16 and skipping 0.
+  for (i = 0; i < NUMBER_OF_MB; i++)
   {
     CAN_RXIMR_REG(CANN[CAN_CANx], i) = 0;
   }
@@ -249,9 +262,17 @@ void CAN_Tx(CAN_CANn CAN_CANx, MB_NUM_n MB_NUM_x, CAN_USR_ID_n CAN_USR_ID_x, uin
   // Start send
   CAN_CS_REG(CANN[CAN_CANx], MB_NUM_x) = (0 | CAN_CS_CODE(CAN_CS_CODE_TX_DATA) | CAN_CS_DLC(Len));
 
-  // Time limited waiting for sending completion
-  while (!(CAN_IFLAG1_REG(CANN[CAN_CANx]) & (1 << MB_NUM_x)))
-    ;
+  // Time-limited wait for send completion. A bus-off condition or a missing
+  // acknowledge would otherwise spin here forever; fall through on timeout so
+  // the caller regains control.
+  {
+    uint32 timeout = CAN_TX_TIMEOUT;
+    while (!(CAN_IFLAG1_REG(CANN[CAN_CANx]) & (1 << MB_NUM_x)))
+    {
+      if (--timeout == 0)
+        break;
+    }
+  }
 
   // Clear message buffer interrupt flag
   CAN_IFLAG1_REG(CANN[CAN_CANx]) = (1 << MB_NUM_x);

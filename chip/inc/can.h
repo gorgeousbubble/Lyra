@@ -16,6 +16,14 @@
 #include "common.h"
 
 /*
+**Bounded spin-wait for CAN_Tx transmit-complete polling.
+**A CAN transmission that never completes (bus-off, no acknowledge, wiring
+**fault) would otherwise hang the caller forever. On timeout CAN_Tx falls
+**through so the caller regains control instead of dead-locking.
+*/
+#define CAN_TX_TIMEOUT   0x00300000u
+
+/*
 **CAN module enumeration
 */
 typedef enum
