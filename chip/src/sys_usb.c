@@ -64,8 +64,12 @@ void USB_Init(void)
   USB0_BDTPAGE2 = (uint8)((uint32)tBDTtable >> 16);
   USB0_BDTPAGE3 = (uint8)((uint32)tBDTtable >> 24);
 
-  // Clear USB reset mark
-  FLAG_SET(USB_ISTAT_USBRST_MASK, USB0_ISTAT);
+  // Clear USB reset flag (write-1-to-clear on ISTAT bit USBRST).
+  // FLAG_SET(BitNumber, Reg) expands to Reg |= (1 << BitNumber), so it needs
+  // the bit *position* (_SHIFT), not the _MASK. Passing USBRST_MASK (0x1)
+  // computed 1 << 1 = 0x2, which cleared the ERROR flag (bit 1) and left the
+  // USBRST flag (bit 0) untouched.
+  FLAG_SET(USB_ISTAT_USBRST_SHIFT, USB0_ISTAT);
 
   // Enable USB reset interrupt
   FLAG_SET(USB_INTEN_USBRSTEN_SHIFT, USB0_INTEN);
