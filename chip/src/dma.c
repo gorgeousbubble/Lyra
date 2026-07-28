@@ -103,17 +103,23 @@ void DMA_PORTX_To_Buff_Init(DMA_CHn DMA_CHx, void *SADDR, void *DADDR, PTXn PTXx
   DMA_DADDR(DMA_CHx) = (uint32)DADDR;          // Set DMA transfer destination address
   DMA_SOFF(DMA_CHx) = 0;                       // Source address offset 0x00
   DMA_DOFF(DMA_CHx) = BYTEs;                   // Add BYTEs to the destination address after transmission is completed
-  DMA_ATTR(DMA_CHx) = (0 | DMA_ATTR_SMOD(0)    // Source address modulus prohibition
-                       | DMA_ATTR_SSIZE(BYTEs) // Source data bit width
-                       | DMA_ATTR_DMOD(0)      // Target address modulus prohibition
-                       | DMA_ATTR_DSIZE(BYTEs) // Target data bit width
+  // SSIZE/DSIZE take the eDMA *size encoding* (0=8bit,1=16bit,2=32bit,4=16byte),
+  // which is exactly the DMA_BYTEn enum value. NBYTES takes the *actual byte
+  // count* per minor loop (BYTEs = 1/2/4/16). The two were swapped here:
+  // SSIZE/DSIZE were given the byte count and NBYTES the encoding, corrupting
+  // both the transfer width and the bytes-per-loop. (See DMA_Count_Init for the
+  // correct pairing: SSIZE(DMA_BYTEn) + NBYTES(BYTEs).)
+  DMA_ATTR(DMA_CHx) = (0 | DMA_ATTR_SMOD(0)        // Source address modulus prohibition
+                       | DMA_ATTR_SSIZE(DMA_BYTEx) // Source data bit width (size encoding)
+                       | DMA_ATTR_DMOD(0)          // Target address modulus prohibition
+                       | DMA_ATTR_DSIZE(DMA_BYTEx) // Target data bit width (size encoding)
   );
 
   DMA_CITER_ELINKNO(DMA_CHx) = DMA_CITER_ELINKNO_CITER(Count); // Current number of main loops
   DMA_BITER_ELINKNO(DMA_CHx) = DMA_BITER_ELINKNO_BITER(Count); // Starting main loop count
   DMA_CR &= ~DMA_CR_EMLM_MASK;                                 // prohibit
 
-  DMA_NBYTES_MLNO(DMA_CHx) = DMA_NBYTES_MLNO_NBYTES(DMA_BYTEx);
+  DMA_NBYTES_MLNO(DMA_CHx) = DMA_NBYTES_MLNO_NBYTES(BYTEs); // bytes transferred per minor loop
 
   DMA_SLAST(DMA_CHx) = 0;
   DMA_DLAST_SGA(DMA_CHx) = (uint32)((CFG & DADDR_KEEPON) == 0 ? (-Count) : 0);
