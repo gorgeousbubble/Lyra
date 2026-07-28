@@ -318,9 +318,17 @@ void Render_ActivityHistory(void)
         dline_h(screen, 9, 0, 127);
 
         /* Bars occupy y=10..51 (42px tall), x=4..123 for 7 bars */
-        /* Find max step count for auto-scaling */
+        /* The chart has (ACTIVITY_DAYS-1) past-day slots plus one "today"
+         * slot.  When history_len exceeds the number of past slots, the
+         * oldest stored day(s) are NOT displayed (right-aligned to the newest
+         * entries).  Auto-scaling must ignore those hidden entries, otherwise
+         * a tall-but-invisible day would shrink every visible bar. */
+        int first_shown = (Activity.history_len > ACTIVITY_DAYS - 1)
+                          ? Activity.history_len - (ACTIVITY_DAYS - 1)
+                          : 0;
+        /* Find max step count for auto-scaling (displayed days only) */
         uint32 max_steps = Activity.today_steps;
-        for (int i = 0; i < Activity.history_len; i++)
+        for (int i = first_shown; i < Activity.history_len; i++)
             if (Activity.history[i].steps > max_steps)
                 max_steps = Activity.history[i].steps;
         if (max_steps < 1) max_steps = 1;
