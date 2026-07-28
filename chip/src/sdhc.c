@@ -115,9 +115,7 @@ void SDHC_init()
 
     /* reset ESDHC */
     SDHC_SYSCTL = SDHC_SYSCTL_RSTA_MASK | SDHC_SYSCTL_SDCLKFS(0x80);
-    while (SDHC_SYSCTL & SDHC_SYSCTL_RSTA_MASK)
-    {
-    };
+    SDHC_SPIN_WHILE(SDHC_SYSCTL & SDHC_SYSCTL_RSTA_MASK); /* bounded: reset self-clear */
 
     /* initialize value */
     SDHC_VENDOR = 0;
@@ -129,9 +127,7 @@ void SDHC_init()
     SDHC_set_baudrate(SDHC_INIT_BANDRATE);
 
     /* Poll inhibit bits */
-    while (SDHC_PRSSTAT & (SDHC_PRSSTAT_CIHB_MASK | SDHC_PRSSTAT_CDIHB_MASK))
-    {
-    };
+    SDHC_SPIN_WHILE(SDHC_PRSSTAT & (SDHC_PRSSTAT_CIHB_MASK | SDHC_PRSSTAT_CDIHB_MASK)); /* bounded */
 
     /* initialize pin reuse */
     PORT_Init(PTE0, ALT4 | HDS | PULLUP); /* ESDHC.D1  */
@@ -147,9 +143,8 @@ void SDHC_init()
 
     /* send 80 initial clock cycles to the card, which are required during the power on period of the card */
     SDHC_SYSCTL |= SDHC_SYSCTL_INITA_MASK;
-    while (SDHC_SYSCTL & SDHC_SYSCTL_INITA_MASK)
-    {
-    }; // waiting for 80 SD cycles to complete sending
+    /* bounded: waiting for the 80 SD init clocks to finish */
+    SDHC_SPIN_WHILE(SDHC_SYSCTL & SDHC_SYSCTL_INITA_MASK);
 
     /* check if the card is inserted */
     if (SDHC_PRSSTAT & SDHC_PRSSTAT_CINS_MASK) // the CINS field changes from 0 to 1 to indicate card insertion, and from 1 to 0 to indicate card removal
@@ -205,8 +200,7 @@ void SDHC_set_baudrate(uint32 baudrate)
     );
 
     /* waiting for SD clock to stabilize  */
-    while (0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_SDSTB_MASK))
-        ;
+    SDHC_SPIN_WHILE(0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_SDSTB_MASK)); /* bounded: clock stable */
 
     /* enable ESDHC clock */
     SDHC_SYSCTL |= SDHC_SYSCTL_SDCLKEN_MASK;
@@ -225,20 +219,32 @@ uint32 SDHC_cmd(pESDHC_CMD_t command) /* [IN/OUT] Command specification */
     uint32 xfertyp;
     uint32 blkattr;
 
-    // ASSERT(SDHC_CMD_MAX > command->COMMAND  );      //assert that the command cannot exceed SDHC_CMD-MAX
+    /* Bounds-check the command index BEFORE indexing the lookup table.
+     * This was previously only a commented-out ASSERT, and ASSERT compiles to
+     * nothing in release builds -- ESDHC_IOCTL_SEND_CMD passes a caller-supplied
+     * struct straight through, so a COMMAND >= SDHC_CMD_MAX read past the table
+     * (undefined behaviour, garbage XFERTYP driven into the hardware).
+     * Return a non-zero error instead; every caller treats non-zero as failure. */
+    if (NULL == command || command->COMMAND >= SDHC_CMD_MAX)
+    {
+        return ESDHC_CMD_INVALID;
+    }
 
     /*check command*/
     xfertyp = ESDHC_COMMAND_XFERTYP[command->COMMAND];
 
-    ASSERT(~0 != xfertyp); // the assertion is that a valid CMD and xfertyp cannot be~0
+    /* ~0 marks an unsupported/reserved slot in the table -- reject it in
+     * release builds too, not just via ASSERT. */
+    if (~0U == xfertyp)
+    {
+        return ESDHC_CMD_INVALID;
+    }
 
     /* prepare to check the card insertion and removal status */
     SDHC_IRQSTAT |= SDHC_IRQSTAT_CRM_MASK;
 
     /* waiting for CMD line to be idle */
-    while (SDHC_PRSSTAT & SDHC_PRSSTAT_CIHB_MASK)
-    {
-    };
+    SDHC_SPIN_WHILE(SDHC_PRSSTAT & SDHC_PRSSTAT_CIHB_MASK); /* bounded: CMD line idle */
 
     /* set command */
     SDHC_CMDARG = command->ARGUMENT;
@@ -655,9 +661,8 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr)
         {
             /* 80 clocks to update levels */
             SDHC_SYSCTL |= SDHC_SYSCTL_INITA_MASK;
-            while (SDHC_SYSCTL & SDHC_SYSCTL_INITA_MASK)
-            {
-            };
+            /* bounded: 80 clocks to update levels */
+            SDHC_SPIN_WHILE(SDHC_SYSCTL & SDHC_SYSCTL_INITA_MASK);
 
             /* Update and return actual card status */
             if (SDHC_IRQSTAT & SDHC_IRQSTAT_CRM_MASK)

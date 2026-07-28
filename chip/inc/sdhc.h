@@ -189,9 +189,40 @@ typedef struct
 } SDCARD_t, *pSDCARD_t;
 
 #define SDHC_is_running() (0 != (SDHC_PRSSTAT & (SDHC_PRSSTAT_RTA_MASK | SDHC_PRSSTAT_WTA_MASK | SDHC_PRSSTAT_DLA_MASK | SDHC_PRSSTAT_CDIHB_MASK | SDHC_PRSSTAT_CIHB_MASK)))
-#define SDHC_STATUS_WAIT(MASK)         \
-  while (0 == (SDHC_IRQSTAT & (MASK))) \
-    ;
+/* Maximum spin iterations for SDHC hardware waits (command response, reset
+ * self-clear, clock stable, inhibit bits...).  Bounds every busy-wait so a
+ * missing / unpowered / faulty SD card cannot hang the CPU forever -- the boot
+ * path loads a BMP from SD, and an unbounded wait there wedges startup and
+ * trips the watchdog into a reboot loop.  At 120 MHz this is tens of ms, well
+ * beyond any normal SDHC response time. */
+#define SDHC_WAIT_TIMEOUT (1000000UL)
+
+/* Bounded wait for one of the IRQSTAT flags in MASK.  On timeout it simply
+ * falls through: callers re-test the flags with SDHC_STATUS_GET() and report
+ * an error (e.g. ESDHC_CMD_TIMEOUT) instead of dead-locking. */
+#define SDHC_STATUS_WAIT(MASK)             \
+  do                                       \
+  {                                        \
+    uint32 _sdhc_to = SDHC_WAIT_TIMEOUT;   \
+    while (0 == (SDHC_IRQSTAT & (MASK)))   \
+    {                                      \
+      if (--_sdhc_to == 0)                 \
+        break;                             \
+    }                                      \
+  } while (0)
+
+/* Bounded register-bit spin helper for the raw SDHC waits in sdhc.c.
+ * COND is the "keep waiting while true" expression. */
+#define SDHC_SPIN_WHILE(COND)              \
+  do                                       \
+  {                                        \
+    uint32 _sdhc_to = SDHC_WAIT_TIMEOUT;   \
+    while (COND)                           \
+    {                                      \
+      if (--_sdhc_to == 0)                 \
+        break;                             \
+    }                                      \
+  } while (0)
 #define SDHC_STATUS_GET(MASK) (SDHC_IRQSTAT & (MASK))
 
 extern SDCARD_t SDHC_card;
