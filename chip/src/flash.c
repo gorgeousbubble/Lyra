@@ -171,7 +171,14 @@ __RAMFUNC uint8 Flash_Write_Buff(uint16 sector_num, uint16 offset, uint16 cnt, u
   // sector (offset + cnt must be <= FLASH_SECTOR_SIZE). The old check only
   // tested 'offset > FLASH_SECTOR_SIZE', so a large cnt silently spilled into
   // the next sector.
-  if (offset % FLASH_ALIGN_ADDR != 0 || (uint32)offset + cnt > FLASH_SECTOR_SIZE)
+  //
+  // Also require cnt to be a multiple of FLASH_ALIGN_ADDR (8): the FTFE
+  // programs one 8-byte phrase per iteration and the loop always reads a full
+  // 8 bytes (two uint32) from buf. A cnt that is not a multiple of 8 makes the
+  // final iteration over-read the caller's buffer by up to 7 bytes and program
+  // that garbage tail into Flash.
+  if (offset % FLASH_ALIGN_ADDR != 0 || cnt % FLASH_ALIGN_ADDR != 0 ||
+      (uint32)offset + cnt > FLASH_SECTOR_SIZE)
   {
     return 0;
   }
