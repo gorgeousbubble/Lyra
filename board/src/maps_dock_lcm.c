@@ -195,6 +195,14 @@ void MAPS_Dock_LCM_Init(void)
  */
 static inline void MAPS_Dock_LCM_Set_Pos(uint8 x, uint8 y)
 {
+  // Clamp the page to the valid range 0..GUI_LCM_PAGE-1. The string helpers
+  // wrap with "x = 0; y++" without bounding y, so a long enough string can
+  // push y past 7. The page-address command is (0xB0 | y); a y of 8+ produces
+  // 0xB8 or higher, which falls outside the controller's 0xB0..0xB7 page
+  // opcode range and corrupts the command. Clamping keeps the opcode valid.
+  if (y >= GUI_LCM_PAGE)
+    y = GUI_LCM_PAGE - 1;
+
   LCM_Write_CMD(0xB0 | y);                 // Write Page
   LCM_Write_CMD(0x10 | ((x & 0xf0) >> 4)); // High Address
   LCM_Write_CMD(0x00 | (x & 0x0f));        // Low address
