@@ -64,6 +64,14 @@ uint32 I2C_Init(I2C_I2Cn I2C_I2Cx, uint32 I2C_Baud)
     I2C_Mult = 2; // Bus/4
   }
 
+  // Reject a zero baud rate: the divisor below is (1<<I2C_Mult)*I2C_Baud, so
+  // I2C_Baud==0 divides by zero and faults. Return 0 (an impossible real baud)
+  // so the caller can detect the bad request.
+  if (I2C_Baud == 0)
+  {
+    return 0;
+  }
+
   I2C_SCL_Div = (MK64_Bus_KHz * 1000) / ((1 << I2C_Mult) * I2C_Baud);
 
   // I2C pin reuse

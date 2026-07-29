@@ -44,7 +44,7 @@ uint32 SPI_Init(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, SPI_CFG SPI_cfg, uint32 SP
   uint8 SPI_Fit_Pcssck = 0;
   uint8 SPI_Fit_Cssck = 0;
   uint8 SPI_PreScaler[] = {2, 3, 5, 7};
-  uint32 SPI_Clk = MK64_Bus_KHz * 1000 / SPI_Baud;
+  uint32 SPI_Clk = 0;
   uint32 SPI_Scaler[] = {2, 4, 6, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768};
   uint32 SPI_Tmp = 0;
   uint32 SPI_Fit_Clk = 0;
@@ -52,6 +52,15 @@ uint32 SPI_Init(SPI_SPIn SPI_SPIx, SPI_PCSn SPI_PCSx, SPI_CFG SPI_cfg, uint32 SP
   uint32 SPI_Fit_Pbr = 0;
   uint32 SPI_Min_Diff = ~0;
   uint32 SPI_Diff = 0;
+
+  // Reject a zero baud rate before it reaches the SPI_Clk divisor below.
+  // MK64_Bus_KHz*1000 / SPI_Baud would divide by zero and fault. Return 0
+  // (an impossible real baud) so the caller can detect the bad request.
+  if (SPI_Baud == 0)
+  {
+    return 0;
+  }
+  SPI_Clk = MK64_Bus_KHz * 1000 / SPI_Baud;
 
   // SPI pin reuse (select SPI module)
   switch (SPI_SPIx)
