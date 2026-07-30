@@ -59,6 +59,7 @@ int Lyra_ConfigureAdjust_Clock_Number[6] = {0};                         // Confi
 int Lyra_ConfigureAdjust_Date_Cursor = 0;                               // Configure Adjust date cursor
 int Lyra_ConfigureAdjust_Date_Number[8] = {0};                          // Configure Adjust date number (yyyy:mm:dd)
 int Lyra_ConfigureAdjust_Tense_Format = MAPS_ConfigureAdjust_Tense_24H; // Configure Adjust tense format (64: 24-hour/65: 12-hour)
+int Lyra_ConfigureAdjust_StepGoal_Value = 0;                            // Configure Adjust daily step goal edit value
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -570,6 +571,12 @@ void MAPS_Dock_KEY_Incident(void)
             }
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Tense;
             break;
+          case MAPS_ConfigureAdjust_StepGoal:
+            // read current step goal from flash into the edit value
+            Read_Configure_Adjust_StepGoal_E2PROM_To_Value();
+            Lyra_ConfigureAdjust_StepGoal_Value = (int)Activity_Step_Goal;
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_StepGoal;
+            break;
           default:
             break;
           }
@@ -630,6 +637,26 @@ void MAPS_Dock_KEY_Incident(void)
           Read_Configure_Adjust_Tense_E2PROM_To_Value();
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepGoal)
+        {
+          // save step goal to flash
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // clamp to configurable range
+          if (Lyra_ConfigureAdjust_StepGoal_Value < STEP_GOAL_MIN)
+          {
+            Lyra_ConfigureAdjust_StepGoal_Value = STEP_GOAL_MIN;
+          }
+          if (Lyra_ConfigureAdjust_StepGoal_Value > STEP_GOAL_MAX)
+          {
+            Lyra_ConfigureAdjust_StepGoal_Value = STEP_GOAL_MAX;
+          }
+          // commit to the live value and persist
+          Activity_Step_Goal = (uint32)Lyra_ConfigureAdjust_StepGoal_Value;
+          Write_Configure_Adjust_StepGoal_Value_To_E2PROM();
+          Read_Configure_Adjust_StepGoal_E2PROM_To_Value();
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -685,6 +712,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Tense)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepGoal)
         {
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
@@ -1181,6 +1212,14 @@ void MAPS_Dock_KEY_Incident(void)
           Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
           Animation_Screen_Switch_Vertical_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 0, 0, 5);
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepGoal)
+        {
+          Lyra_ConfigureAdjust_StepGoal_Value -= STEP_GOAL_STEP; // decrease step goal
+          if (Lyra_ConfigureAdjust_StepGoal_Value < STEP_GOAL_MIN)
+          {
+            Lyra_ConfigureAdjust_StepGoal_Value = STEP_GOAL_MIN; // clamp to minimum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1380,6 +1419,14 @@ void MAPS_Dock_KEY_Incident(void)
           Refresh_Dynamic_Animation_Cache(Lyra_Dynamic_Cache, ARRAY_LENGTH(Lyra_Dynamic_Cache), MAPS_Menu_SelectionN[Lyra_Menu_Selection], index);
           Animation_Screen_Switch_Vertical_Scroll_Array(Lyra_Dynamic_Cache[0].coord, Lyra_Dynamic_Cache[0].length, Lyra_Dynamic_Cache[1].coord, Lyra_Dynamic_Cache[1].length, 1, 0, 5);
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepGoal)
+        {
+          Lyra_ConfigureAdjust_StepGoal_Value += STEP_GOAL_STEP; // increase step goal
+          if (Lyra_ConfigureAdjust_StepGoal_Value > STEP_GOAL_MAX)
+          {
+            Lyra_ConfigureAdjust_StepGoal_Value = STEP_GOAL_MAX; // clamp to maximum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1507,6 +1554,10 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Tense_icon_coordinate, LCM_ConfigureAdjust_Tense_icon_coordinate_length);
         }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_StepGoal)
+        {
+          Render_Configure_Adjust_StepGoal_Item(Activity_Step_Goal);
+        }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
@@ -1526,6 +1577,10 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_Tense_Digit(LCM_ConfigureAdjust_Tense_12_icon_coordinate, LCM_ConfigureAdjust_Tense_12_icon_coordinate_length);
         }
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepGoal)
+      {
+        Render_Configure_Adjust_StepGoal_Item((uint32)Lyra_ConfigureAdjust_StepGoal_Value);
       }
       break;
     default:
@@ -1741,6 +1796,10 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
         break;
       case MAPS_ConfigureAdjust_Tense_12H:
         Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Tense_12_icon_coordinate, LCM_ConfigureAdjust_Tense_12_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_StepGoal:
+        Calc_Configure_Adjust_StepGoal_Item((uint8 *)cache, Activity_Step_Goal);
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       default:

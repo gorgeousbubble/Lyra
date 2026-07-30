@@ -126,9 +126,11 @@ void AllInit(void)
  *  Loads:
  *    - Alarm clock list  (Sector 0, Page 0)
  *    - Time-format tense (Sector 1, Page 1, 12H/24H)
+ *    - Daily step goal   (Sector 3, Page 48, uint16)
  */
 void ReadConf(void)
 {
     Read_Alarm_Clock_E2PROM_To_List();
     Read_Configure_Adjust_Tense_E2PROM_To_Value();
+    Read_Configure_Adjust_StepGoal_E2PROM_To_Value();
 }

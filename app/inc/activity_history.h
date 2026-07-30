@@ -50,8 +50,17 @@
  * Date-rollover saves are NOT rate-limited (at most once per day).      */
 #define ACTIVITY_SAVE_THROTTLE_S  300     /* 5 minutes                      */
 
-/* Step goal for progress bar */
-#define ACTIVITY_GOAL_STEPS       10000
+/* Daily step goal.
+ * ACTIVITY_GOAL_STEPS is the factory default. The live value is held in the
+ * runtime variable Activity_Step_Goal, which is user-configurable through the
+ * Configure-Adjust menu and persisted in Flash (Sector 3 / Page 48).
+ * The activity chart and the health score both read Activity_Step_Goal. */
+#define ACTIVITY_GOAL_STEPS       10000   /* factory default */
+#define STEP_GOAL_MIN             1000    /* configurable lower bound */
+#define STEP_GOAL_MAX             50000   /* configurable upper bound (fits uint16) */
+#define STEP_GOAL_STEP            500     /* KEY2/KEY3 increment */
+
+extern uint32 Activity_Step_Goal;         /* live, persisted daily step goal */
 
 typedef struct
 {

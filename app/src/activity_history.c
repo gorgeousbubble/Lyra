@@ -30,6 +30,11 @@ ActivityHistoryState Activity = {
     0       /* last_flash_rtc */
 };
 
+/* Live daily step goal. Initialised to the factory default; overwritten by
+ * Read_Configure_Adjust_StepGoal_E2PROM_To_Value() at boot and by the
+ * Configure-Adjust menu at runtime. */
+uint32 Activity_Step_Goal = ACTIVITY_GOAL_STEPS;
+
 /* -----------------------------------------------------------------------
  * CRC-8/SMBUS (polynomial 0x07, init 0x00, no reflection)
  * Used to detect Flash data corruption on read-back.
@@ -339,10 +344,10 @@ void Render_ActivityHistory(void)
         const int SPACING    = 17;  /* center-to-center spacing */
         const int X_START    = 11;  /* center of first bar */
 
-        /* Draw goal line (dashed) at height corresponding to 10000 steps */
-        if (max_steps >= (uint32)ACTIVITY_GOAL_STEPS)
+        /* Draw goal line (dashed) at height corresponding to the step goal */
+        if (max_steps >= Activity_Step_Goal)
         {
-            int goal_y = Y_BOT - (int)((uint64)ACTIVITY_GOAL_STEPS * BAR_MAX_H / max_steps);
+            int goal_y = Y_BOT - (int)((uint64)Activity_Step_Goal * BAR_MAX_H / max_steps);
             for (int x = 2; x < 126; x += 4)
                 dp(screen, x, goal_y);
         }
@@ -399,7 +404,7 @@ void Render_ActivityHistory(void)
         snprintf(buf, sizeof(buf), "TODAY:%lu", (unsigned long)Activity.today_steps);
         ds6(screen, 0, 57, buf);
 
-        snprintf(buf, sizeof(buf), "/%d", ACTIVITY_GOAL_STEPS);
+        snprintf(buf, sizeof(buf), "/%lu", (unsigned long)Activity_Step_Goal);
         ds6(screen, 72, 57, buf);
     }
     else
@@ -439,9 +444,9 @@ void Render_ActivityHistory(void)
         ds6(screen, 43, 37, "steps");
 
         /* Progress bar toward goal */
-        uint32 pct = (Activity.today_steps >= (uint32)ACTIVITY_GOAL_STEPS)
+        uint32 pct = (Activity.today_steps >= Activity_Step_Goal)
                      ? 100
-                     : (uint32)(Activity.today_steps * 100 / ACTIVITY_GOAL_STEPS);
+                     : (uint32)(Activity.today_steps * 100 / Activity_Step_Goal);
         int bar_w = (int)((uint32)pct * 116 / 100);
 
         dline_h(screen, 46, 6, 122);
@@ -461,7 +466,7 @@ void Render_ActivityHistory(void)
         dline_h(screen, 50, 5, 123);
 
         /* Percentage */
-        snprintf(buf, sizeof(buf), "%lu%%  /%d", (unsigned long)pct, ACTIVITY_GOAL_STEPS);
+        snprintf(buf, sizeof(buf), "%lu%%  /%lu", (unsigned long)pct, (unsigned long)Activity_Step_Goal);
         ds6(screen, 20, 55, buf);
     }
 

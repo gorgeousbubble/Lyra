@@ -14,6 +14,7 @@
 #define __HEALTH_SCORE_H__
 
 #include "common.h"
+#include "activity_history.h"  /* single source of truth for the daily step goal */
 
 /* -----------------------------------------------------------------------
  * Scoring model (total 100 points):
@@ -46,8 +47,9 @@
 #define HS_SLEEP_TARGET_S    (7UL * 3600UL)  /* 7 hours in seconds */
 #define HS_DEEP_TARGET_PCT   25              /* target deep sleep % */
 
-/* Step goal */
-#define HS_STEP_GOAL         10000
+/* Step goal — aliased to the single definition in activity_history.h so the
+ * activity screen and the health score can never drift apart. */
+#define HS_STEP_GOAL         ACTIVITY_GOAL_STEPS
 
 typedef enum
 {

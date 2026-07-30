@@ -10,6 +10,7 @@
  * @date       2025-06-24
  */
 
+#include "activity_history.h"
 #include "animation.h"
 #include "conf.h"
 #include "framebuf.h"
@@ -2056,6 +2057,107 @@ void Read_Configure_Adjust_Tense_E2PROM_To_Value()
 {
   // read tense value from e2prom
   MAPS_Dock_W25Q80_Read_Page(1, 0, &Configure_Adjust_Tense, 1);
+}
+
+/* -----------------------------------------------------------------------
+ * Daily step-goal configuration (Configure-Adjust -> STEP GOAL)
+ *
+ * Unlike the Clock/Date/Tense pages (hand-drawn coordinate art), the step
+ * goal is a free-form number, so it is drawn with the built-in 6x8 font.
+ * The same text bitmap feeds both the static page render and the list
+ * scroll-animation cache. Persisted to W25Q80 Sector 3 / Page 48 as a
+ * 2-byte big-endian uint16 (STEP_GOAL_MAX 50000 fits in 16 bits).
+ * ----------------------------------------------------------------------- */
+
+/* Draw a 6x8 ASCII string into a 128x64 (64 rows x 16 bytes) framebuffer. */
+static void StepGoal_Put_Str(uint8 (*fb)[16], int x, int y, const char *s)
+{
+  for (; *s != '\0'; s++, x += 6)
+  {
+    int c = (uint8)(*s) - 32;
+    if (c < 0 || c >= 96) continue; /* printable ASCII 32..127 only */
+    for (int col = 0; col < 6; col++)
+    {
+      uint8 bits = Oled_FontLib_6x8[c][col];
+      for (int row = 0; row < 8; row++)
+      {
+        if (bits & (0x01 << row))
+        {
+          int px = x + col;
+          int py = y + row;
+          if (px >= 0 && px < 128 && py >= 0 && py < 64)
+            fb[py][px >> 3] |= (0x01 << (7 - (px & 7)));
+        }
+      }
+    }
+  }
+}
+
+/*
+ *  @brief      Calc_Configure_Adjust_StepGoal_Item
+ *  @param      array   128x64 framebuffer (64 rows x 16 bytes) to fill
+ *  @param      goal    step goal value to display
+ *  @since      v1.0
+ */
+void Calc_Configure_Adjust_StepGoal_Item(uint8 *array, uint32 goal)
+{
+  uint8 (*fb)[16] = (uint8 (*)[16])array;
+  char numbuf[12];
+  int len = 0;
+
+  memset(array, 0x00, 64 * 16);
+
+  StepGoal_Put_Str(fb, 34, 6, "STEP GOAL");
+
+  snprintf(numbuf, sizeof(numbuf), "%lu", (unsigned long)goal);
+  while (numbuf[len] != '\0') len++;
+  StepGoal_Put_Str(fb, (128 - len * 6) / 2, 28, numbuf);
+
+  StepGoal_Put_Str(fb, 4, 52, "KEY2:- KEY3:+ OK");
+}
+
+/*
+ *  @brief      Render_Configure_Adjust_StepGoal_Item
+ *  @param      goal    step goal value to display
+ *  @since      v1.0
+ */
+void Render_Configure_Adjust_StepGoal_Item(uint32 goal)
+{
+  Calc_Configure_Adjust_StepGoal_Item((uint8 *)g_fb, goal);
+  Oled_I2C_Draw_Picture_128x64((const uint8 *)g_fb);
+}
+
+/*
+ *  @brief      Write_Configure_Adjust_StepGoal_Value_To_E2PROM
+ *  @since      v1.0
+ */
+void Write_Configure_Adjust_StepGoal_Value_To_E2PROM(void)
+{
+  uint8 buf[2];
+  uint32 g = Activity_Step_Goal;
+  if (g < (uint32)STEP_GOAL_MIN) g = (uint32)STEP_GOAL_MIN;
+  if (g > (uint32)STEP_GOAL_MAX) g = (uint32)STEP_GOAL_MAX;
+  buf[0] = (uint8)(g >> 8);
+  buf[1] = (uint8)(g & 0xFF);
+  /* Dedicated Sector 3 (address 0x3000) / Page 48 - erase then program. */
+  MAPS_Dock_W25Q80_Erase_Block(0x00003000, ERASE_SECTOR_SIZE);
+  MAPS_Dock_W25Q80_Write_Page(48, 0, buf, 2);
+}
+
+/*
+ *  @brief      Read_Configure_Adjust_StepGoal_E2PROM_To_Value
+ *  @since      v1.0
+ */
+void Read_Configure_Adjust_StepGoal_E2PROM_To_Value(void)
+{
+  uint8 buf[2] = {0xFF, 0xFF};
+  uint32 g;
+  MAPS_Dock_W25Q80_Read_Page(48, 0, buf, 2);
+  g = ((uint32)buf[0] << 8) | (uint32)buf[1];
+  /* Erased flash (0xFFFF) or out-of-range -> fall back to factory default. */
+  if (g < (uint32)STEP_GOAL_MIN || g > (uint32)STEP_GOAL_MAX)
+    g = (uint32)ACTIVITY_GOAL_STEPS;
+  Activity_Step_Goal = g;
 }
 
 /*

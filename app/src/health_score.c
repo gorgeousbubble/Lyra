@@ -31,10 +31,10 @@ void HealthScore_Calculate(void)
     /* --- 1. Activity score (0-25): steps / goal, capped at 25 --- */
     uint32 steps = Activity.today_steps;
     uint8 act_score;
-    if (steps >= (uint32)HS_STEP_GOAL)
+    if (steps >= Activity_Step_Goal)
         act_score = HS_WEIGHT_ACTIVITY;
     else
-        act_score = (uint8)((uint32)steps * HS_WEIGHT_ACTIVITY / HS_STEP_GOAL);
+        act_score = (uint8)((uint32)steps * HS_WEIGHT_ACTIVITY / Activity_Step_Goal);
 
     /* --- 2. Sleep duration score (0-15): sleep_s / 7h --- */
     uint8 sdur_score;
