@@ -2173,7 +2173,10 @@ void Read_Configure_Adjust_StepGoal_E2PROM_To_Value(void)
  */
 void Render_Spirit_Level(float pitch, float roll)
 {
-  uint8 screen[64][16] = {0x00}; // 64 rows x 128 columns (bit-packed)
+  /* Use the shared global framebuffer instead of a 1 KB stack local, matching
+   * every other Render_* function (saves 1 KB of stack per call). */
+  #define screen g_fb
+  fb_clear(g_fb);
 
   // --- Constants ---
   const int cx = 44;    // Center X of the bubble area (left half of screen)
@@ -2302,4 +2305,6 @@ void Render_Spirit_Level(float pitch, float roll)
 
   // --- Output to OLED ---
   Oled_I2C_Draw_Picture_128x64((const uint8 *)screen);
+
+  #undef screen  /* release the framebuffer alias; keep it function-local */
 }
