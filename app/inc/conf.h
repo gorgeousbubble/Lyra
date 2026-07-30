@@ -78,7 +78,7 @@ void assert_failed(char *, int);
 /*
 **variate declaration
 */
-extern uint8 Vector_Str[][15];
+extern uint8 Vector_Str[][16];
 
 /*
 **function declaration

@@ -70,7 +70,12 @@ void default_isr(void)
 #endif
 }
 
-uint8 Vector_Str[][15] =
+/* Second dimension is 16, not 15: the longest interrupt names
+ * ("CAN0_Tx_Warning", "CAN0_Rx_Warning", "ENET_1588_Timer") are exactly 15
+ * characters, so a width of 15 dropped their NUL terminator. default_isr()
+ * (DEBUG) passes these rows to MAPS_Dock_LCM_Put_Str_6x8 as C strings, which
+ * then over-read past the row end. 16 leaves room for the terminator. */
+uint8 Vector_Str[][16] =
     {
         /******  Cortex-M4 Processor Exceptions Numbers ***********************************************************************/
         "", // 0
