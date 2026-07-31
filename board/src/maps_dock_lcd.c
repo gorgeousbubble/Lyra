@@ -614,6 +614,16 @@ uint8 MAPS_LCDC_BMP_From_SD(char *file, Site_t Site)
     goto BMP_EXIT_FALSE; // Jump to exit function
   }
 
+  /* Bound the height to the screen. The per-row loops below iterate Height
+   * times and the vertical centering computes (LCDC_SCREEN_PIXEL_Y - Height)/2;
+   * a crafted/corrupt oversize height from untrusted SD header data would make
+   * that offset negative, blit far off-screen and waste a large amount of time.
+   * Width is already bounded above (MAX_BMP_W); bound Height the same way. */
+  if (Height > LCDC_SCREEN_PIXEL_Y)
+  {
+    goto BMP_EXIT_FALSE;
+  }
+
   size.H = 1;
   size.W = Width;
   site.x = Site.x;
