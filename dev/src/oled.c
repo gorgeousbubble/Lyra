@@ -98,7 +98,7 @@ void Oled_Set_Pos(uint8 x, uint8 y)
 {
   Oled_WrCmd(0xb0 + y);
   Oled_WrCmd(((x & 0xf0) >> 4) | 0x10);
-  Oled_WrCmd((x & 0x0f) | 0x01);
+  Oled_WrCmd((x & 0x0f) | 0x00); // low column address base is 0x00 (not 0x01, which shifted even columns right by one)
 }
 
 /*
@@ -114,7 +114,7 @@ void Oled_Fill(uint8 data)
   for (j = 0; j < 8; j++)
   {
     Oled_WrCmd(0xb0 + j);
-    Oled_WrCmd(0x01);
+    Oled_WrCmd(0x00); // low column address base 0x00 (was 0x01, which skipped column 0)
     Oled_WrCmd(0x10);
     for (i = 0; i < OLED_X_WIDTH; i++)
     {
@@ -135,7 +135,7 @@ void Oled_Clean(void)
   for (j = 0; j < 8; j++)
   {
     Oled_WrCmd(0xb0 + j);
-    Oled_WrCmd(0x01);
+    Oled_WrCmd(0x00); // low column address base 0x00 (was 0x01, which skipped column 0)
     Oled_WrCmd(0x10);
     for (i = 0; i < OLED_X_WIDTH; i++)
     {
