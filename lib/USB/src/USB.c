@@ -272,7 +272,18 @@ void USB_StdReq_Handler(void)
             break;
 
         case mSTRING:
-            EP_IN_Transfer(EP0, (uint8 *)String_Table[Setup_Pkt->wValue_l], String_Table[Setup_Pkt->wValue_l][0]);
+            /* wValue_l is a host-supplied string index, but String_Table has
+             * only a fixed number of entries. An out-of-range index reads past
+             * the array and then dereferences the garbage pointer for [0].
+             * Bounds-check it and stall EP0 on an invalid request. */
+            if (Setup_Pkt->wValue_l < (sizeof(String_Table) / sizeof(String_Table[0])))
+            {
+                EP_IN_Transfer(EP0, (uint8 *)String_Table[Setup_Pkt->wValue_l], String_Table[Setup_Pkt->wValue_l][0]);
+            }
+            else
+            {
+                USB_EP0_Stall();
+            }
             break;
 
         default:
