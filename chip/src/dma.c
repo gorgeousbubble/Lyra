@@ -122,7 +122,11 @@ void DMA_PORTX_To_Buff_Init(DMA_CHn DMA_CHx, void *SADDR, void *DADDR, PTXn PTXx
   DMA_NBYTES_MLNO(DMA_CHx) = DMA_NBYTES_MLNO_NBYTES(BYTEs); // bytes transferred per minor loop
 
   DMA_SLAST(DMA_CHx) = 0;
-  DMA_DLAST_SGA(DMA_CHx) = (uint32)((CFG & DADDR_KEEPON) == 0 ? (-Count) : 0);
+  /* After a major loop the destination has advanced by CITER * DOFF =
+   * Count * BYTEs bytes (DOFF was set to BYTEs above). To restore DADDR to the
+   * buffer start, DLAST_SGA must undo that full byte count, not just -Count
+   * (which was only correct for the 1-byte DMA_BYTE1 case). */
+  DMA_DLAST_SGA(DMA_CHx) = (uint32)((CFG & DADDR_KEEPON) == 0 ? (-(Count * BYTEs)) : 0);
 
   DMA_CSR(DMA_CHx) = (0 | DMA_CSR_BWC(3)      // Bandwidth control, the eDMA engine stops for 8 cycles per read (0 does not stop; 1 reserves; 2 stops for 4 cycles; 3 stops for 8 cycles)
                       | DMA_CSR_DREQ_MASK     // Stop hardware requests after the main loop ends
