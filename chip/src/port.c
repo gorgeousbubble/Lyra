@@ -58,9 +58,13 @@ void PORT_Init(PTXn PTXx, uint32 CFG)
     break;
   }
 
-  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));             // clear interrupt flag
-  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) &= ~PORT_PCR_MUX_MASK; // clear the original MUX register value
-  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) |= (0 | CFG);          // reuse of MUX pin function
+  PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx)); // clear interrupt flag (write-1-clear)
+  /* Assign the whole PCR rather than clearing only MUX and OR-ing CFG in. CFG
+   * carries the complete intended configuration (MUX + pull/IRQC/filter/drive
+   * ...); the old read-OR left non-MUX bits from a previous configuration of
+   * the same pin set, so attributes like pull-up/down, IRQC and filter
+   * accumulated across re-inits. A plain write clears all stale fields. */
+  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) = (0 | CFG);
 }
 
 /*
@@ -98,7 +102,10 @@ void PORT_Init_NoALT(PTXn PTXx, uint32 CFG)
   PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));                    // clear interrupt flag
   CFG &= ~PORT_PCR_MUX_MASK;                                                   // clear configuration MUX
   CFG |= (PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) & PORT_PCR_MUX_MASK); // read the original MUX configuration
-  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) |= (0 | CFG);                 // reuse of MUX pin function
+  /* Write the full PCR: CFG now holds the preserved original MUX plus the new
+   * non-MUX attributes, so a plain assignment keeps MUX while clearing stale
+   * pull/IRQC/filter/drive bits (the old OR accumulated them across re-inits). */
+  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) = (0 | CFG);
 }
 
 /*
@@ -133,8 +140,10 @@ void PORT_Init_Exit(PTXn PTXx, uint32 CFG)
     break;
   }
 
-  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) &= ~PORT_PCR_MUX_MASK; // clear the original MUX register value
-  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) |= (0 | ALT1 | CFG);   // reuse of MUX pin function
+  /* Write the full PCR (MUX = ALT1 for the GPIO EXTI pin) instead of clearing
+   * only MUX and OR-ing CFG in, so stale non-MUX bits from a previous config of
+   * the same pin do not persist. */
+  PORT_PCR_REG(PORTX_BASE(PTXx), PORT_PTn(PTXx)) = (0 | ALT1 | CFG);
   GPIO_PDDR_REG(GPIOX_BASE(PTXx)) &= ~(1 << PORT_PTn(PTXx));            // pin set to input mode
   PORT_ISFR_REG(PORTX_BASE(PTXx)) |= (1 << PORT_PTn(PTXx));             // clear interrupt flag
 }
