@@ -161,8 +161,9 @@ void SDHC_init()
  */
 void SDHC_set_baudrate(uint32 baudrate)
 {
-    uint32 pres, div, min, minpres = 0x80, mindiv = 0x0F;
-    int32 val;
+    uint32 pres, div, minpres = 0x80, mindiv = 0x0F;
+    int64  val;                 /* 64-bit: pres*div*baudrate overflows uint32 */
+    uint64 min;
     uint32 clock = SDHC_CLOCK;
 
     /* calculate the optimal configuration */
@@ -170,15 +171,18 @@ void SDHC_set_baudrate(uint32 baudrate)
     // the maximum value of SD clock frequency is 50MHz
     // pre division=2,4,8,16,32,64128256, and SDCLKFS=Pre division>>1;
     // divisor=DVS+1, the value range of DVS is 0~0xF
-    min = (uint32)-1;                       // set min to its maximum value first
+    min = (uint64)-1;                       // set min to its maximum value first
     for (pres = 2; pres <= 256; pres <<= 1) // pres stands for Pre Divider
     {
         for (div = 1; div <= 16; div++) // div stands for Divisor
         {
-            val = pres * div * baudrate - clock;
+            // Compute in 64-bit: pres(<=256)*div(<=16)*baudrate(tens of MHz)
+            // far exceeds uint32, so the old uint32 product wrapped and could
+            // select a wrong divisor.
+            val = (int64)((uint64)pres * (uint64)div * (uint64)baudrate) - (int64)clock;
             if (val >= 0) // the baud rate is greater than or equal to the set target value
             {
-                if (min > val) // choose the one closest to the target value
+                if (min > (uint64)val) // choose the one closest to the target value
                 {
                     min = val;
                     minpres = pres;
