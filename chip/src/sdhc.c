@@ -445,7 +445,7 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr)
                     result = ESDHC_INIT_ERR;
                     break;
                 }
-                if (0xCE == (command.RESPONSE[0] >> 8) & 0xFF)
+                if (0xCE == ((command.RESPONSE[0] >> 8) & 0xFF))
                 {
                     /* CMD39 - Fast IO - check CE-ATA signature AA */
                     command.COMMAND = ESDHC_CMD39;
@@ -458,7 +458,7 @@ ESDHC_IOCTL_ERR_e SDHC_ioctl(ESDHC_IOCTL_CMD_e cmd, void *param_ptr)
                         result = ESDHC_INIT_ERR;
                         break;
                     }
-                    if (0xAA == (command.RESPONSE[0] >> 8) & 0xFF)
+                    if (0xAA == ((command.RESPONSE[0] >> 8) & 0xFF))
                     {
                         mmc = FALSE;
                         ceata = TRUE;
