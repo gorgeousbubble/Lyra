@@ -462,13 +462,18 @@ DRESULT disk_ioctl (
         if (0 == (command.RESPONSE[3] & 0x00C00000))
         {
             //SD V1
-            *(unsigned long *)buff = ((((command.RESPONSE[2] >> 18) & 0x7F) + 1) << (((command.RESPONSE[3] >> 8) & 0x03) - 1));
+            /* The 2-bit field can be 0; subtracting 1 unconditionally gave a
+             * shift of -1 (undefined behaviour). Clamp the shift to >= 0. */
+            uint32 mult  = (command.RESPONSE[3] >> 8) & 0x03;
+            uint32 shift = (mult > 0) ? (mult - 1) : 0;
+            *(unsigned long *)buff = ((((command.RESPONSE[2] >> 18) & 0x7F) + 1) << shift);
         }
         else
         {
-            //SD V2
-            // Implementar
-            //*(uint32*)buff = (((command.RESPONSE[2] >> 18) & 0x7F) << (((command.RESPONSE[3] >> 8) & 0x03) - 1));
+            //SD V2 / SDHC: the erase unit is not derived from the CSD here.
+            //Report 1 sector (no special erase-block alignment) rather than
+            //returning RES_OK with *buff left uninitialised.
+            *(unsigned long *)buff = 1;
         }
         res = RES_OK;
         break;
