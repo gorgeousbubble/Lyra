@@ -294,7 +294,7 @@ extern uint8 gu8Interface;
 */
 extern void USB_EP0_IN_Handler(void);
 extern void EP_IN_Transfer(uint8, uint8 *, uint8);
-extern uint8 EP_OUT_Transfer(uint8, uint8 *);
+extern uint8 EP_OUT_Transfer(uint8, uint8 *, uint8);
 extern void USB_Stall_Handler(void);
 extern void USB_EP0_OUT_Handler(void);
 extern void USB_EP0_Stall(void);

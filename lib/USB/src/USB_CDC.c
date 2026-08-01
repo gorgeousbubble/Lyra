@@ -53,7 +53,7 @@ void CDC_Engine(void)
     if(FLAG_CHK(EP0, gu8USB_Flags))
     {
       FLAG_CLR(EP0, gu8USB_Flags);
-      (void)EP_OUT_Transfer(EP0, (uint8 *)&com_cfg);
+      (void)EP_OUT_Transfer(EP0, (uint8 *)&com_cfg, sizeof(com_cfg));
       EP_IN_Transfer(EP0, 0, 0);
     }
     break;

@@ -182,7 +182,7 @@ void EP_IN_Transfer(uint8 u8EP, uint8 *pu8DataPointer, uint8 u8DataSize)
  *  @brief      Endpoint OUT transmission (OUT is relative to the host)
  *  @since      v1.0
  */
-uint8 EP_OUT_Transfer(uint8 u8EP, uint8 *pu8DataPointer)
+uint8 EP_OUT_Transfer(uint8 u8EP, uint8 *pu8DataPointer, uint8 u8MaxLen)
 {
   uint8 *pu8EPBuffer;
   uint8 u8EPSize;
@@ -193,8 +193,13 @@ uint8 EP_OUT_Transfer(uint8 u8EP, uint8 *pu8DataPointer)
   /* Assign the proper EP buffer */
   pu8EPBuffer = BufferPointer[u8EP];
 
-  /* Copy User buffer to EP buffer */
+  /* Number of bytes the host actually sent (hardware-reported Cnt, up to the
+   * endpoint max packet size). Clamp to the caller's destination size so a
+   * host that sends more than expected cannot overflow the destination
+   * buffer (e.g. the 7-byte com_cfg on a full 64-byte EP0 packet). */
   u8EPSize = tBDTtable[u8EP].Cnt;
+  if (u8EPSize > u8MaxLen)
+    u8EPSize = u8MaxLen;
   u8EP = u8EPSize;
 
   while(u8EPSize--)
