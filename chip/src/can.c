@@ -235,8 +235,6 @@ void CAN_Init(CAN_CANn CAN_CANx, CAN_BAUD_n CAN_BAUD_x, CAN_MODE CAN_MODE_x, CAN
  */
 void CAN_Tx(CAN_CANn CAN_CANx, MB_NUM_n MB_NUM_x, CAN_USR_ID_n CAN_USR_ID_x, uint8 Len, void *Buff)
 {
-  uint32 Word = 0;
-
   ASSERT(Len <= 8);
 
   CAN_CS_REG(CANN[CAN_CANx], MB_NUM_x) = (0 | CAN_CS_CODE(CAN_CS_CODE_TX_INACTIVE) // Write inactive code in the buffer
@@ -254,10 +252,23 @@ void CAN_Tx(CAN_CANn CAN_CANx, MB_NUM_n MB_NUM_x, CAN_USR_ID_n CAN_USR_ID_x, uin
     CAN_ID_REG(CANN[CAN_CANx], MB_NUM_x) = (0 | CAN_ID_PRIO(1) | CAN_ID_STD(CAN_USR_ID_x.ID));
   }
 
-  Word = *(uint32 *)Buff;
-  CAN_WORD0_REG(CANN[CAN_CANx], MB_NUM_x) = SWAP32(Word);
-  Word = *((uint32 *)Buff + 1);
-  CAN_WORD1_REG(CANN[CAN_CANx], MB_NUM_x) = SWAP32(Word);
+  /* Pack only the Len valid bytes into the two 32-bit data words, big-endian
+   * (DATA_BYTE0 in the MSB of WORD0). Byte-wise access avoids both the
+   * over-read of a caller buffer shorter than 8 bytes and the unaligned 32-bit
+   * load of the old *(uint32 *)Buff. */
+  {
+    const uint8 *pb = (const uint8 *)Buff;
+    uint32 w0 = 0, w1 = 0;
+    uint8 i;
+    for (i = 0; i < 4; i++)
+      if (i < Len)
+        w0 |= (uint32)pb[i] << (24 - 8 * i);
+    for (i = 0; i < 4; i++)
+      if ((uint8)(i + 4) < Len)
+        w1 |= (uint32)pb[i + 4] << (24 - 8 * i);
+    CAN_WORD0_REG(CANN[CAN_CANx], MB_NUM_x) = w0;
+    CAN_WORD1_REG(CANN[CAN_CANx], MB_NUM_x) = w1;
+  }
 
   // Start send
   CAN_CS_REG(CANN[CAN_CANx], MB_NUM_x) = (0 | CAN_CS_CODE(CAN_CS_CODE_TX_DATA) | CAN_CS_DLC(Len));
@@ -382,7 +393,6 @@ void CAN_RxBuff_Mask(CAN_CANn CAN_CANx, MB_NUM_n MB_NUM_x, uint32 Mask, uint8 Is
 void CAN_Rx(CAN_CANn CAN_CANx, MB_NUM_n MB_NUM_x, CAN_USR_ID_n *CAN_USR_ID_x, uint8 *Len, void *Buff)
 {
   uint8 Lenth = 0;
-  uint32 Word = 0;
 
   *(uint32 *)CAN_USR_ID_x = 0;
 
@@ -415,11 +425,23 @@ void CAN_Rx(CAN_CANn CAN_CANx, MB_NUM_n MB_NUM_x, CAN_USR_ID_n *CAN_USR_ID_x, ui
     CAN_USR_ID_x->RTR = 1;
   }
 
-  Word = CAN_WORD0_REG(CANN[CAN_CANx], MB_NUM_x);
-  *((uint32 *)Buff) = SWAP32(Word);
-
-  Word = CAN_WORD1_REG(CANN[CAN_CANx], MB_NUM_x);
-  *((uint32 *)Buff + 1) = SWAP32(Word);
+  /* Unpack only the Lenth received bytes (DLC), big-endian (DATA_BYTE0 is the
+   * MSB of WORD0), writing byte-wise. This avoids over-writing a caller buffer
+   * shorter than 8 bytes and the unaligned 32-bit store of the old
+   * *(uint32 *)Buff. Lenth is capped at 8 by the loop bounds even if the DLC
+   * field reports a larger value. */
+  {
+    uint8 *pb = (uint8 *)Buff;
+    uint32 w0 = CAN_WORD0_REG(CANN[CAN_CANx], MB_NUM_x);
+    uint32 w1 = CAN_WORD1_REG(CANN[CAN_CANx], MB_NUM_x);
+    uint8 i;
+    for (i = 0; i < 4; i++)
+      if (i < Lenth)
+        pb[i] = (uint8)(w0 >> (24 - 8 * i));
+    for (i = 0; i < 4; i++)
+      if ((uint8)(i + 4) < Lenth)
+        pb[i + 4] = (uint8)(w1 >> (24 - 8 * i));
+  }
 
   *Len = Lenth;
 
