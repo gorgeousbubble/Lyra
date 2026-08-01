@@ -280,8 +280,8 @@ typedef struct _tUSB_Setup
 /*
 **variate declaration
 */
-extern uint8 gu8USB_Flags;
-extern uint8 gu8USB_State;
+extern volatile uint8 gu8USB_Flags;
+extern volatile uint8 gu8USB_State;
 extern tUSB_Setup *Setup_Pkt;
 extern uint8 gu8EP2_IN_ODD_Buffer[];
 extern uint8 gu8EP3_OUT_ODD_Buffer[];

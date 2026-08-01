@@ -92,16 +92,20 @@ const uint8 *String_Table[4] =
 /*
 **USB global variables of interrupt service function
 */
-uint8   gu8USB_Flags;           //the flag bits of data received by each endpoint of USB
-uint8   gu8USBClearFlags;
+/* volatile: these flags/state are written in USB ISR context and read in
+ * main context (e.g. the WAITING_FOR_ENUMERATION spin loop in CDC_Engine and
+ * USB_Enum_Wait). Without volatile the compiler may hoist the load out of the
+ * loop and spin forever even after enumeration completes. */
+volatile uint8   gu8USB_Flags;  //the flag bits of data received by each endpoint of USB
+volatile uint8   gu8USBClearFlags;
 uint8   *pu8IN_DataPointer;     //pointer to USB input data buffer
 uint8   gu8IN_Counter;
-uint8   gu8USB_Toogle_flags;
+volatile uint8   gu8USB_Toogle_flags;
 uint8   gu8Dummy;
 uint16  gu8Status;
 uint8   gu8Interface;
 uint8   gu8HALT_EP;
-uint8   gu8USB_State;
+volatile uint8   gu8USB_State;
 
 tUSB_Setup *Setup_Pkt;          //USB setup packet pointer
 
