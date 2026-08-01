@@ -185,8 +185,13 @@ void DMA_Count_Init(DMA_CHn DMA_CHx, PTXn PTXx, uint32 DMA_Count, PORT_CFG DMA_c
 
   DMA_NBYTES_MLNO(DMA_CHx) = DMA_NBYTES_MLNO_NBYTES(BYTEs); // DMA transfer byte count
 
-  DMA_SLAST(DMA_CHx) = -DMA_Count;     // restore source address
-  DMA_DLAST_SGA(DMA_CHx) = -DMA_Count; // restore destination address
+  /* SOFF and DOFF are 0 (the pulse-count source/dest are fixed dummy
+   * addresses that never advance), so the addresses need no restore after a
+   * major loop. The old -DMA_Count adjustment instead drifted both addresses
+   * by -DMA_Count every major loop, eventually walking them into unintended
+   * memory. Leave them unchanged. */
+  DMA_SLAST(DMA_CHx) = 0;     // no source-address adjustment (SOFF == 0)
+  DMA_DLAST_SGA(DMA_CHx) = 0; // no destination-address adjustment (DOFF == 0)
 
   DMA_CSR(DMA_CHx) = (0 | DMA_CSR_DREQ_MASK   // stop hardware requests after the main loop ends
                       | DMA_CSR_INTMAJOR_MASK // interrupt generated after the main loop ends
