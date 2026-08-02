@@ -32,7 +32,10 @@
 **PIT0: 1ms tick counter, resets every 100ms
 */
 volatile int PIT0_Count = 0;
-char PIT0_Flag = 0; // 100ms cycle flag (0~3 rolling)
+/* ISR-internal rolling counter (0..3); only ever touched inside PIT0_IRQHandler
+ * and not referenced elsewhere, so give it internal linkage instead of leaking
+ * an external symbol. */
+static char PIT0_Flag = 0; // 100ms cycle flag (0~3 rolling)
 
 /*
 **PIT1: 1ms tick counter, resets every 100ms
@@ -41,7 +44,10 @@ char PIT0_Flag = 0; // 100ms cycle flag (0~3 rolling)
 **  >= 100    : 100ms periodic tasks
 */
 volatile int PIT1_Count = 0;
-char PIT1_Flag = 0; // 100ms cycle flag (0~3 rolling)
+/* ISR-internal rolling counter (0..3); only ever touched inside PIT1_IRQHandler
+ * and not referenced elsewhere, so give it internal linkage instead of leaking
+ * an external symbol. */
+static char PIT1_Flag = 0; // 100ms cycle flag (0~3 rolling)
 
 /*
 **ADC convert
