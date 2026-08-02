@@ -374,14 +374,22 @@ void FTM_PWM_Init(FTM_FTMn FTM_FTMx, FTM_CHn FTM_CHx, uint32 FTM_Freq, uint32 FT
   FTM_Mod = (FTM_Clk_Hz >> 16) / FTM_Freq; // FTM-Mod temporary cache, (MOD+1) first set to the maximum value (0xffff+0x1=0x10000, i.e. 2 ^ 16, shifted 16 bits to the right, calculate the value of FTM-PS)
   FTM_Ps = 0;
 
-  while ((FTM_Mod >> FTM_Ps) >= 1) // Find the minimum value of FTM-Ps that satisfies the frequency division condition
+  while ((FTM_Mod >> FTM_Ps) >= 1 && FTM_Ps < 0x07) // find min FTM-Ps, capped at the hardware max (2^7 = 128)
   {
     FTM_Ps++;
   }
 
-  ASSERT(FTM_Ps <= 0x07); // Assumption: FTM-Ps (0~7), the maximum value of FTM-Ps is 0x07. If it exceeds 0x07, the PWM frequency is set too low or the Bus frequency is set too high
+  ASSERT(FTM_Ps <= 0x07); // FTM-Ps (0~7); if the loop hit the cap the frequency is set too low for the current bus clock
 
-  FTM_Mod = (FTM_Clk_Hz >> FTM_Ps) / FTM_Freq; // Calculate the value of FTM-Mod and FTM cycle value
+  /* Compute MOD in 32-bit and clamp to the 16-bit FTM_MOD register range. With
+   * the prescaler capped at 7, a very low FTM_Freq can make this quotient
+   * exceed 0xFFFF; the old uint16 store truncated it, producing a wildly wrong
+   * period. Clamp to 0xFFFF (the lowest achievable frequency) instead. */
+  {
+    uint32 mod = (FTM_Clk_Hz >> FTM_Ps) / FTM_Freq;
+    if (mod > 0xFFFF) mod = 0xFFFF;
+    FTM_Mod = (uint16)mod;
+  }
 
   // EPWM edge alignment modePWM,FTM_Cv / FTM_PRECISON = FTM_Duty / (FTM_Mod + 1)
 
