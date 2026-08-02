@@ -53,10 +53,15 @@ void Common_StartUp(void)
     uint32 *VECTOR_TABLE_P = &__VECTOR_TABLE[0];
     uint32 *VECTOR_RAM_P = &__VECTOR_RAM[0];
 
-    /* Copy interrupt vector table from ROM to RAM */
+    /* Copy interrupt vector table from ROM to RAM.
+     * The table occupies 0x410 BYTES (the .icf sets __code_start__ =
+     * intvec_start + 0x410), i.e. 0x410/4 32-bit entries. The pointers are
+     * uint32*, so the loop must count WORDS: the old bound of 0x410 copied
+     * 0x410 words = 4x too many, over-reading ROM and overwriting ~3 KB of RAM
+     * past __VECTOR_RAM. */
     if (__VECTOR_RAM != __VECTOR_TABLE)
     {
-        for (n = 0; n < 0x410; n++)
+        for (n = 0; n < 0x410 / 4; n++)
             *VECTOR_RAM_P++ = *VECTOR_TABLE_P++;
     }
     /* Specific latest interrupt vector table address __VECTOR_RAM */
