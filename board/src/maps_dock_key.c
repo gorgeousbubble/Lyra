@@ -375,9 +375,15 @@ void MAPS_Dock_KEY_Incident(void)
       int cur  = MAPS_Menu_SelectionN[Lyra_Menu_Selection];
       int prev = (Lyra_Menu_Selection - 1 + MAPS_Menu_Selection_Max) % MAPS_Menu_Selection_Max;
       int pe   = MAPS_Menu_SelectionN[prev];
-      Animation_Screen_Switch_Horizontal_Scroll_Array(
-          menu_scroll_icon[cur].coord, *menu_scroll_icon[cur].len,
-          menu_scroll_icon[pe].coord,  *menu_scroll_icon[pe].len, 0, 0, 5);
+      /* Bounds-check both icon-table indices before use (same guard as the
+       * display path below); skip only the animation if out of range. */
+      if (cur >= 0 && cur < MAPS_Menu_Selection_Max &&
+          pe  >= 0 && pe  < MAPS_Menu_Selection_Max)
+      {
+        Animation_Screen_Switch_Horizontal_Scroll_Array(
+            menu_scroll_icon[cur].coord, *menu_scroll_icon[cur].len,
+            menu_scroll_icon[pe].coord,  *menu_scroll_icon[pe].len, 0, 0, 5);
+      }
       Lyra_Menu_Selection = prev;
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -388,9 +394,15 @@ void MAPS_Dock_KEY_Incident(void)
       int cur  = MAPS_Menu_SelectionN[Lyra_Menu_Selection];
       int next = (Lyra_Menu_Selection + 1) % MAPS_Menu_Selection_Max;
       int ne   = MAPS_Menu_SelectionN[next];
-      Animation_Screen_Switch_Horizontal_Scroll_Array(
-          menu_scroll_icon[cur].coord, *menu_scroll_icon[cur].len,
-          menu_scroll_icon[ne].coord,  *menu_scroll_icon[ne].len, 1, 0, 5);
+      /* Bounds-check both icon-table indices before use (same guard as the
+       * display path below); skip only the animation if out of range. */
+      if (cur >= 0 && cur < MAPS_Menu_Selection_Max &&
+          ne  >= 0 && ne  < MAPS_Menu_Selection_Max)
+      {
+        Animation_Screen_Switch_Horizontal_Scroll_Array(
+            menu_scroll_icon[cur].coord, *menu_scroll_icon[cur].len,
+            menu_scroll_icon[ne].coord,  *menu_scroll_icon[ne].len, 1, 0, 5);
+      }
       Lyra_Menu_Selection = next;
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
