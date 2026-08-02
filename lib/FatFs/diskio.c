@@ -180,7 +180,13 @@ static int rcvr_datablock (uint8   *buff, uint32  btr)
 
     /* Workaround for random bit polling failures - not suitable for IO cards    */
 
-    while(!(SDHC_IRQSTAT & SDHC_IRQSTAT_BRR_MASK));
+    {
+        /* Bounded wait: a stuck/removed card must not hang the CPU here
+         * (previously an unbounded spin, only recoverable by the watchdog). */
+        uint32 to = SDHC_WAIT_TIMEOUT;
+        while (!(SDHC_IRQSTAT & SDHC_IRQSTAT_BRR_MASK))
+            if (--to == 0) return 0;
+    }
     SDHC_IRQSTAT =  SDHC_IRQSTAT_BRR_MASK ;
 
     /* Read data in 4 byte counts */
@@ -196,7 +202,11 @@ static int rcvr_datablock (uint8   *buff, uint32  btr)
                 return 0;
             }
 
-            while (0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_BREN_MASK)) {};
+            {
+                uint32 to = SDHC_WAIT_TIMEOUT;
+                while (0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_BREN_MASK))
+                    if (--to == 0) return 0;
+            }
 
             // little port
             *ptr++ = SDHC_DATPORT;
@@ -302,7 +312,11 @@ static int xmit_datablock (const uint8 *buff, uint32 btr    )
                 SDHC_IRQSTAT |= SDHC_IRQSTAT_DEBE_MASK | SDHC_IRQSTAT_DCE_MASK | SDHC_IRQSTAT_DTOE_MASK | SDHC_IRQSTAT_BWR_MASK;
                 return IO_ERROR;
             }
-            while (0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_BWEN_MASK)) {};
+            {
+                uint32 to = SDHC_WAIT_TIMEOUT;
+                while (0 == (SDHC_PRSSTAT & SDHC_PRSSTAT_BWEN_MASK))
+                    if (--to == 0) return IO_ERROR;
+            }
 
             SDHC_DATPORT = *ptr++;
         }
@@ -372,7 +386,13 @@ DRESULT disk_write (uint8  drv, const uint8  *buff, uint32 sector, uint8  count)
             {
                 count = 0;
             }
-            while((SDHC_IRQSTAT & SDHC_IRQSTAT_TC_MASK)==0);
+            {
+                /* Bounded wait for transfer-complete; fall through on timeout
+                 * so the error-flag check below can run instead of hanging. */
+                uint32 to = SDHC_WAIT_TIMEOUT;
+                while ((SDHC_IRQSTAT & SDHC_IRQSTAT_TC_MASK) == 0)
+                    if (--to == 0) break;
+            }
 
             if (SDHC_IRQSTAT & (SDHC_IRQSTAT_DEBE_MASK | SDHC_IRQSTAT_DCE_MASK | SDHC_IRQSTAT_DTOE_MASK))
             {
