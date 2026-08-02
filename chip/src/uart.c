@@ -202,9 +202,15 @@ void UART_Init(UART_UARTn UART_UARTx, uint32 UART_Baud)
     UART_Sbr = 0x1FFF;
   }
 
-  // BRFA baud rate adjustment value
+  // BRFA baud rate adjustment value (5-bit field, 0..0x1F). When UART_Sbr was
+  // clamped to 0x1FFF above (baud too low for the divider), this difference can
+  // exceed 0x1F and the C4_BRFA macro would silently truncate it. Clamp
+  // explicitly; the old ASSERT only caught this in debug builds.
   UART_Brfa = (UART_SysClk / UART_Baud) - (UART_Sbr * 16);
-  ASSERT(UART_Brfa <= 0x1F);
+  if (UART_Brfa > 0x1F)
+  {
+    UART_Brfa = 0x1F;
+  }
 
   // UART configuration
   UART_Temp = UART_BDH_REG(UARTN[UART_UARTx]) & (~UART_BDH_SBR_MASK);        // Save BDH register and other settings
