@@ -121,14 +121,16 @@ void MAPS_Dock_W25Q80_Read_ID(uint8 *Vender_ID, uint8 *Drive_ID)
  *  @since      v1.0
  *  Sample usage:       MAPS_Dock_W25Q80_Erase_Chip();//W25Q80 chip erase
  */
-void MAPS_Dock_W25Q80_Erase_Chip(void)
+uint8 MAPS_Dock_W25Q80_Erase_Chip(void)
 {
   uint8 CMD = W25Q80_CMD_CHIP_ERASE;
 
   W25Q80_Write_Enable();
   W25Q80_Transfer(&CMD, NULL, 1);
-  /* Poll until erase completes (≤6 s worst case) — no fixed delay needed */
-  MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
+  /* Poll until erase completes (≤6 s worst case) — no fixed delay needed.
+   * Return the busy-wait result (1 = completed, 0 = timed out) so callers can
+   * detect a chip that is still busy instead of proceeding blindly. */
+  return MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
 }
 
 /*
@@ -138,7 +140,7 @@ void MAPS_Dock_W25Q80_Erase_Chip(void)
  *  @since      v1.0
  *  Sample usage:       MAPS_Dock_W25Q80_Erase_Block();//W25Q80 chip sector erase
  */
-void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size)
+uint8 MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size)
 {
   uint8 CMD[4] = {0};
 
@@ -148,7 +150,7 @@ void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size)
   if (Block_Size == 0)
   {
     ASSERT(0);
-    return;
+    return 0; /* invalid size -> report failure */
   }
 
   ASSERT((Address % Block_Size) == 0);
@@ -175,8 +177,9 @@ void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size)
 
   W25Q80_Write_Enable();
   W25Q80_Transfer(&CMD[0], NULL, 4);
-  /* Poll until sector/block erase completes — no fixed delay needed */
-  MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
+  /* Poll until sector/block erase completes — no fixed delay needed.
+   * Return 1 = completed, 0 = timed out so callers can detect a busy chip. */
+  return MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
 }
 
 /*
@@ -188,7 +191,7 @@ void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size)
  *  @since      v1.0
  *  Sample usage:       MAPS_Dock_W25Q80_Write_Page();//W25Q80 writes one page of data
  */
-void MAPS_Dock_W25Q80_Write_Page(uint16 Page_Number, uint8 Byte_Offset, uint8 *Page_Buff, uint8 Page_Buff_Len)
+uint8 MAPS_Dock_W25Q80_Write_Page(uint16 Page_Number, uint8 Byte_Offset, uint8 *Page_Buff, uint8 Page_Buff_Len)
 {
   uint8 Send[4] = {W25Q80_CMD_PAGE_PROGRAM, (Page_Number >> 8), (Page_Number & 0xff), Byte_Offset};
 
@@ -197,8 +200,9 @@ void MAPS_Dock_W25Q80_Write_Page(uint16 Page_Number, uint8 Byte_Offset, uint8 *P
   /* Poll until page-program completes (≤3 ms worst case).
    * The original code had only a fixed DELAY_MS here with NO busy poll, so
    * a subsequent SPI op could talk to a still-busy chip if the delay was
-   * too short.  Polling the BUSY bit is both faster and correct. */
-  MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
+   * too short.  Polling the BUSY bit is both faster and correct.
+   * Return 1 = completed, 0 = timed out so callers can detect a busy chip. */
+  return MAPS_Dock_W25Q80_Wait_Busy(SPI_FLASH_POLL_MAX);
 }
 
 /*

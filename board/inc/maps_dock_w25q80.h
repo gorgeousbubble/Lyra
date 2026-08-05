@@ -78,9 +78,9 @@ typedef struct
 */
 extern void MAPS_Dock_W25Q80_Init(void);
 extern void MAPS_Dock_W25Q80_Read_ID(uint8 *Vender_ID, uint8 *Drive_ID);
-extern void MAPS_Dock_W25Q80_Erase_Chip(void);
-extern void MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size);
-extern void MAPS_Dock_W25Q80_Write_Page(uint16 Page_Number, uint8 Byte_Offset, uint8 *Page_Buff, uint8 Page_Buff_Len);
+extern uint8 MAPS_Dock_W25Q80_Erase_Chip(void);                                                                 /* 1 = completed, 0 = timed out (still busy) */
+extern uint8 MAPS_Dock_W25Q80_Erase_Block(uint32 Address, uint32 Block_Size);                                   /* 1 = completed, 0 = timed out / invalid    */
+extern uint8 MAPS_Dock_W25Q80_Write_Page(uint16 Page_Number, uint8 Byte_Offset, uint8 *Page_Buff, uint8 Page_Buff_Len); /* 1 = completed, 0 = timed out */
 extern void MAPS_Dock_W25Q80_Read_Page(uint16 Page_Number, uint8 Byte_Offset, uint8 *Page_Buff, uint8 Page_Buff_Len);
 
 #endif
