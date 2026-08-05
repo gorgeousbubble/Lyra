@@ -99,6 +99,12 @@ const uint32 ESDHC_COMMAND_XFERTYP[] =
         ~0,
         ~0};
 
+/* Number of entries in the command transfer-type lookup table. Defined here
+ * because sdhc.c does not pull in the ARRAY_LENGTH macro from animation.h. */
+#ifndef ARR_SIZE
+#define ARR_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#endif
+
 #define SDHC_CMD_MAX ARR_SIZE(ESDHC_COMMAND_XFERTYP)
 
 /*
