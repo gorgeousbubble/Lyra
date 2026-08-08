@@ -1568,7 +1568,7 @@ void MAPS_Dock_KEY_Incident(void)
         }
         else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_StepGoal)
         {
-          Render_Configure_Adjust_StepGoal_Item(Activity_Step_Goal);
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_StepGoal_icon_coordinate, LCM_ConfigureAdjust_StepGoal_icon_coordinate_length);
         }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
@@ -1811,7 +1811,7 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       case MAPS_ConfigureAdjust_StepGoal:
-        Calc_Configure_Adjust_StepGoal_Item((uint8 *)cache, Activity_Step_Goal);
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_StepGoal_icon_coordinate, LCM_ConfigureAdjust_StepGoal_icon_coordinate_length);
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       default:
