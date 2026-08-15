@@ -19,6 +19,11 @@
  * dyn_min=MAX, dyn_max=0, threshold=INIT, win_count=0 */
 PedometerState Pedometer = {0, 0, 0, 0xFFFFFFFFUL, 0, STEP_THRESHOLD_INIT, 0};
 
+/* Live stride length (cm). Initialised to the factory default; overwritten by
+ * Read_Configure_Adjust_Stride_E2PROM_To_Value() at boot and by the
+ * Configure-Adjust menu at runtime. */
+uint32 Pedometer_Stride_Cm = STEP_STRIDE_CM;
+
 /* Internal elapsed time accumulator (ms) */
 static uint32 s_elapsed_total_ms = 0;
 
@@ -178,7 +183,7 @@ void Render_Pedometer(void)
     Oled_I2C_Put_Str_6x8(0, 4, "----------------");
 
     // --- Distance at page 5 ---
-    uint32 dist_cm = Pedometer.step_count * (uint32)STEP_STRIDE_CM;
+    uint32 dist_cm = Pedometer.step_count * Pedometer_Stride_Cm;
     uint32 dist_m  = dist_cm / 100;
     uint32 dist_dm = (dist_cm % 100) / 10;
 

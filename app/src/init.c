@@ -133,4 +133,5 @@ void ReadConf(void)
     Read_Alarm_Clock_E2PROM_To_List();
     Read_Configure_Adjust_Tense_E2PROM_To_Value();
     Read_Configure_Adjust_StepGoal_E2PROM_To_Value();
+    Read_Configure_Adjust_Stride_E2PROM_To_Value();
 }

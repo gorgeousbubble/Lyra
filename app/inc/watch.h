@@ -55,6 +55,7 @@ extern const Coord LCM_ConfigureAdjust_Tense_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_Tense_24_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_Tense_12_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_StepGoal_icon_coordinate[];
+extern const Coord LCM_ConfigureAdjust_Stride_icon_coordinate[];
 
 extern const int LCM_Clock_Dial_coordinate_length;
 extern const int LCM_Clock_Digit_coordinate_length;
@@ -79,6 +80,7 @@ extern const int LCM_ConfigureAdjust_Tense_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_Tense_24_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_Tense_12_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_StepGoal_icon_coordinate_length;
+extern const int LCM_ConfigureAdjust_Stride_icon_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time Alarm_Clock_List[ALARM_CLOCK_MAX_LEN]; // Static array (no malloc)
@@ -126,6 +128,11 @@ extern void Calc_Configure_Adjust_StepGoal_Item(uint8 *array, uint32 goal);
 extern void Render_Configure_Adjust_StepGoal_Item(uint32 goal);
 extern void Write_Configure_Adjust_StepGoal_Value_To_E2PROM(void);
 extern void Read_Configure_Adjust_StepGoal_E2PROM_To_Value(void);
+
+extern void Calc_Configure_Adjust_Stride_Item(uint8 *array, uint32 stride);
+extern void Render_Configure_Adjust_Stride_Item(uint32 stride);
+extern void Write_Configure_Adjust_Stride_Value_To_E2PROM(void);
+extern void Read_Configure_Adjust_Stride_E2PROM_To_Value(void);
 extern void Render_Spirit_Level(float pitch, float roll);
 
 #endif

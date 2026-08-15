@@ -57,8 +57,17 @@
 #define STEP_MIN_AMPLITUDE    4000    // Min peak-to-peak magnitude (LSB, ~0.24g) to count
 #define STEP_THRESHOLD_INIT   17000   // Initial magnitude threshold before first adaptation
 
-// Average stride length (cm) – tunable
-#define STEP_STRIDE_CM        65
+// Average stride length (cm).
+// STEP_STRIDE_CM is the factory default. The live value is held in the runtime
+// variable Pedometer_Stride_Cm, which is user-configurable through the
+// Configure-Adjust menu and persisted in Flash (Sector 4 / Page 64).
+// Distance = step_count * Pedometer_Stride_Cm.
+#define STEP_STRIDE_CM        65      /* factory default (cm) */
+#define STRIDE_CM_MIN         30      /* configurable lower bound */
+#define STRIDE_CM_MAX         120     /* configurable upper bound */
+#define STRIDE_CM_STEP        1       /* KEY2/KEY3 increment (cm) */
+
+extern uint32 Pedometer_Stride_Cm;    /* live, persisted stride length (cm) */
 
 // Maximum steps before display overflows (99999)
 #define STEP_MAX_COUNT        99999
