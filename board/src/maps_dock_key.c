@@ -61,6 +61,7 @@ int Lyra_ConfigureAdjust_Date_Number[8] = {0};                          // Confi
 int Lyra_ConfigureAdjust_Tense_Format = MAPS_ConfigureAdjust_Tense_24H; // Configure Adjust tense format (64: 24-hour/65: 12-hour)
 int Lyra_ConfigureAdjust_StepGoal_Value = 0;                            // Configure Adjust daily step goal edit value
 int Lyra_ConfigureAdjust_Stride_Value = 0;                              // Configure Adjust stride length edit value (cm)
+int Lyra_ConfigureAdjust_SleepGoal_Value = 0;                           // Configure Adjust sleep goal edit value (minutes)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -596,6 +597,12 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_Stride_Value = (int)Pedometer_Stride_Cm;
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Stride;
             break;
+          case MAPS_ConfigureAdjust_SleepGoal:
+            // read current sleep goal from flash into the edit value (minutes)
+            Read_Configure_Adjust_SleepGoal_E2PROM_To_Value();
+            Lyra_ConfigureAdjust_SleepGoal_Value = (int)(Health_Sleep_Goal_S / 60);
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_SleepGoal;
+            break;
           default:
             break;
           }
@@ -696,6 +703,26 @@ void MAPS_Dock_KEY_Incident(void)
           Read_Configure_Adjust_Stride_E2PROM_To_Value();
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepGoal)
+        {
+          // save sleep goal to flash
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // clamp to configurable range (minutes)
+          if (Lyra_ConfigureAdjust_SleepGoal_Value < HS_SLEEP_GOAL_MIN_MIN)
+          {
+            Lyra_ConfigureAdjust_SleepGoal_Value = HS_SLEEP_GOAL_MIN_MIN;
+          }
+          if (Lyra_ConfigureAdjust_SleepGoal_Value > HS_SLEEP_GOAL_MAX_MIN)
+          {
+            Lyra_ConfigureAdjust_SleepGoal_Value = HS_SLEEP_GOAL_MAX_MIN;
+          }
+          // commit to the live value (seconds) and persist
+          Health_Sleep_Goal_S = (uint32)Lyra_ConfigureAdjust_SleepGoal_Value * 60;
+          Write_Configure_Adjust_SleepGoal_Value_To_E2PROM();
+          Read_Configure_Adjust_SleepGoal_E2PROM_To_Value();
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -759,6 +786,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Stride)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepGoal)
         {
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
@@ -1271,6 +1302,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_Stride_Value = STRIDE_CM_MIN; // clamp to minimum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepGoal)
+        {
+          Lyra_ConfigureAdjust_SleepGoal_Value -= HS_SLEEP_GOAL_STEP_MIN; // decrease sleep goal
+          if (Lyra_ConfigureAdjust_SleepGoal_Value < HS_SLEEP_GOAL_MIN_MIN)
+          {
+            Lyra_ConfigureAdjust_SleepGoal_Value = HS_SLEEP_GOAL_MIN_MIN; // clamp to minimum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1486,6 +1525,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_Stride_Value = STRIDE_CM_MAX; // clamp to maximum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepGoal)
+        {
+          Lyra_ConfigureAdjust_SleepGoal_Value += HS_SLEEP_GOAL_STEP_MIN; // increase sleep goal
+          if (Lyra_ConfigureAdjust_SleepGoal_Value > HS_SLEEP_GOAL_MAX_MIN)
+          {
+            Lyra_ConfigureAdjust_SleepGoal_Value = HS_SLEEP_GOAL_MAX_MIN; // clamp to maximum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1621,6 +1668,10 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Stride_icon_coordinate, LCM_ConfigureAdjust_Stride_icon_coordinate_length);
         }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_SleepGoal)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_SleepGoal_icon_coordinate, LCM_ConfigureAdjust_SleepGoal_icon_coordinate_length);
+        }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
@@ -1648,6 +1699,10 @@ void MAPS_Dock_KEY_Incident(void)
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Stride)
       {
         Render_Configure_Adjust_Stride_Item((uint32)Lyra_ConfigureAdjust_Stride_Value);
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepGoal)
+      {
+        Render_Configure_Adjust_SleepGoal_Item((uint32)Lyra_ConfigureAdjust_SleepGoal_Value);
       }
       break;
     default:
@@ -1871,6 +1926,10 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
         break;
       case MAPS_ConfigureAdjust_Stride:
         Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Stride_icon_coordinate, LCM_ConfigureAdjust_Stride_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_SleepGoal:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_SleepGoal_icon_coordinate, LCM_ConfigureAdjust_SleepGoal_icon_coordinate_length);
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       default:

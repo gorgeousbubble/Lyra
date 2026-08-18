@@ -120,7 +120,8 @@ typedef enum
   MAPS_ConfigureAdjust_Tense = 3, // Configure Adjust Time Tense
   MAPS_ConfigureAdjust_StepGoal = 4, // Configure Adjust daily step goal
   MAPS_ConfigureAdjust_Stride = 5, // Configure Adjust pedometer stride length
-  MAPS_ConfigureAdjust_Max = 6,   // Maximum Configure Adjust mode
+  MAPS_ConfigureAdjust_SleepGoal = 6, // Configure Adjust sleep duration goal
+  MAPS_ConfigureAdjust_Max = 7,   // Maximum Configure Adjust mode
 } MAPS_ConfigureAdjust_Mode;
 
 typedef enum

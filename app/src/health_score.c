@@ -23,6 +23,11 @@
  * ----------------------------------------------------------------------- */
 HealthScoreResult HealthScore = {0};
 
+/* Live sleep-duration goal (seconds). Initialised to the factory default;
+ * overwritten by Read_Configure_Adjust_SleepGoal_E2PROM_To_Value() at boot and
+ * by the Configure-Adjust menu at runtime. */
+uint32 Health_Sleep_Goal_S = HS_SLEEP_TARGET_S;
+
 /* -----------------------------------------------------------------------
  * HealthScore_Calculate
  * ----------------------------------------------------------------------- */
@@ -39,10 +44,10 @@ void HealthScore_Calculate(void)
     /* --- 2. Sleep duration score (0-15): sleep_s / 7h --- */
     uint8 sdur_score;
     uint32 sleep_s = SleepMon.total_sleep_s;
-    if (sleep_s >= HS_SLEEP_TARGET_S)
+    if (sleep_s >= Health_Sleep_Goal_S)
         sdur_score = HS_WEIGHT_SLEEP_DUR;
     else
-        sdur_score = (uint8)((uint64)sleep_s * HS_WEIGHT_SLEEP_DUR / HS_SLEEP_TARGET_S);
+        sdur_score = (uint8)((uint64)sleep_s * HS_WEIGHT_SLEEP_DUR / Health_Sleep_Goal_S);
 
     /* --- 3. Sleep quality score (0-30): deep_sleep% vs 25% target --- */
     uint8 squa_score;

@@ -43,9 +43,19 @@
 #define HS_HR_LOW    60
 #define HS_HR_HIGH  100
 
-/* Sleep targets */
-#define HS_SLEEP_TARGET_S    (7UL * 3600UL)  /* 7 hours in seconds */
+/* Sleep targets.
+ * HS_SLEEP_TARGET_S is the factory default. The live value is held in the
+ * runtime variable Health_Sleep_Goal_S (seconds), which is user-configurable
+ * through the Configure-Adjust menu and persisted in Flash (Sector 5 / Page 80).
+ * The editor works in minutes (30-min steps); the sleep-duration score reads
+ * Health_Sleep_Goal_S. */
+#define HS_SLEEP_TARGET_S    (7UL * 3600UL)  /* factory default: 7 hours in seconds */
+#define HS_SLEEP_GOAL_MIN_MIN   240          /* 4.0 h  (minutes) configurable lower bound */
+#define HS_SLEEP_GOAL_MAX_MIN   720          /* 12.0 h (minutes) configurable upper bound */
+#define HS_SLEEP_GOAL_STEP_MIN   30          /* 0.5 h  (minutes) KEY2/KEY3 increment */
 #define HS_DEEP_TARGET_PCT   25              /* target deep sleep % */
+
+extern uint32 Health_Sleep_Goal_S;           /* live, persisted sleep goal (seconds) */
 
 /* Step goal — aliased to the single definition in activity_history.h so the
  * activity screen and the health score can never drift apart. */
