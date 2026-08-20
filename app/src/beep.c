@@ -13,6 +13,10 @@
 #include "beep.h"
 #include "gpio.h"
 
+/* Global buzzer mute flag (0 = sound on, 1 = muted). Overwritten at boot by
+ * Read_Configure_Adjust_Sound_E2PROM_To_Value() and by the Configure menu. */
+uint8 Beep_Muted = 0;
+
 /*
 ** @brief      Beep Initialization
 ** @since      v1.0
@@ -29,6 +33,12 @@ void Beep_Init(void)
 */
 void Beep_On(void)
 {
+    // When globally muted, keep the buzzer off regardless of caller.
+    if (Beep_Muted)
+    {
+        BEEP_SET_L;
+        return;
+    }
     // Set the beep GPIO pin high
     BEEP_SET_H;
 }

@@ -135,4 +135,6 @@ void ReadConf(void)
     Read_Configure_Adjust_StepGoal_E2PROM_To_Value();
     Read_Configure_Adjust_Stride_E2PROM_To_Value();
     Read_Configure_Adjust_SleepGoal_E2PROM_To_Value();
+    Read_Configure_Adjust_Sound_E2PROM_To_Value();
+    Read_Configure_Adjust_TiltAngle_E2PROM_To_Value();
 }

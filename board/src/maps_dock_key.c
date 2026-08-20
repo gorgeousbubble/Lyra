@@ -14,6 +14,7 @@
 #include "adc_scope.h"
 #include "alarm.h"
 #include "animation.h"
+#include "beep.h"
 #include "framebuf.h"
 #include "attitude3d.h"
 #include "conf.h"
@@ -62,6 +63,8 @@ int Lyra_ConfigureAdjust_Tense_Format = MAPS_ConfigureAdjust_Tense_24H; // Confi
 int Lyra_ConfigureAdjust_StepGoal_Value = 0;                            // Configure Adjust daily step goal edit value
 int Lyra_ConfigureAdjust_Stride_Value = 0;                              // Configure Adjust stride length edit value (cm)
 int Lyra_ConfigureAdjust_SleepGoal_Value = 0;                           // Configure Adjust sleep goal edit value (minutes)
+int Lyra_ConfigureAdjust_Sound_Value = 1;                               // Configure Adjust sound edit value (1=on, 0=off)
+int Lyra_ConfigureAdjust_TiltAngle_Value = 0;                           // Configure Adjust tilt alarm angle edit value (degrees)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -603,6 +606,18 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_SleepGoal_Value = (int)(Health_Sleep_Goal_S / 60);
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_SleepGoal;
             break;
+          case MAPS_ConfigureAdjust_Sound:
+            // read current sound setting from flash into the edit value (1=on, 0=off)
+            Read_Configure_Adjust_Sound_E2PROM_To_Value();
+            Lyra_ConfigureAdjust_Sound_Value = Beep_Muted ? 0 : 1;
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_Sound;
+            break;
+          case MAPS_ConfigureAdjust_TiltAngle:
+            // read current tilt angle threshold from flash into the edit value (degrees)
+            Read_Configure_Adjust_TiltAngle_E2PROM_To_Value();
+            Lyra_ConfigureAdjust_TiltAngle_Value = (int)(TiltAlarm.threshold + 0.5f);
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_TiltAngle;
+            break;
           default:
             break;
           }
@@ -723,6 +738,37 @@ void MAPS_Dock_KEY_Incident(void)
           Read_Configure_Adjust_SleepGoal_E2PROM_To_Value();
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Sound)
+        {
+          // save sound setting to flash
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // commit to the live mute flag (edit value 1=on -> not muted) and persist
+          Beep_Muted = Lyra_ConfigureAdjust_Sound_Value ? 0 : 1;
+          Write_Configure_Adjust_Sound_Value_To_E2PROM();
+          Read_Configure_Adjust_Sound_E2PROM_To_Value();
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_TiltAngle)
+        {
+          // save tilt alarm angle threshold to flash
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // clamp to configurable range (degrees)
+          if (Lyra_ConfigureAdjust_TiltAngle_Value < (int)TILT_THRESHOLD_MIN)
+          {
+            Lyra_ConfigureAdjust_TiltAngle_Value = (int)TILT_THRESHOLD_MIN;
+          }
+          if (Lyra_ConfigureAdjust_TiltAngle_Value > (int)TILT_THRESHOLD_MAX)
+          {
+            Lyra_ConfigureAdjust_TiltAngle_Value = (int)TILT_THRESHOLD_MAX;
+          }
+          // commit to the live threshold and persist
+          TiltAlarm.threshold = (float)Lyra_ConfigureAdjust_TiltAngle_Value;
+          Write_Configure_Adjust_TiltAngle_Value_To_E2PROM();
+          Read_Configure_Adjust_TiltAngle_E2PROM_To_Value();
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -790,6 +836,14 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepGoal)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Sound)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_TiltAngle)
         {
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
@@ -1310,6 +1364,18 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_SleepGoal_Value = HS_SLEEP_GOAL_MIN_MIN; // clamp to minimum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Sound)
+        {
+          Lyra_ConfigureAdjust_Sound_Value = 0; // KEY2 -> sound OFF (mute)
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_TiltAngle)
+        {
+          Lyra_ConfigureAdjust_TiltAngle_Value -= (int)TILT_THRESHOLD_STEP; // decrease tilt angle
+          if (Lyra_ConfigureAdjust_TiltAngle_Value < (int)TILT_THRESHOLD_MIN)
+          {
+            Lyra_ConfigureAdjust_TiltAngle_Value = (int)TILT_THRESHOLD_MIN; // clamp to minimum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1533,6 +1599,18 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_SleepGoal_Value = HS_SLEEP_GOAL_MAX_MIN; // clamp to maximum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Sound)
+        {
+          Lyra_ConfigureAdjust_Sound_Value = 1; // KEY3 -> sound ON
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_TiltAngle)
+        {
+          Lyra_ConfigureAdjust_TiltAngle_Value += (int)TILT_THRESHOLD_STEP; // increase tilt angle
+          if (Lyra_ConfigureAdjust_TiltAngle_Value > (int)TILT_THRESHOLD_MAX)
+          {
+            Lyra_ConfigureAdjust_TiltAngle_Value = (int)TILT_THRESHOLD_MAX; // clamp to maximum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1672,6 +1750,14 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_SleepGoal_icon_coordinate, LCM_ConfigureAdjust_SleepGoal_icon_coordinate_length);
         }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_Sound)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_Sound_icon_coordinate, LCM_ConfigureAdjust_Sound_icon_coordinate_length);
+        }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_TiltAngle)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_TiltAngle_icon_coordinate, LCM_ConfigureAdjust_TiltAngle_icon_coordinate_length);
+        }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
@@ -1703,6 +1789,14 @@ void MAPS_Dock_KEY_Incident(void)
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepGoal)
       {
         Render_Configure_Adjust_SleepGoal_Item((uint32)Lyra_ConfigureAdjust_SleepGoal_Value);
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Sound)
+      {
+        Render_Configure_Adjust_Sound_Item((uint32)Lyra_ConfigureAdjust_Sound_Value);
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_TiltAngle)
+      {
+        Render_Configure_Adjust_TiltAngle_Item((uint32)Lyra_ConfigureAdjust_TiltAngle_Value);
       }
       break;
     default:
@@ -1930,6 +2024,14 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
         break;
       case MAPS_ConfigureAdjust_SleepGoal:
         Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_SleepGoal_icon_coordinate, LCM_ConfigureAdjust_SleepGoal_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_Sound:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_Sound_icon_coordinate, LCM_ConfigureAdjust_Sound_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_TiltAngle:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_TiltAngle_icon_coordinate, LCM_ConfigureAdjust_TiltAngle_icon_coordinate_length);
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       default:

@@ -34,6 +34,11 @@
 /*
 **variate declaration
 */
+/* Global buzzer mute flag: 0 = sound enabled, 1 = muted (all beeps suppressed).
+ * User-configurable via the Configure-Adjust menu, persisted in Flash
+ * (Sector 6 / Page 96). Beep_On() honours this flag, so every buzzer source
+ * (alarm, tilt alarm, free-fall) is silenced at once when muted. */
+extern uint8 Beep_Muted;
 
 /*
 **function declaration
