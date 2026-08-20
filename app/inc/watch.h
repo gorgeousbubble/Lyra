@@ -59,6 +59,7 @@ extern const Coord LCM_ConfigureAdjust_Stride_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_SleepGoal_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_Sound_icon_coordinate[];
 extern const Coord LCM_ConfigureAdjust_TiltAngle_icon_coordinate[];
+extern const Coord LCM_ConfigureAdjust_RingTime_icon_coordinate[];
 
 extern const int LCM_Clock_Dial_coordinate_length;
 extern const int LCM_Clock_Digit_coordinate_length;
@@ -87,6 +88,7 @@ extern const int LCM_ConfigureAdjust_Stride_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_SleepGoal_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_Sound_icon_coordinate_length;
 extern const int LCM_ConfigureAdjust_TiltAngle_icon_coordinate_length;
+extern const int LCM_ConfigureAdjust_RingTime_icon_coordinate_length;
 
 extern uint8 Alarm_Clock_Array[16];
 extern Alarm_Clock_Time Alarm_Clock_List[ALARM_CLOCK_MAX_LEN]; // Static array (no malloc)
@@ -154,6 +156,11 @@ extern void Calc_Configure_Adjust_TiltAngle_Item(uint8 *array, uint32 degrees);
 extern void Render_Configure_Adjust_TiltAngle_Item(uint32 degrees);
 extern void Write_Configure_Adjust_TiltAngle_Value_To_E2PROM(void);
 extern void Read_Configure_Adjust_TiltAngle_E2PROM_To_Value(void);
+
+extern void Calc_Configure_Adjust_RingTime_Item(uint8 *array, uint32 seconds);
+extern void Render_Configure_Adjust_RingTime_Item(uint32 seconds);
+extern void Write_Configure_Adjust_RingTime_Value_To_E2PROM(void);
+extern void Read_Configure_Adjust_RingTime_E2PROM_To_Value(void);
 extern void Render_Spirit_Level(float pitch, float roll);
 
 #endif

@@ -38,7 +38,18 @@
 #define ALARM_BEEP_ON_MS        500     /* buzzer on per pulse  (ms) */
 #define ALARM_BEEP_OFF_MS       500     /* buzzer off per pulse (ms) */
 #define ALARM_RING_PERIOD       (ALARM_BEEP_ON_MS + ALARM_BEEP_OFF_MS)
-#define ALARM_RING_DURATION_MS  60000   /* auto-dismiss after 60 s   */
+
+/* Auto-dismiss duration.
+ * ALARM_RING_DURATION_MS is the factory default. The live value is held in the
+ * runtime variable Alarm_Ring_Duration_S (seconds), which is user-configurable
+ * through the Configure-Adjust menu and persisted in Flash (Sector 8 / Page 128).
+ * Alarm_Tick() auto-dismisses once ring_elapsed_ms reaches this many seconds. */
+#define ALARM_RING_DURATION_MS  60000   /* factory default: auto-dismiss after 60 s */
+#define ALARM_RING_MIN_S        15      /* configurable lower bound (seconds) */
+#define ALARM_RING_MAX_S        300     /* configurable upper bound (seconds) */
+#define ALARM_RING_STEP_S       15      /* KEY2/KEY3 increment (seconds) */
+
+extern uint32 Alarm_Ring_Duration_S;    /* live, persisted ring duration (seconds) */
 
 /* -----------------------------------------------------------------------
  * State

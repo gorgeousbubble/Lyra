@@ -129,6 +129,7 @@ MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max] =
     MAPS_ConfigureAdjust_SleepGoal,
     MAPS_ConfigureAdjust_Sound,
     MAPS_ConfigureAdjust_TiltAngle,
+    MAPS_ConfigureAdjust_RingTime,
 };
 
 /*

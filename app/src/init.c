@@ -137,4 +137,5 @@ void ReadConf(void)
     Read_Configure_Adjust_SleepGoal_E2PROM_To_Value();
     Read_Configure_Adjust_Sound_E2PROM_To_Value();
     Read_Configure_Adjust_TiltAngle_E2PROM_To_Value();
+    Read_Configure_Adjust_RingTime_E2PROM_To_Value();
 }

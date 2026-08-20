@@ -25,6 +25,11 @@ AlarmState Alarm = {
     -1   /* last_checked_minute */
 };
 
+/* Live auto-dismiss duration (seconds). Initialised to the factory default;
+ * overwritten by Read_Configure_Adjust_RingTime_E2PROM_To_Value() at boot and
+ * by the Configure-Adjust menu at runtime. */
+uint32 Alarm_Ring_Duration_S = ALARM_RING_DURATION_MS / 1000;
+
 /* -----------------------------------------------------------------------
  * Internal helpers
  * ----------------------------------------------------------------------- */
@@ -96,8 +101,8 @@ void Alarm_Tick(int rtc_hour, int rtc_minute)
         else
             Beep_Off();
 
-        /* Auto-dismiss after maximum ring duration */
-        if (Alarm.ring_elapsed_ms >= ALARM_RING_DURATION_MS)
+        /* Auto-dismiss after the configured ring duration */
+        if (Alarm.ring_elapsed_ms >= Alarm_Ring_Duration_S * 1000UL)
             stop_ring();
 
         return; /* Do not start a second alarm while one is already ringing */

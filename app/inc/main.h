@@ -123,7 +123,8 @@ typedef enum
   MAPS_ConfigureAdjust_SleepGoal = 6, // Configure Adjust sleep duration goal
   MAPS_ConfigureAdjust_Sound = 7, // Configure Adjust buzzer sound on/off
   MAPS_ConfigureAdjust_TiltAngle = 8, // Configure Adjust tilt alarm angle threshold
-  MAPS_ConfigureAdjust_Max = 9,   // Maximum Configure Adjust mode
+  MAPS_ConfigureAdjust_RingTime = 9, // Configure Adjust alarm auto-dismiss duration
+  MAPS_ConfigureAdjust_Max = 10,  // Maximum Configure Adjust mode
 } MAPS_ConfigureAdjust_Mode;
 
 typedef enum
