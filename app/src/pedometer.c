@@ -24,6 +24,11 @@ PedometerState Pedometer = {0, 0, 0, 0xFFFFFFFFUL, 0, STEP_THRESHOLD_INIT, 0};
  * Configure-Adjust menu at runtime. */
 uint32 Pedometer_Stride_Cm = STEP_STRIDE_CM;
 
+/* Live step debounce interval (ms). Initialised to the factory default;
+ * overwritten by Read_Configure_Adjust_StepSens_E2PROM_To_Value() at boot and
+ * by the Configure-Adjust menu at runtime. */
+uint32 Pedometer_Min_Interval_Ms = STEP_MIN_INTERVAL_MS;
+
 /* Internal elapsed time accumulator (ms) */
 static uint32 s_elapsed_total_ms = 0;
 
@@ -92,7 +97,7 @@ void Pedometer_Update(int16 ax, int16 ay, int16 az, uint32 elapsed_ms)
         if (!Pedometer.above_threshold)
         {
             uint32 dt = s_elapsed_total_ms - Pedometer.last_step_ms;
-            if (dt >= STEP_MIN_INTERVAL_MS)
+            if (dt >= Pedometer_Min_Interval_Ms)
             {
                 if (Pedometer.step_count < STEP_MAX_COUNT)
                     Pedometer.step_count++;

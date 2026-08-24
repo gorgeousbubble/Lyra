@@ -66,6 +66,7 @@ int Lyra_ConfigureAdjust_SleepGoal_Value = 0;                           // Confi
 int Lyra_ConfigureAdjust_Sound_Value = 1;                               // Configure Adjust sound edit value (1=on, 0=off)
 int Lyra_ConfigureAdjust_TiltAngle_Value = 0;                           // Configure Adjust tilt alarm angle edit value (degrees)
 int Lyra_ConfigureAdjust_RingTime_Value = 0;                            // Configure Adjust alarm ring duration edit value (seconds)
+int Lyra_ConfigureAdjust_StepSens_Value = 0;                            // Configure Adjust step debounce interval edit value (ms)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -625,6 +626,12 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_RingTime_Value = (int)Alarm_Ring_Duration_S;
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_RingTime;
             break;
+          case MAPS_ConfigureAdjust_StepSens:
+            // read current step debounce interval from flash into the edit value (ms)
+            Read_Configure_Adjust_StepSens_E2PROM_To_Value();
+            Lyra_ConfigureAdjust_StepSens_Value = (int)Pedometer_Min_Interval_Ms;
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_StepSens;
+            break;
           default:
             break;
           }
@@ -796,6 +803,26 @@ void MAPS_Dock_KEY_Incident(void)
           Read_Configure_Adjust_RingTime_E2PROM_To_Value();
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepSens)
+        {
+          // save step debounce interval to flash
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // clamp to configurable range (ms)
+          if (Lyra_ConfigureAdjust_StepSens_Value < STEP_INTERVAL_MIN_MS)
+          {
+            Lyra_ConfigureAdjust_StepSens_Value = STEP_INTERVAL_MIN_MS;
+          }
+          if (Lyra_ConfigureAdjust_StepSens_Value > STEP_INTERVAL_MAX_MS)
+          {
+            Lyra_ConfigureAdjust_StepSens_Value = STEP_INTERVAL_MAX_MS;
+          }
+          // commit to the live value and persist
+          Pedometer_Min_Interval_Ms = (uint32)Lyra_ConfigureAdjust_StepSens_Value;
+          Write_Configure_Adjust_StepSens_Value_To_E2PROM();
+          Read_Configure_Adjust_StepSens_E2PROM_To_Value();
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -875,6 +902,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_RingTime)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepSens)
         {
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
@@ -1415,6 +1446,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_RingTime_Value = ALARM_RING_MIN_S; // clamp to minimum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepSens)
+        {
+          Lyra_ConfigureAdjust_StepSens_Value -= STEP_INTERVAL_STEP_MS; // decrease debounce interval
+          if (Lyra_ConfigureAdjust_StepSens_Value < STEP_INTERVAL_MIN_MS)
+          {
+            Lyra_ConfigureAdjust_StepSens_Value = STEP_INTERVAL_MIN_MS; // clamp to minimum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1658,6 +1697,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_RingTime_Value = ALARM_RING_MAX_S; // clamp to maximum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepSens)
+        {
+          Lyra_ConfigureAdjust_StepSens_Value += STEP_INTERVAL_STEP_MS; // increase debounce interval
+          if (Lyra_ConfigureAdjust_StepSens_Value > STEP_INTERVAL_MAX_MS)
+          {
+            Lyra_ConfigureAdjust_StepSens_Value = STEP_INTERVAL_MAX_MS; // clamp to maximum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1809,6 +1856,10 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_RingTime_icon_coordinate, LCM_ConfigureAdjust_RingTime_icon_coordinate_length);
         }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_StepSens)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_StepSens_icon_coordinate, LCM_ConfigureAdjust_StepSens_icon_coordinate_length);
+        }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
@@ -1852,6 +1903,10 @@ void MAPS_Dock_KEY_Incident(void)
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_RingTime)
       {
         Render_Configure_Adjust_RingTime_Item((uint32)Lyra_ConfigureAdjust_RingTime_Value);
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepSens)
+      {
+        Render_Configure_Adjust_StepSens_Item((uint32)Lyra_ConfigureAdjust_StepSens_Value);
       }
       break;
     default:
@@ -2091,6 +2146,10 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
         break;
       case MAPS_ConfigureAdjust_RingTime:
         Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_RingTime_icon_coordinate, LCM_ConfigureAdjust_RingTime_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_StepSens:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_StepSens_icon_coordinate, LCM_ConfigureAdjust_StepSens_icon_coordinate_length);
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       default:

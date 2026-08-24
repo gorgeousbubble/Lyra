@@ -37,7 +37,17 @@
 // 1.2g motion:  mag ≈ 19660 → mag_sq ≈ 386,516,0 (above rest, triggered by step)
 #define STEP_THRESHOLD        19660UL   // ~1.2g in LSB — initial/fallback threshold
 #define STEP_THRESHOLD_SQ     (19660ULL * 19660ULL)  // Pre-squared (legacy)
-#define STEP_MIN_INTERVAL_MS  300     // Minimum ms between two steps (max ~200 steps/min)
+// Step debounce interval (minimum ms between two counted steps).
+// STEP_MIN_INTERVAL_MS is the factory default. The live value is held in the
+// runtime variable Pedometer_Min_Interval_Ms, which is user-configurable through
+// the Configure-Adjust menu and persisted in Flash (Sector 9 / Page 144).
+// Lower it for fast running, raise it for a slow walk / to reject vibration.
+#define STEP_MIN_INTERVAL_MS  300     // factory default: max ~200 steps/min
+#define STEP_INTERVAL_MIN_MS  150     // configurable lower bound (fast running)
+#define STEP_INTERVAL_MAX_MS  600     // configurable upper bound (slow walk)
+#define STEP_INTERVAL_STEP_MS  25     // KEY2/KEY3 increment (ms)
+
+extern uint32 Pedometer_Min_Interval_Ms;  // live, persisted step debounce interval
 
 /* -----------------------------------------------------------------------
  * Adaptive threshold parameters
