@@ -32,6 +32,34 @@ static uint32 isqrt32(uint32 n)
     return x;
 }
 
+/* -----------------------------------------------------------------------
+ * Detection sensitivity
+ *
+ * Live level and the two thresholds derived from it. Initialised to the
+ * factory default; overwritten by Read_Configure_Adjust_FallSens_E2PROM_To_Value()
+ * at boot and by the Configure-Adjust menu at runtime.
+ * ----------------------------------------------------------------------- */
+uint8  FF_Sensitivity        = FF_SENS_DEFAULT;
+uint32 FF_Freefall_Thresh_Sq = FF_FREEFALL_THRESHOLD_SQ;
+uint32 FF_Impact_Thresh_Sq   = FF_IMPACT_THRESHOLD_SQ;
+
+void FreeFall_Apply_Sensitivity(uint8 level)
+{
+    /* (free-fall |a|², impact |a|²) pairs, indexed by level.
+     * LOW  : (0.25g)² = 4096²  , (3.0g)² = 49152²
+     * MID  : (0.30g)² = 4915²  , (2.5g)² = 40960²   <- factory default
+     * HIGH : (0.40g)² = 6554²  , (2.0g)² = 32768²   */
+    static const uint32 ff_tbl[3] = {  16777216UL,   24159236UL,   42954916UL };
+    static const uint32 im_tbl[3] = { 2415919104UL, 1677721600UL, 1073741824UL };
+
+    if (level > (uint8)FF_SENS_MAX)
+        level = (uint8)FF_SENS_DEFAULT;
+
+    FF_Sensitivity        = level;
+    FF_Freefall_Thresh_Sq = ff_tbl[level];
+    FF_Impact_Thresh_Sq   = im_tbl[level];
+}
+
 /* Global detector state */
 FreeFallDetector FFDet = {
     FF_STATE_IDLE,
@@ -94,7 +122,7 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
     {
     /* ---- IDLE: watch for free-fall onset ---- */
     case FF_STATE_IDLE:
-        if (mag_sq64 < (uint64)FF_FREEFALL_THRESHOLD_SQ)
+        if (mag_sq64 < (uint64)FF_Freefall_Thresh_Sq)
         {
             /* Enter FALLING: start a fresh relative duration counter.
              * No absolute timestamp needed — avoids uint32 wrap-around. */
@@ -105,7 +133,7 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
 
     /* ---- FALLING: confirm minimum duration then log event ---- */
     case FF_STATE_FALLING:
-        if (mag_sq64 < (uint64)FF_FREEFALL_THRESHOLD_SQ)
+        if (mag_sq64 < (uint64)FF_Freefall_Thresh_Sq)
         {
             /* Still below threshold — accumulate duration */
             FFDet.fall_duration_ms += FF_CALL_INTERVAL_MS;
@@ -158,7 +186,7 @@ void FreeFall_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
             FFDet.impact_peak_sq = clamped;
         }
 
-        if (mag_sq64 >= (uint64)FF_IMPACT_THRESHOLD_SQ)
+        if (mag_sq64 >= (uint64)FF_Impact_Thresh_Sq)
         {
             /* Impact detected: compute peak in g */
             uint32 peak_lsb = isqrt32(FFDet.impact_peak_sq);

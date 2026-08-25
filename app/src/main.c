@@ -132,6 +132,7 @@ MAPS_ConfigureAdjust_Mode MAPS_ConfigureAdjust_ModeN[MAPS_ConfigureAdjust_Max] =
     MAPS_ConfigureAdjust_RingTime,
     MAPS_ConfigureAdjust_StepSens,
     MAPS_ConfigureAdjust_HrRange,
+    MAPS_ConfigureAdjust_FallSens,
 };
 
 /*

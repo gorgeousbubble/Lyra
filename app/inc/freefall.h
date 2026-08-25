@@ -21,13 +21,42 @@
  * ----------------------------------------------------------------------- */
 
 /* Free-fall: |a|² < (0.3g)² = (0.3 × 16384)² ≈ 24159236 */
-#define FF_FREEFALL_THRESHOLD_SQ   24159236UL   /* (0.3 × 16384)² */
+#define FF_FREEFALL_THRESHOLD_SQ   24159236UL   /* (0.3 × 16384)² — MID default */
 
 /* Free-fall must persist for at least this many ms */
 #define FF_FREEFALL_MIN_MS         80
 
 /* Impact: |a|² > (2.5g)² = (2.5 × 16384)² ≈ 1677721600 */
-#define FF_IMPACT_THRESHOLD_SQ     1677721600UL  /* (2.5 × 16384)² */
+#define FF_IMPACT_THRESHOLD_SQ     1677721600UL  /* (2.5 × 16384)² — MID default */
+
+/* -----------------------------------------------------------------------
+ * Detection sensitivity (user-configurable preset)
+ *
+ * Raw |a|² thresholds are meaningless to a user, so the setting exposes three
+ * presets instead. Each level maps to a (free-fall, impact) threshold pair:
+ *
+ *   LOW  : 0.25g / 3.0g  — hardest to trigger (fewest false alarms)
+ *   MID  : 0.30g / 2.5g  — factory default
+ *   HIGH : 0.40g / 2.0g  — easiest to trigger (most sensitive)
+ *
+ * A higher free-fall threshold and a lower impact threshold both make the
+ * detector fire more readily, so the two move in opposite directions.
+ * The live thresholds are held in FF_Freefall_Thresh_Sq / FF_Impact_Thresh_Sq;
+ * the level itself is persisted in Flash (Sector 11 / Page 176).
+ * ----------------------------------------------------------------------- */
+#define FF_SENS_LOW      0
+#define FF_SENS_MID      1
+#define FF_SENS_HIGH     2
+#define FF_SENS_DEFAULT  FF_SENS_MID
+#define FF_SENS_MAX      FF_SENS_HIGH
+
+extern uint8  FF_Sensitivity;         /* live level: FF_SENS_LOW/MID/HIGH   */
+extern uint32 FF_Freefall_Thresh_Sq;  /* live free-fall threshold (|a|²)    */
+extern uint32 FF_Impact_Thresh_Sq;    /* live impact threshold (|a|²)       */
+
+/* Set FF_Sensitivity and derive the two live thresholds from it.
+ * Out-of-range levels fall back to FF_SENS_DEFAULT. */
+extern void FreeFall_Apply_Sensitivity(uint8 level);
 
 /* Beep duration after confirmed free-fall (ms) */
 #define FF_BEEP_DURATION_MS        300
