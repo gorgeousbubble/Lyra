@@ -125,7 +125,8 @@ typedef enum
   MAPS_ConfigureAdjust_TiltAngle = 8, // Configure Adjust tilt alarm angle threshold
   MAPS_ConfigureAdjust_RingTime = 9, // Configure Adjust alarm auto-dismiss duration
   MAPS_ConfigureAdjust_StepSens = 10, // Configure Adjust pedometer step debounce interval
-  MAPS_ConfigureAdjust_Max = 11,  // Maximum Configure Adjust mode
+  MAPS_ConfigureAdjust_HrRange = 11, // Configure Adjust normal heart-rate range
+  MAPS_ConfigureAdjust_Max = 12,  // Maximum Configure Adjust mode
 } MAPS_ConfigureAdjust_Mode;
 
 typedef enum

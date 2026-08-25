@@ -28,6 +28,12 @@ HealthScoreResult HealthScore = {0};
  * by the Configure-Adjust menu at runtime. */
 uint32 Health_Sleep_Goal_S = HS_SLEEP_TARGET_S;
 
+/* Live normal heart-rate range (bpm). Initialised to the factory defaults;
+ * overwritten by Read_Configure_Adjust_HrRange_E2PROM_To_Value() at boot and by
+ * the Configure-Adjust menu at runtime. */
+uint32 Health_Hr_Low  = HS_HR_LOW;
+uint32 Health_Hr_High = HS_HR_HIGH;
+
 /* -----------------------------------------------------------------------
  * HealthScore_Calculate
  * ----------------------------------------------------------------------- */
@@ -72,7 +78,7 @@ void HealthScore_Calculate(void)
         /* No reading yet: give partial credit (sensors may not be worn) */
         hr_score = HS_WEIGHT_HEART / 2;
     }
-    else if (Heart_Rate >= HS_HR_LOW && Heart_Rate <= HS_HR_HIGH)
+    else if (Heart_Rate >= (int32)Health_Hr_Low && Heart_Rate <= (int32)Health_Hr_High)
     {
         /* Normal range: full marks */
         hr_score = HS_WEIGHT_HEART;
@@ -81,10 +87,10 @@ void HealthScore_Calculate(void)
     {
         /* Out of range: proportional penalty */
         int32 dev;
-        if (Heart_Rate < HS_HR_LOW)
-            dev = HS_HR_LOW - (int32)Heart_Rate;     /* below 60 */
+        if (Heart_Rate < (int32)Health_Hr_Low)
+            dev = (int32)Health_Hr_Low - (int32)Heart_Rate;   /* below the low limit  */
         else
-            dev = (int32)Heart_Rate - HS_HR_HIGH;    /* above 100 */
+            dev = (int32)Heart_Rate - (int32)Health_Hr_High;  /* above the high limit */
         /* Proportional penalty: 3 pts per 10 bpm outside the normal range,
          * applied per-bpm (dev*3/10) rather than (dev/10)*3 which truncated
          * so 101-109 bpm (and 51-59) scored full marks like a normal reading. */

@@ -39,9 +39,21 @@
 #define HS_WEIGHT_HEART      15
 #define HS_WEIGHT_SPO2       15
 
-/* Normal heart rate range (bpm) */
+/* Normal heart rate range (bpm).
+ * HS_HR_LOW / HS_HR_HIGH are the factory defaults. The live values are held in
+ * the runtime variables Health_Hr_Low / Health_Hr_High, user-configurable
+ * through the Configure-Adjust menu and persisted in Flash (Sector 10 / Page 160).
+ * The heart-rate score reads the runtime values. */
 #define HS_HR_LOW    60
 #define HS_HR_HIGH  100
+#define HS_HR_LOW_MIN     40   /* configurable lower bound for the low limit  */
+#define HS_HR_LOW_MAX     80   /* configurable upper bound for the low limit  */
+#define HS_HR_HIGH_MIN    90   /* configurable lower bound for the high limit */
+#define HS_HR_HIGH_MAX   140   /* configurable upper bound for the high limit */
+#define HS_HR_STEP         5   /* KEY2 increment (bpm) */
+
+extern uint32 Health_Hr_Low;   /* live, persisted normal-HR lower limit (bpm) */
+extern uint32 Health_Hr_High;  /* live, persisted normal-HR upper limit (bpm) */
 
 /* Sleep targets.
  * HS_SLEEP_TARGET_S is the factory default. The live value is held in the

@@ -67,6 +67,9 @@ int Lyra_ConfigureAdjust_Sound_Value = 1;                               // Confi
 int Lyra_ConfigureAdjust_TiltAngle_Value = 0;                           // Configure Adjust tilt alarm angle edit value (degrees)
 int Lyra_ConfigureAdjust_RingTime_Value = 0;                            // Configure Adjust alarm ring duration edit value (seconds)
 int Lyra_ConfigureAdjust_StepSens_Value = 0;                            // Configure Adjust step debounce interval edit value (ms)
+int Lyra_ConfigureAdjust_HrLow_Value = 0;                               // Configure Adjust normal-HR lower limit edit value (bpm)
+int Lyra_ConfigureAdjust_HrHigh_Value = 0;                              // Configure Adjust normal-HR upper limit edit value (bpm)
+int Lyra_ConfigureAdjust_HrRange_Cursor = 0;                            // Configure Adjust HR range cursor (0=low, 1=high)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -632,6 +635,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_StepSens_Value = (int)Pedometer_Min_Interval_Ms;
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_StepSens;
             break;
+          case MAPS_ConfigureAdjust_HrRange:
+            // read current normal-HR range from flash into the edit values (bpm)
+            Read_Configure_Adjust_HrRange_E2PROM_To_Value();
+            Lyra_ConfigureAdjust_HrLow_Value = (int)Health_Hr_Low;
+            Lyra_ConfigureAdjust_HrHigh_Value = (int)Health_Hr_High;
+            Lyra_ConfigureAdjust_HrRange_Cursor = 0; // start on the LOW limit
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_HrRange;
+            break;
           default:
             break;
           }
@@ -823,6 +834,35 @@ void MAPS_Dock_KEY_Incident(void)
           Read_Configure_Adjust_StepSens_E2PROM_To_Value();
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_HrRange)
+        {
+          // save normal-HR range to flash
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // clamp both limits to their configurable ranges (bpm)
+          if (Lyra_ConfigureAdjust_HrLow_Value < HS_HR_LOW_MIN)
+          {
+            Lyra_ConfigureAdjust_HrLow_Value = HS_HR_LOW_MIN;
+          }
+          if (Lyra_ConfigureAdjust_HrLow_Value > HS_HR_LOW_MAX)
+          {
+            Lyra_ConfigureAdjust_HrLow_Value = HS_HR_LOW_MAX;
+          }
+          if (Lyra_ConfigureAdjust_HrHigh_Value < HS_HR_HIGH_MIN)
+          {
+            Lyra_ConfigureAdjust_HrHigh_Value = HS_HR_HIGH_MIN;
+          }
+          if (Lyra_ConfigureAdjust_HrHigh_Value > HS_HR_HIGH_MAX)
+          {
+            Lyra_ConfigureAdjust_HrHigh_Value = HS_HR_HIGH_MAX;
+          }
+          // commit to the live values and persist
+          Health_Hr_Low = (uint32)Lyra_ConfigureAdjust_HrLow_Value;
+          Health_Hr_High = (uint32)Lyra_ConfigureAdjust_HrHigh_Value;
+          Write_Configure_Adjust_HrRange_Value_To_E2PROM();
+          Read_Configure_Adjust_HrRange_E2PROM_To_Value();
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -906,6 +946,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepSens)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_HrRange)
         {
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
@@ -1454,6 +1498,27 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_StepSens_Value = STEP_INTERVAL_MIN_MS; // clamp to minimum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_HrRange)
+        {
+          // KEY2 steps the selected limit up, wrapping back to its minimum at
+          // the top (same increment-and-wrap behaviour as the clock digits).
+          if (Lyra_ConfigureAdjust_HrRange_Cursor == 0)
+          {
+            Lyra_ConfigureAdjust_HrLow_Value += HS_HR_STEP;
+            if (Lyra_ConfigureAdjust_HrLow_Value > HS_HR_LOW_MAX)
+            {
+              Lyra_ConfigureAdjust_HrLow_Value = HS_HR_LOW_MIN; // wrap to minimum
+            }
+          }
+          else
+          {
+            Lyra_ConfigureAdjust_HrHigh_Value += HS_HR_STEP;
+            if (Lyra_ConfigureAdjust_HrHigh_Value > HS_HR_HIGH_MAX)
+            {
+              Lyra_ConfigureAdjust_HrHigh_Value = HS_HR_HIGH_MIN; // wrap to minimum
+            }
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1705,6 +1770,15 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_StepSens_Value = STEP_INTERVAL_MAX_MS; // clamp to maximum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_HrRange)
+        {
+          // KEY3 selects which limit KEY2 edits (same role as the clock cursor)
+          Lyra_ConfigureAdjust_HrRange_Cursor++;
+          if (Lyra_ConfigureAdjust_HrRange_Cursor >= 2)
+          {
+            Lyra_ConfigureAdjust_HrRange_Cursor = 0; // wrap back to the LOW limit
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1860,6 +1934,10 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_StepSens_icon_coordinate, LCM_ConfigureAdjust_StepSens_icon_coordinate_length);
         }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_HrRange)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_HrRange_icon_coordinate, LCM_ConfigureAdjust_HrRange_icon_coordinate_length);
+        }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
@@ -1907,6 +1985,10 @@ void MAPS_Dock_KEY_Incident(void)
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_StepSens)
       {
         Render_Configure_Adjust_StepSens_Item((uint32)Lyra_ConfigureAdjust_StepSens_Value);
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_HrRange)
+      {
+        Render_Configure_Adjust_HrRange_Item((uint32)Lyra_ConfigureAdjust_HrLow_Value, (uint32)Lyra_ConfigureAdjust_HrHigh_Value, Lyra_ConfigureAdjust_HrRange_Cursor);
       }
       break;
     default:
@@ -2150,6 +2232,10 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
         break;
       case MAPS_ConfigureAdjust_StepSens:
         Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_StepSens_icon_coordinate, LCM_ConfigureAdjust_StepSens_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_HrRange:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_HrRange_icon_coordinate, LCM_ConfigureAdjust_HrRange_icon_coordinate_length);
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       default:
