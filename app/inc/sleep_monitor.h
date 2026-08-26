@@ -24,10 +24,41 @@
  * |a| = sqrt(ax²+ay²+az²); subtract 1g = 16384 LSB.
  * ----------------------------------------------------------------------- */
 
-/* Thresholds for |a|-1g RMS (in LSB units) */
+/* Thresholds for |a|-1g RMS (in LSB units) — MID (factory default) preset */
 #define SLEEP_AWAKE_THRESHOLD    1800   /* RMS > this → AWAKE           */
 #define SLEEP_LIGHT_THRESHOLD     400   /* RMS > this → LIGHT SLEEP     */
 /* RMS ≤ SLEEP_LIGHT_THRESHOLD → DEEP SLEEP                             */
+
+/* -----------------------------------------------------------------------
+ * Detection sensitivity (user-configurable preset)
+ *
+ * Raw RMS thresholds are meaningless to a user, so the setting exposes three
+ * presets instead. Each level maps to an (awake, light) threshold pair:
+ *
+ *   LOW  : 2600 / 600  — least twitchy: needs a lot of motion to count as
+ *                        awake, so light sleep is reported as deep more often
+ *   MID  : 1800 / 400  — factory default
+ *   HIGH : 1200 / 250  — most sensitive: small movements already register as
+ *                        awake / light sleep
+ *
+ * Lowering both thresholds makes the detector react to smaller movements, so
+ * the two move in the same direction (unlike the free-fall pair).
+ * The live thresholds are held in Sleep_Awake_Thresh / Sleep_Light_Thresh;
+ * the level itself is persisted in Flash (Sector 12 / Page 192).
+ * ----------------------------------------------------------------------- */
+#define SLEEP_SENS_LOW      0
+#define SLEEP_SENS_MID      1
+#define SLEEP_SENS_HIGH     2
+#define SLEEP_SENS_DEFAULT  SLEEP_SENS_MID
+#define SLEEP_SENS_MAX      SLEEP_SENS_HIGH
+
+extern uint8  Sleep_Sensitivity;   /* live level: SLEEP_SENS_LOW/MID/HIGH */
+extern uint32 Sleep_Awake_Thresh;  /* live AWAKE RMS threshold            */
+extern uint32 Sleep_Light_Thresh;  /* live LIGHT-sleep RMS threshold      */
+
+/* Set Sleep_Sensitivity and derive the two live thresholds from it.
+ * Out-of-range levels fall back to SLEEP_SENS_DEFAULT. */
+extern void SleepMonitor_Apply_Sensitivity(uint8 level);
 
 /* Window size for RMS calculation: 30 s × 100 Hz = 3000 samples,
    but we accumulate sum-of-squares at 100 Hz and evaluate every 30 s */

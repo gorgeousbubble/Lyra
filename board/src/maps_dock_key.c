@@ -71,6 +71,7 @@ int Lyra_ConfigureAdjust_HrLow_Value = 0;                               // Confi
 int Lyra_ConfigureAdjust_HrHigh_Value = 0;                              // Configure Adjust normal-HR upper limit edit value (bpm)
 int Lyra_ConfigureAdjust_HrRange_Cursor = 0;                            // Configure Adjust HR range cursor (0=low, 1=high)
 int Lyra_ConfigureAdjust_FallSens_Value = 0;                            // Configure Adjust fall sensitivity edit value (0=low,1=mid,2=high)
+int Lyra_ConfigureAdjust_SleepSens_Value = 0;                           // Configure Adjust sleep sensitivity edit value (0=low,1=mid,2=high)
 
 CoordCache Lyra_Dynamic_Cache[2] = {0}; // Dynamic cache
 
@@ -650,6 +651,12 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_FallSens_Value = (int)FF_Sensitivity;
             Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_FallSens;
             break;
+          case MAPS_ConfigureAdjust_SleepSens:
+            // read current sleep sensitivity level from flash into the edit value
+            Read_Configure_Adjust_SleepSens_E2PROM_To_Value();
+            Lyra_ConfigureAdjust_SleepSens_Value = (int)Sleep_Sensitivity;
+            Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_SleepSens;
+            break;
           default:
             break;
           }
@@ -890,6 +897,26 @@ void MAPS_Dock_KEY_Incident(void)
           Read_Configure_Adjust_FallSens_E2PROM_To_Value();
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepSens)
+        {
+          // save sleep detection sensitivity to flash
+          // display waiting icon
+          Oled_I2C_Draw_BMP_128x64(LCM_Wait_icon, OLED_Invert_Color);
+          // clamp to the valid preset range
+          if (Lyra_ConfigureAdjust_SleepSens_Value < SLEEP_SENS_LOW)
+          {
+            Lyra_ConfigureAdjust_SleepSens_Value = SLEEP_SENS_LOW;
+          }
+          if (Lyra_ConfigureAdjust_SleepSens_Value > SLEEP_SENS_MAX)
+          {
+            Lyra_ConfigureAdjust_SleepSens_Value = SLEEP_SENS_MAX;
+          }
+          // apply the preset (derives both live thresholds) and persist
+          SleepMonitor_Apply_Sensitivity((uint8)Lyra_ConfigureAdjust_SleepSens_Value);
+          Write_Configure_Adjust_SleepSens_Value_To_E2PROM();
+          Read_Configure_Adjust_SleepSens_E2PROM_To_Value();
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -981,6 +1008,10 @@ void MAPS_Dock_KEY_Incident(void)
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
         else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_FallSens)
+        {
+          Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
+        }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepSens)
         {
           Lyra_ConfigureAdjust_Mode = MAPS_ConfigureAdjust_List;
         }
@@ -1558,6 +1589,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_FallSens_Value = FF_SENS_LOW; // clamp to minimum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepSens)
+        {
+          Lyra_ConfigureAdjust_SleepSens_Value--; // less sensitive
+          if (Lyra_ConfigureAdjust_SleepSens_Value < SLEEP_SENS_LOW)
+          {
+            Lyra_ConfigureAdjust_SleepSens_Value = SLEEP_SENS_LOW; // clamp to minimum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1826,6 +1865,14 @@ void MAPS_Dock_KEY_Incident(void)
             Lyra_ConfigureAdjust_FallSens_Value = FF_SENS_MAX; // clamp to maximum
           }
         }
+        else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepSens)
+        {
+          Lyra_ConfigureAdjust_SleepSens_Value++; // more sensitive
+          if (Lyra_ConfigureAdjust_SleepSens_Value > SLEEP_SENS_MAX)
+          {
+            Lyra_ConfigureAdjust_SleepSens_Value = SLEEP_SENS_MAX; // clamp to maximum
+          }
+        }
       }
       KEY_ACTION_DONE(100); // Button delay 500ms
     }
@@ -1989,6 +2036,10 @@ void MAPS_Dock_KEY_Incident(void)
         {
           Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_FallSens_icon_coordinate, LCM_ConfigureAdjust_FallSens_icon_coordinate_length);
         }
+        else if (Lyra_ConfigureAdjust_List_Cursor == MAPS_ConfigureAdjust_SleepSens)
+        {
+          Render_Configure_Adjust_List_Mode_Item(LCM_ConfigureAdjust_SleepSens_icon_coordinate, LCM_ConfigureAdjust_SleepSens_icon_coordinate_length);
+        }
       }
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_Clock)
       {
@@ -2044,6 +2095,10 @@ void MAPS_Dock_KEY_Incident(void)
       else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_FallSens)
       {
         Render_Configure_Adjust_FallSens_Item((uint32)Lyra_ConfigureAdjust_FallSens_Value);
+      }
+      else if (Lyra_ConfigureAdjust_Mode == MAPS_ConfigureAdjust_SleepSens)
+      {
+        Render_Configure_Adjust_SleepSens_Item((uint32)Lyra_ConfigureAdjust_SleepSens_Value);
       }
       break;
     default:
@@ -2295,6 +2350,10 @@ void Refresh_Dynamic_Animation_Cache(CoordCache *array, int len, int menu, int i
         break;
       case MAPS_ConfigureAdjust_FallSens:
         Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_FallSens_icon_coordinate, LCM_ConfigureAdjust_FallSens_icon_coordinate_length);
+        Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
+        break;
+      case MAPS_ConfigureAdjust_SleepSens:
+        Calc_Configure_Adjust_List_Mode_Item((uint8 *)cache, LCM_ConfigureAdjust_SleepSens_icon_coordinate, LCM_ConfigureAdjust_SleepSens_icon_coordinate_length);
         Calc_Dynamic_Animation_Cache_Array(&(array[i].coord), &(array[i].length), cache);
         break;
       default:

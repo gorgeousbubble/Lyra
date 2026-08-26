@@ -127,7 +127,8 @@ typedef enum
   MAPS_ConfigureAdjust_StepSens = 10, // Configure Adjust pedometer step debounce interval
   MAPS_ConfigureAdjust_HrRange = 11, // Configure Adjust normal heart-rate range
   MAPS_ConfigureAdjust_FallSens = 12, // Configure Adjust fall detection sensitivity
-  MAPS_ConfigureAdjust_Max = 13,  // Maximum Configure Adjust mode
+  MAPS_ConfigureAdjust_SleepSens = 13, // Configure Adjust sleep detection sensitivity
+  MAPS_ConfigureAdjust_Max = 14,  // Maximum Configure Adjust mode
 } MAPS_ConfigureAdjust_Mode;
 
 typedef enum

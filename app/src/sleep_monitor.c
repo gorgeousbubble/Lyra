@@ -27,6 +27,34 @@ SleepMonitorState SleepMon = {
 };
 
 /* -----------------------------------------------------------------------
+ * Detection sensitivity
+ *
+ * Live level and the two RMS thresholds derived from it. Initialised to the
+ * factory default; overwritten by Read_Configure_Adjust_SleepSens_E2PROM_To_Value()
+ * at boot and by the Configure-Adjust menu at runtime.
+ * ----------------------------------------------------------------------- */
+uint8  Sleep_Sensitivity  = SLEEP_SENS_DEFAULT;
+uint32 Sleep_Awake_Thresh = SLEEP_AWAKE_THRESHOLD;
+uint32 Sleep_Light_Thresh = SLEEP_LIGHT_THRESHOLD;
+
+void SleepMonitor_Apply_Sensitivity(uint8 level)
+{
+    /* (awake RMS, light RMS) pairs, indexed by level.
+     * LOW  : 2600 / 600  — needs more motion before reporting AWAKE
+     * MID  : 1800 / 400  — factory default
+     * HIGH : 1200 / 250  — small movements already register            */
+    static const uint32 awake_tbl[3] = { 2600UL, 1800UL, 1200UL };
+    static const uint32 light_tbl[3] = {  600UL,  400UL,  250UL };
+
+    if (level > (uint8)SLEEP_SENS_MAX)
+        level = (uint8)SLEEP_SENS_DEFAULT;
+
+    Sleep_Sensitivity  = level;
+    Sleep_Awake_Thresh = awake_tbl[level];
+    Sleep_Light_Thresh = light_tbl[level];
+}
+
+/* -----------------------------------------------------------------------
  * Integer square root (Newton's method)
  * Input and working variables are uint64 to handle the large mag_sq values
  * computed from 16-bit accelerometer samples (max ~3.2e9 before sqrt).
@@ -84,9 +112,9 @@ void SleepMonitor_Update(int16 ax, int16 ay, int16 az, uint32 rtc_seconds)
 
     /* Classify state */
     SleepState new_state;
-    if (rms > (uint32)SLEEP_AWAKE_THRESHOLD)
+    if (rms > Sleep_Awake_Thresh)
         new_state = SLEEP_STATE_AWAKE;
-    else if (rms > (uint32)SLEEP_LIGHT_THRESHOLD)
+    else if (rms > Sleep_Light_Thresh)
         new_state = SLEEP_STATE_LIGHT;
     else
         new_state = SLEEP_STATE_DEEP;
