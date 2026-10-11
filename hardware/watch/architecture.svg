@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1060" width="1500" height="1060">
+  <style>
+    .ttl{font:600 24px 'Segoe UI','Microsoft YaHei',system-ui,sans-serif;fill:#111827}
+    .sub{font:13px 'Segoe UI','Microsoft YaHei',system-ui,sans-serif;fill:#6b7280}
+    .blk{fill:#fbfcfe;stroke:#334155;stroke-width:1.6}
+    .newblk{fill:#fef2f2;stroke:#dc2626;stroke-width:1.8}
+    .btitle{font:600 13.5px 'Segoe UI','Microsoft YaHei',system-ui,sans-serif;fill:#0f172a}
+    .bmeta{font:11px 'Segoe UI','Microsoft YaHei',system-ui,sans-serif;fill:#64748b}
+    .pin{font:11.5px Consolas,ui-monospace,monospace;fill:#1e293b}
+    .pinsm{font:10.5px Consolas,ui-monospace,monospace;fill:#475569}
+    .amber{font:10.5px Consolas,ui-monospace,monospace;fill:#b45309}
+    .grp{font:10.5px Consolas,ui-monospace,monospace;fill:#334155}
+    .note{font:11.5px 'Segoe UI','Microsoft YaHei',system-ui,sans-serif;fill:#334155}
+    .lg{font:11px 'Segoe UI','Microsoft YaHei',system-ui,sans-serif;fill:#475569}
+    .badge{font:600 10px 'Segoe UI','Microsoft YaHei',system-ui,sans-serif;fill:#ffffff}
+    .w{stroke-width:1.6;fill:none}
+    .bus{stroke-width:4.5;fill:none;stroke-linecap:round}
+    .pwr{stroke-width:5;fill:none;stroke-linecap:round}
+    .cI2C{stroke:#059669}
+    .cGPIO{stroke:#64748b}
+    .cAN{stroke:#ea580c}
+    .cPWR{stroke:#dc2626}
+  </style>
+
+  <rect width="1500" height="1060" fill="#ffffff"/>
+
+  <text class="ttl" x="750" y="38" text-anchor="middle">Lyra 智能手表 — 硬件架构（决策 1-5 已定稿）</text>
+  <text class="sub" x="750" y="62" text-anchor="middle">100-LQFP · 片内 FlexNVM · 成品 OLED 模块 · 振动马达 · 原型优先（小时级续航）· 23 根信号引脚</text>
+  <text class="sub" x="750" y="82" text-anchor="middle" fill="#b45309">引脚为建议方案（三条 I2C 落在 I2C0/I2C1/I2C2 物理脚上，留硬件外设升级余地）· 仍需对照 100 LQFP 引脚表确认 · 红框为新增电路</text>
+
+  <!-- ===== MCU ===== -->
+  <rect class="blk" x="590" y="100" width="320" height="784" rx="6" fill="#eef2f7"/>
+  <text class="btitle" x="750" y="128" text-anchor="middle" font-size="15">MK64FX512VLL12</text>
+  <text class="bmeta" x="750" y="147" text-anchor="middle">100-LQFP · 14 × 14 mm · Cortex-M4F</text>
+  <text class="bmeta" x="750" y="164" text-anchor="middle">512 KB Flash + 128 KB FlexNVM + 256 KB SRAM</text>
+  <line x1="610" y1="178" x2="890" y2="178" stroke="#cbd5e1"/>
+  <text class="pinsm" x="750" y="198" text-anchor="middle">13 根位带信号可任意重排</text>
+  <text class="pinsm" x="750" y="214" text-anchor="middle">10 根受约束（晶振 ×4 · SWD ×2 · RESET · ADC · UART ×2）</text>
+  <text class="amber" x="750" y="234" text-anchor="middle">⚠ PLL 配置算术存疑：表标 100 MHz，注释公式算得 84 MHz</text>
+
+  <text class="grp" x="602" y="268">VDD / VDDA</text>
+  <text class="grp" x="602" y="320">ADC0_DP0</text>
+  <text class="grp" x="602" y="452">EXTAL</text>
+  <text class="grp" x="602" y="500">EXTAL32</text>
+  <text class="grp" x="602" y="612">FlexNVM</text>
+  <text class="grp" x="602" y="730">SWD</text>
+  <text class="grp" x="602" y="842">UART4</text>
+
+  <text class="grp" x="898" y="170" text-anchor="end">PTB0/PTB1</text>
+  <text class="grp" x="898" y="306" text-anchor="end">PTA12/PTA11</text>
+  <text class="grp" x="898" y="440" text-anchor="end">PTC10/PTC11</text>
+  <text class="grp" x="898" y="455" text-anchor="end">PTB2/PTB3</text>
+  <text class="grp" x="898" y="610" text-anchor="end">PTC0-PTC3</text>
+  <text class="grp" x="898" y="742" text-anchor="end">PTC4</text>
+
+  <!-- ===== POWER ===== -->
+  <rect class="newblk" x="60" y="100" width="420" height="240" rx="6"/>
+  <rect x="404" y="88" width="46" height="18" rx="9" fill="#dc2626"/>
+  <text class="badge" x="427" y="101" text-anchor="middle">新增</text>
+  <text class="btitle" x="76" y="124" fill="#991b1b">电源系统　固件中完全不存在</text>
+
+  <rect x="76" y="136" width="88" height="40" rx="4" fill="#fff" stroke="#dc2626" stroke-width="1.2"/>
+  <text class="pinsm" x="120" y="152" text-anchor="middle">USB 5 V</text>
+  <text class="pinsm" x="120" y="167" text-anchor="middle">输入</text>
+
+  <rect x="180" y="136" width="88" height="40" rx="4" fill="#fff" stroke="#dc2626" stroke-width="1.2"/>
+  <text class="pinsm" x="224" y="152" text-anchor="middle">充电 IC</text>
+  <text class="pinsm" x="224" y="167" text-anchor="middle">单节线性</text>
+
+  <rect x="284" y="136" width="88" height="40" rx="4" fill="#fff" stroke="#dc2626" stroke-width="1.2"/>
+  <text class="pinsm" x="328" y="152" text-anchor="middle">锂聚合物</text>
+  <text class="pinsm" x="328" y="167" text-anchor="middle">带保护板</text>
+
+  <rect x="388" y="136" width="76" height="40" rx="4" fill="#fff" stroke="#dc2626" stroke-width="1.2"/>
+  <text class="pinsm" x="426" y="152" text-anchor="middle">3.3 V</text>
+  <text class="pinsm" x="426" y="167" text-anchor="middle">LDO</text>
+
+  <path class="w cPWR" d="M164 156 H180"/>
+  <path class="w cPWR" d="M268 156 H284"/>
+  <path class="w cPWR" d="M372 156 H388"/>
+
+  <text class="pin" x="76" y="200">电池分压 + 滤波电容 → ADC0_DP0（电量检测）</text>
+  <text class="pinsm" x="76" y="218">固件需新增；原 adc_scope 菜单删掉后正好腾出这一路</text>
+  <text class="pinsm" x="76" y="238">LDO 在电池降到约 3.5 V 后失去调节 —— 损失放电曲线尾段</text>
+  <text class="pinsm" x="76" y="254">要吃满容量需换 buck-boost（多一组电感，布局更复杂）</text>
+  <text class="pinsm" x="76" y="274">VBAT 原型直接接 3.3 V；代价是电池耗尽后 RTC 丢时间</text>
+  <text class="pinsm" x="76" y="290">VDDA / VREFH 需与数字分开滤波，关系到电量读数精度</text>
+  <text class="note" x="76" y="314" fill="#991b1b">⚠ 固件无任何低功耗代码（LLWU / WFI 仅存在于 CMSIS 头文件）</text>
+  <text class="pinsm" x="76" y="332">100 MHz 常开 + PIT 1 ms + 主循环空转 + OLED 持续刷新 ⇒ 小时级</text>
+
+  <path class="pwr cPWR" d="M480 268 H590"/>
+  <path class="w cAN" d="M480 320 H590"/>
+
+  <!-- ===== CLOCKS ===== -->
+  <rect class="blk" x="60" y="366" width="420" height="164" rx="6"/>
+  <text class="btitle" x="76" y="390">时钟源　已查实，与常规接法不同</text>
+  <text class="pin" x="76" y="414">50 MHz　→　EXTAL</text>
+  <text class="pinsm" x="76" y="432" fill="#b45309">必须用有源晶振（oscillator can），不是无源晶体</text>
+  <text class="pinsm" x="76" y="448">mcg.c 从未写 MCG_C2_EREFS ⇒ EREFS=0 ⇒ 片内振荡器被旁路</text>
+  <text class="pinsm" x="76" y="464">XTAL 脚悬空 · 不需要负载电容 · 晶振自身需去耦电容</text>
+  <text class="pin" x="76" y="488">32.768 kHz　→　EXTAL32 / XTAL32</text>
+  <text class="pinsm" x="76" y="506">无源晶体 · rtc.c 已选片内 16 pF 负载电容 ⇒ 不需外部电容</text>
+  <text class="pinsm" x="76" y="522">两者接法相反，搞错板子上电就不跑</text>
+  <path class="w cAN" d="M480 414 H560 V452 H590"/>
+  <path class="w cAN" d="M480 488 H560"/>
+
+  <!-- ===== FlexNVM ===== -->
+  <rect class="blk" x="60" y="556" width="420" height="104" rx="6" fill="#f0fdf4" stroke="#059669" stroke-width="1.8"/>
+  <text class="btitle" x="76" y="580" fill="#065f46">配置存储　片内 FlexNVM　128 KB</text>
+  <text class="pinsm" x="76" y="600">决策 2：删掉外挂 W25Q80 ⇒ SPI2 整个不用，省 4 个引脚 + 一颗芯片</text>
+  <text class="pinsm" x="76" y="618">存 70 字节配置：闹钟表、步数/睡眠目标、7 天历史、各类阈值</text>
+  <text class="pinsm" x="76" y="636">固件只需用 FlexNVM 重写 3 个函数，26 个调用点一行不改</text>
+  <text class="pinsm" x="76" y="652">零引脚、零走线、零封装占位</text>
+
+  <!-- ===== SWD ===== -->
+  <rect class="blk" x="60" y="686" width="420" height="86" rx="6"/>
+  <text class="btitle" x="76" y="710">调试口 SWD</text>
+  <text class="pin" x="76" y="732">SWD_CLK PTA0 · SWD_DIO PTA3 · RESET_b</text>
+  <text class="pinsm" x="76" y="751">4 个测试点即可；PTA1/PTA2（JTAG TDI/TDO）可省</text>
+  <text class="pinsm" x="76" y="767">这三根在任何封装上都必然存在，不用查手册</text>
+  <path class="w cGPIO" d="M480 732 H590 V730"/>
+
+  <!-- ===== UART ===== -->
+  <rect class="blk" x="60" y="798" width="420" height="86" rx="6"/>
+  <text class="btitle" x="76" y="822">UART4 遥测测试点（可选）</text>
+  <text class="pin" x="76" y="844">RX PTC14 · TX PTC15　备选 PTE25 / PTE24</text>
+  <text class="pinsm" x="76" y="863" fill="#b45309">唯一真正需要查手册的受约束引脚 —— 100 脚上是否存在</text>
+  <text class="pinsm" x="76" y="879">100 Hz 发姿态融合中间量，纯调试，产品功能不需要</text>
+  <path class="w cGPIO" d="M480 844 H560 V842 H590"/>
+
+  <!-- ===== OLED ===== -->
+  <rect class="blk" x="1020" y="100" width="420" height="128" rx="6" fill="#f0fdf4" stroke="#059669" stroke-width="1.8"/>
+  <text class="btitle" x="1036" y="124" fill="#065f46">SSD1306 OLED 0.96" 模块　128 × 64　0x3C　★ 唯一 UI 屏</text>
+  <text class="pin" x="1036" y="146">SCL PTB0　SDA PTB1　（位带 I2C，亦为 I2C0 物理脚）</text>
+  <text class="pinsm" x="1036" y="165">决策 3：成品 4 脚模块，电荷泵外围由模块厂家解决</text>
+  <text class="pinsm" x="1036" y="183">全部 16 个菜单功能的 Render_*() 都收尾于此，已逐个核实</text>
+  <text class="pinsm" x="1036" y="201">帧缓冲 g_fb = uint8[64][16] = 1024 B，全局共用一份</text>
+  <text class="pinsm" x="1036" y="219">模块要对准表壳开窗 —— 这是布局的主约束之一</text>
+  <path class="bus cI2C" d="M910 170 H1020 V164"/>
+
+  <!-- ===== MPU6050 ===== -->
+  <rect class="blk" x="1020" y="254" width="420" height="104" rx="6"/>
+  <text class="btitle" x="1036" y="278">MPU6050　6 轴 IMU　0x68</text>
+  <text class="pin" x="1036" y="300">SCL PTA12　SDA PTA11　（位带 I2C，亦为 I2C2 物理脚）</text>
+  <text class="pinsm" x="1036" y="319">驱动 6 个功能：计步、睡眠、跌倒、倾斜报警、姿态、陀螺表盘</text>
+  <text class="pinsm" x="1036" y="337">INT 脚固件未用，但建议引出 —— 将来做抬手亮屏/运动唤醒要用</text>
+  <text class="pinsm" x="1036" y="353">需外部上拉（固件未开内部上拉）</text>
+  <path class="bus cI2C" d="M910 306 H1020 V300"/>
+
+  <!-- ===== MAX30102 ===== -->
+  <rect class="blk" x="1020" y="384" width="420" height="140" rx="6"/>
+  <text class="btitle" x="1036" y="408">MAX30102　心率 / 血氧　0x57</text>
+  <text class="pin" x="1036" y="430">SCL PTC10　SDA PTC11　（亦为 I2C1 物理脚）</text>
+  <text class="pin" x="1036" y="449">INT PTB2　　LED 驱动 PTB3</text>
+  <text class="pinsm" x="1036" y="465" fill="#b45309">⚠ 原 PTA7 被 GPIO 与 FTM0_CH4 重复声明，新板只画一条网络</text>
+  <text class="pinsm" x="1036" y="484">算法链吃 ≈14 KB RAM（500 点数据复制三份），最大单项</text>
+  <text class="pinsm" x="1036" y="502">必须放表背、贴皮肤、做遮光 —— 布局的另一个主约束</text>
+  <text class="pinsm" x="1036" y="518">LED 驱动回流要远离电池分压，避免干扰电量读数</text>
+  <path class="bus cI2C" d="M910 440 H1020 V430"/>
+  <path class="w cGPIO" d="M910 455 H990 V430"/>
+
+  <!-- ===== keys ===== -->
+  <rect class="blk" x="1020" y="550" width="420" height="120" rx="6"/>
+  <text class="btitle" x="1036" y="574">按键 × 4　菜单导航的全部所需</text>
+  <text class="pin" x="1036" y="596">KEY0 PTC0　进入 / 确认　　KEY1 PTC1　返回</text>
+  <text class="pin" x="1036" y="615">KEY2 PTC2　上一项 / 减　　KEY3 PTC3　下一项 / 加</text>
+  <text class="pinsm" x="1036" y="634" fill="#b45309">低电平有效，固件未开内部上拉 ⇒ 需外部上拉电阻</text>
+  <text class="pinsm" x="1036" y="652">任意键可解除闹钟。位置由表壳侧面决定</text>
+  <path class="bus cGPIO" d="M910 610 H1020 V615"/>
+
+  <!-- ===== motor ===== -->
+  <rect class="newblk" x="1020" y="696" width="420" height="104" rx="6"/>
+  <text class="btitle" x="1036" y="720" fill="#991b1b">振动马达　PTC4　（决策 4）</text>
+  <text class="pin" x="1036" y="742">低边 N-MOSFET + 续流二极管 + 就近储能电容</text>
+  <text class="pinsm" x="1036" y="761">beep.c 是纯 GPIO 电平翻转，不是 PWM ⇒ 固件零改动</text>
+  <text class="pinsm" x="1036" y="778">服务：闹钟、跌倒报警、倾斜报警</text>
+  <text class="pinsm" x="1036" y="794">启动电流大，回流路径要远离 MAX30102 和电池分压</text>
+  <path class="w cGPIO" d="M910 742 H1020"/>
+
+  <!-- ===== removed ===== -->
+  <rect x="60" y="910" width="1380" height="94" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text class="btitle" x="76" y="934" fill="#475569">从开发板剥离的部分（已逐项核实对手表功能零贡献）</text>
+  <text class="note" x="76" y="956">ILI9341 320×240 彩屏 + FlexBus 29 根信号：只在 main.c:164 开机贴一张 BMP —— 连带省掉 150 KB flash、SD 卡 + FatFs、外部 SRAM，板上再无高速并口</text>
+  <text class="note" x="76" y="976">ST7565R 单色 LCM：只显示 5 页调试变量 + 死机现场（注意 maps_dock_lcm_lib.h 的位图表被 OLED 复用，驱动可删、位图必须留）　·　W25Q80：改用片内 FlexNVM</text>
+  <text class="note" x="76" y="996">五向摇杆：5 向只有 3 向有行为且只服务 LCM，Select 还接在 PTA4 = NMI　·　4 个 LED：仅心跳闪和死机闪　·　ADC 双通道示波器：ADC0_DP0 让给电量检测</text>
+
+  <!-- legend -->
+  <path class="pwr cPWR" d="M1120 952 H1150"/><text class="lg" x="1156" y="956">电源</text>
+  <path class="bus cI2C" d="M1210 952 H1240"/><text class="lg" x="1246" y="956">I2C</text>
+  <path class="bus cGPIO" d="M1292 952 H1322"/><text class="lg" x="1328" y="956">GPIO</text>
+  <path class="w cAN" d="M1382 952 H1412"/><text class="lg" x="1418" y="956">模拟/时钟</text>
+</svg>
